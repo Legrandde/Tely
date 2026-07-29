@@ -119,7 +119,8 @@ export default function ChartSection() {
                 boxShadow: "0 4px 20px rgba(0,0,0,0.08)",
                 fontSize: "12px",
               }}
-              formatter={(value: number) => [value.toLocaleString(), ""]}
+              // eslint-disable-next-line @typescript-eslint/no-explicit-any
+              formatter={(value: any) => [value ? Number(value).toLocaleString() : "0", ""]}
             />
 
             {/* Last year — pointillés bleus */}

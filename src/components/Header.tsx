@@ -1,6 +1,22 @@
 import { Search, Settings, Bell } from "lucide-react";
+import { useAuth } from "../context/authContext";
+
 
 export default function Header({ title = "Tableau de bord" }: { title?: string }) {
+  const { user } = useAuth();
+
+  const nomComplet = user
+    ? `${user.prenom ?? ""} ${user.nom ?? ""}`.trim()
+    : "";
+  const initiales = nomComplet
+    ? nomComplet
+        .split(" ")
+        .filter(Boolean)
+        .map((mot) => mot.charAt(0).toUpperCase())
+        .slice(0, 2)
+        .join("")
+    : "?";
+
   return (
     <div className="flex items-center h-14 justify-between px-6 py-4 bg-white shadow-sm w-full">
       
@@ -32,12 +48,22 @@ export default function Header({ title = "Tableau de bord" }: { title?: string }
         </div>
 
         {/* Avatar */}
-        <div className="w-9 h-9 rounded-full overflow-hidden cursor-pointer ring-2 ring-amber-500">
-          <img
-            src="https://i.pravatar.cc/150?img=47"
-            alt="avatar"
-            className="w-full h-full object-cover"
-          />
+        <div
+          className="w-9 h-9 rounded-full overflow-hidden cursor-pointer ring-2 ring-amber-500 flex-shrink-0"
+          title={nomComplet || undefined}
+        >
+          {user?.avatar ? (
+            <img
+              src={user.avatar}
+              alt={nomComplet || "avatar"}
+              referrerPolicy="no-referrer"
+              className="w-full h-full object-cover"
+            />
+          ) : (
+            <div className="w-full h-full bg-amber-500 text-white flex items-center justify-center text-xs font-semibold">
+              {initiales}
+            </div>
+          )}
         </div>
 
       </div>
