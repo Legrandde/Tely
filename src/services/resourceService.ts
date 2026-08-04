@@ -78,6 +78,7 @@ export async function getProfesseurs() {
 // ─── Élèves (création en 2 étapes : compte user puis profil élève) ───
 export async function listEleves() {
   const { data } = await api.get("/api/eleves");
+  console.log(data)
   return Array.isArray(data) ? data : data.data;
 }
 
