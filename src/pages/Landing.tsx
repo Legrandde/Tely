@@ -3,9 +3,13 @@ import { Link, useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import Service from "../components/Services";
 import { GoArrowRight } from "react-icons/go";
-import NiveauCard from "../components/NiveauCard";
+import PartainerSponsor from "../components/PartenaireSponsort";
 import Header from "../components/ui/Header";
 import { useAuth } from "../context/authContext";
+import RechercheCours from "../components/RechercheCours";
+import TemoinSection from "../components/TemoinSection";
+import NouvelleLettre from "../components/NouvelleLettre";
+import FooterSection from "../components/FooterSection";
 
 
 // ── Variants ────────────────────────────────────────────────────────────────
@@ -122,9 +126,29 @@ export default function Landing() {
           </div>
         </div>
 
-        {/* Section des niveaux */}
+        {/* Section Partenaires/Sponsors */}
         <div className="flex flex-col p-3 items-center justify-center">
-            <NiveauCard />
+            <PartainerSponsor />
+        </div>
+           
+        {/* Section Partenaires/Sponsors */}
+        <div className="flex flex-col p-3 items-center justify-center">
+            <RechercheCours />
+        </div>
+
+        {/* Section Partenaires/Sponsors */}
+        <div className="flex flex-col p-3 items-center justify-center">
+            <TemoinSection />
+        </div>
+
+        {/* Section Partenaires/Sponsors */}
+        <div className="flex flex-col p-16 items-center justify-center">
+            <NouvelleLettre />
+        </div>
+
+        {/* Section Partenaires/Sponsors */}
+        <div className="flex flex-col p-10 items-center justify-center">
+            <FooterSection />
         </div>
       </div>
   );
