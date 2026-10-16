@@ -49,7 +49,7 @@ export default function Header({ title = "Tableau de bord" }: { title?: string }
 
         {/* Avatar */}
         <div
-          className="w-9 h-9 rounded-full overflow-hidden cursor-pointer ring-2 ring-amber-500 flex-shrink-0"
+          className="w-9 h-9 rounded-full overflow-hidden cursor-pointer ring-2 ring-amber-500 shrink-0"
           title={nomComplet || undefined}
         >
           {user?.avatar ? (
