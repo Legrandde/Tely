@@ -67,7 +67,7 @@ export default function Header() {
           initial="hidden"
           animate="show"
         >
-          {["Exercices", "Anciens Sujets", "Corrections"].map((item) => (
+          {["Exercices", "Sujets", "Corrections"].map((item) => (
             <motion.span key={item} variants={navItemVariant} className="cursor-pointer">
                <Link to={`/${item}`}>{item}</Link>
             </motion.span>

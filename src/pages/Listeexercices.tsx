@@ -25,6 +25,7 @@ export default function ListeExercices() {
     setFiltres({ ...nouveauxFiltres, page: 1 });
   }
 
+  
   function goToPage(p: number) {
     if (p < 1 || p > totalPages) return;
     setFiltres({ ...filtres, page: p });

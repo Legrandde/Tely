@@ -18,6 +18,8 @@ import GestionEleves from "../pages/GestionEleves";
 import NotFoundPage from "../pages/NotFound";
 import { RequireGuest } from "./RequireGuest";
 import { RequireAuth } from "./RequireAuth";
+import ListeSujets from "../pages/ListeSujets";
+import SujetDetailPage from "../pages/SujetsDetailPage";
 
 export const Route = createBrowserRouter([
     {
@@ -106,8 +108,16 @@ export const Route = createBrowserRouter([
         element: <CourseDetailPage />
     },
     {
+        path: "ennoncer-sujet",
+        element: <SujetDetailPage />
+    },
+    {
         path: "Exercices",
         element: <ListeExercices />
+    },
+    {
+        path: "sujets",
+        element: <ListeSujets />
     },
     {
         path: "*",
