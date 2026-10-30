@@ -6,7 +6,6 @@ import { GoArrowRight } from "react-icons/go";
 import PartainerSponsor from "../components/PartenaireSponsort";
 import Header from "../components/ui/Header";
 import { useAuth } from "../context/authContext";
-import RechercheCours from "../components/RechercheCours";
 import TemoinSection from "../components/TemoinSection";
 import NouvelleLettre from "../components/NouvelleLettre";
 import FooterSection from "../components/FooterSection";
@@ -41,7 +40,7 @@ export default function Landing() {
 
         {/* ── Hero text block ──────────────────────────────────────────────── */}
         <motion.div
-          className="flex self-center flex-col w-96 gap-4"
+          className="flex self-center flex-col w-full max-w-xl px-4 gap-4"
           variants={staggerContainer}
           initial="hidden"
           animate="show"
@@ -120,36 +119,23 @@ export default function Landing() {
             
           </motion.div >
           <div className="flex bg-amber-50 p-3 items-center gap-7 mt-7 justify-center flex-col">
-            <h2 className="font-semibold text-2xl">Commencez dés maintenant a vous exercer!</h2>
-            <p className="text-center w-96 self-center">Lorem ipsum dolor sit amet consectetur, adipisicing elit. Modi unde quam iusto, perferendis harum nostrum inventore libero neque illo aspernatur aperiam praesentium temporibus</p>
-            <button className="p-1 shadow-xl  bg-black rounded-lg flex items-center gap-4 text-white">Commencer la pratique <GoArrowRight /> </button>
+            <h2 className="font-semibold text-2xl text-center">Commencez dès maintenant à vous exercer !</h2>
+            <p className="text-center w-full max-w-xl self-center">Des milliers d'exercices, d'anciens sujets d'examen et de corrigés détaillés vous attendent. Choisissez votre niveau et votre matière, entraînez-vous à votre rythme et suivez vos progrès pour aborder vos examens en toute confiance.</p>
+            <button onClick={() => navigate('/exercices')} className="p-1 shadow-xl cursor-pointer bg-black rounded-lg flex items-center gap-4 text-white px-3 py-2">Commencer la pratique <GoArrowRight /> </button>
           </div>
         </div>
 
-        {/* Section Partenaires/Sponsors */}
-        <div className="flex flex-col p-3 items-center justify-center">
-            <PartainerSponsor />
-        </div>
-           
-        {/* Section Partenaires/Sponsors */}
-        <div className="flex flex-col p-3 items-center justify-center">
-            <RechercheCours />
-        </div>
+        {/* Section Partenaires */}
+        <PartainerSponsor />
 
-        {/* Section Partenaires/Sponsors */}
-        <div className="flex flex-col p-3 items-center justify-center">
-            <TemoinSection />
-        </div>
+        {/* Section Témoignages */}
+        <TemoinSection />
 
-        {/* Section Partenaires/Sponsors */}
-        <div className="flex flex-col p-16 items-center justify-center">
-            <NouvelleLettre />
-        </div>
+        {/* Section Newsletter */}
+        <NouvelleLettre />
 
-        {/* Section Partenaires/Sponsors */}
-        <div className="flex flex-col p-10 items-center justify-center">
-            <FooterSection />
-        </div>
+        {/* Section Footer */}
+        <FooterSection />
       </div>
   );
 }

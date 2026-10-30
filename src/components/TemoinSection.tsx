@@ -1,76 +1,81 @@
-import { Star, ChevronLeft, ChevronRight } from "lucide-react";
+import { motion } from "framer-motion";
+import { Star } from "lucide-react";
 
 const testimonials = [
   {
-    name: "Alexa Rodriguez",
-    role: "Web Developer",
+    name: "Awa Diallo",
+    role: "Élève en Terminale",
     avatar: "https://randomuser.me/api/portraits/women/65.jpg",
-    text: "Enrolling in courses at this eLearning platform was a game-changer for me. Absolutely transformative experience!",
+    text: "Utiliser cette plateforme a tout changé pour moi. Les exercices et les anciens sujets rendent les révisions tellement plus simples !",
   },
   {
-    name: "Emily Chen",
-    role: "UI/UX Designer",
-    avatar: "https://randomuser.me/api/portraits/women/44.jpg",
-    text: "Exceptional courses! The practical insights and flexible learning structure have been instrumental in my professional growth.",
-  },
-  {
-    name: "James Johnson",
-    role: "Web Developer",
+    name: "Mamadou Sow",
+    role: "Étudiant en prépa",
     avatar: "https://randomuser.me/api/portraits/men/32.jpg",
-    text: "Highly recommend! The personalized feedback and real-world application in the courses have elevated my understanding...",
+    text: "Des ressources exceptionnelles ! Les corrigés détaillés et la liberté de m'entraîner à mon rythme ont été essentiels dans ma progression.",
+  },
+  {
+    name: "Fatou Ndiaye",
+    role: "Élève en 1ère",
+    avatar: "https://randomuser.me/api/portraits/women/44.jpg",
+    text: "Je recommande vivement ! Les solutions pas à pas et l'immense bibliothèque d'exercices ont vraiment renforcé ma compréhension.",
   },
 ];
+
+const fadeUp = {
+  hidden: { opacity: 0, y: 24 },
+  show: { opacity: 1, y: 0 },
+};
 
 // carte temoignage
 function TestimonialCard({ name, role, avatar, text }: { name: string; role: string; avatar: string; text: string }) {
   return (
-    <div className="rounded-2xl bg-white p-6 shadow-lg">
+    <motion.div
+      variants={fadeUp}
+      transition={{ duration: 0.5, ease: "easeOut" }}
+      className="flex flex-col gap-4 rounded-lg border bg-white p-6 shadow-lg"
+    >
       <div className="flex items-center gap-3">
         <img
           src={avatar}
           alt={name}
-          className="h-12 w-12 rounded-full border-2 border-purple-400 object-cover"
+          className="h-12 w-12 rounded-full border-2 border-amber-500 object-cover"
         />
         <div>
-          <h3 className="font-bold text-purple-600">{name}</h3>
-          <p className="text-xs text-slate-400">{role}</p>
+          <h3 className="font-bold text-black">{name}</h3>
+          <p className="text-xs text-black/50">{role}</p>
           <div className="mt-1 flex gap-0.5">
             {Array.from({ length: 5 }).map((_, i) => (
-              <Star key={i} size={12} className="fill-yellow-400 text-yellow-400" />
+              <Star key={i} size={12} className="fill-amber-500 text-amber-500" />
             ))}
           </div>
         </div>
       </div>
-      <p className="mt-4 text-sm text-slate-500">{text}</p>
-    </div>
+      <p className="text-sm text-black/70">{text}</p>
+    </motion.div>
   );
 }
 
 export default function TestimonialsSection() {
   return (
-    <section className="bg-linear-to-br from-gray-200 to-amber-50 px-6 pb-32 pt-20 w-full">
-      <h2 className="text-center text-3xl font-extrabold text-amber-500">Student's Testimonials</h2>
-      <p className="mx-auto mt-3 max-w-xl text-center text-sm text-black/80">
-        Here's what our students have to say about their transformative learning experience: Real
-        stories, real growth. Discover firsthand the impact our courses have had on their lives.
+    <section className="w-full bg-amber-50 px-6 py-16">
+      <h2 className="text-center text-3xl font-bold text-black">Témoignages de nos élèves</h2>
+      <p className="mx-auto mt-3 max-w-xl text-center text-base text-black/70">
+        Voici ce que nos élèves pensent de leur expérience : des histoires vraies, de vrais progrès.
+        Découvrez l'impact de notre plateforme sur leur réussite.
       </p>
 
-      <div className="mx-auto mt-12 grid max-w-5xl gap-6 md:grid-cols-3">
+      <motion.div
+        className="mx-auto mt-12 grid max-w-5xl gap-6 md:grid-cols-3"
+        initial="hidden"
+        whileInView="show"
+        viewport={{ once: true, amount: 0.2 }}
+        variants={{ show: { transition: { staggerChildren: 0.12 } } }}
+      >
         {testimonials.map((t, i) => (
           <TestimonialCard key={i} {...t} />
         ))}
-      </div>
-
-      {/* pagination */}
-      <div className="mt-8 flex items-center justify-center gap-4 text-black">
-        <button aria-label="Précédent">
-          <ChevronLeft size={18} />
-        </button>
-        <span className="text-sm">01/15</span>
-        <button aria-label="Suivant">
-          <ChevronRight size={18} />
-        </button>
-      </div>
+      </motion.div>
     </section>
   );
 }

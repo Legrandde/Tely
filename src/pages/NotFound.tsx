@@ -63,13 +63,6 @@ export default function NotFoundPage() {
             </Link>
             <span className="text-gray-300">•</span>
             <Link
-              to="/cours"
-              className="text-sm text-orange-600 hover:text-orange-700 font-medium transition-colors"
-            >
-              Cours
-            </Link>
-            <span className="text-gray-300">•</span>
-            <Link
               to="/contact"
               className="text-sm text-orange-600 hover:text-orange-700 font-medium transition-colors"
             >
