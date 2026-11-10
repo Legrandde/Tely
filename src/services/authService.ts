@@ -1,18 +1,33 @@
-import api from "../api/axio"; // adapte le chemin vers ton instance axios
+import api from "../api/axio";
 import { setAccess, clearAccess } from "../utils/storage";
 
-interface LoginPayload {
-  email: string;
-  password: string;
-}
-
-interface AuthUser {
+export interface AuthUser {
   id: number;
   nom: string;
   prenom: string;
   email: string;
   avatar: string | null;
+  avatar_url?: string | null;
   role: "eleve" | "professeur" | "administrateur";
+  professeur?: {
+    id: number;
+    specialite?: string;
+  } | null;
+  eleve?: {
+    id: number;
+    matricule?: string;
+    classe?: string;
+    niveau_id?: number;
+    niveau?: {
+      id: number;
+      nom: string;
+    };
+  } | null;
+}
+
+interface LoginPayload {
+  email: string;
+  password: string;
 }
 
 interface LoginResponse {
@@ -43,6 +58,12 @@ export function loginWithGoogle(): void {
   window.location.href = `${import.meta.env.VITE_API_URL}/api/auth/google`;
 }
 
+export async function loginWithGoogleOneTap(credential: string): Promise<AuthUser> {
+  const { data } = await api.post<LoginResponse>("/api/auth/google/one-tap", { credential });
+  setAccess(data.token);
+  return data.user;
+}
+
 interface RegisterPayload {
   nom: string;
   prenom?: string;
@@ -58,7 +79,6 @@ export async function register(payload: RegisterPayload): Promise<AuthUser> {
   return data.user;
 }
 
-// =================================== pour la réinitialisation du mot de pas =================
 export async function forgotPassword(email: string): Promise<{ message: string }> {
   const { data } = await api.post("/api/auth/forgot-password", { email });
   return data;
@@ -71,5 +91,26 @@ export async function resetPassword(payload: {
   password_confirmation: string;
 }): Promise<{ message: string }> {
   const { data } = await api.post("/api/auth/reset-password", payload);
+  return data;
+}
+
+export async function updateProfile(
+  payload: FormData | Record<string, unknown>
+): Promise<{ message: string; user: AuthUser }> {
+  const isFormData = payload instanceof FormData;
+  const { data } = await api.post<{ message: string; user: AuthUser }>(
+    "/api/auth/profile",
+    payload,
+    isFormData ? { headers: { "Content-Type": "multipart/form-data" } } : undefined
+  );
+  return data;
+}
+
+export async function updatePassword(payload: {
+  current_password: string;
+  password: string;
+  password_confirmation: string;
+}): Promise<{ message: string }> {
+  const { data } = await api.put<{ message: string }>("/api/auth/password", payload);
   return data;
 }

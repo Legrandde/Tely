@@ -7,6 +7,7 @@ import { matiereSchema } from "../config/resourceSchemas";
 import { deleteMatiere, listMatieres } from "../services/resourceService";
 import type { MatiereItem } from "../types/admin";
 import { useToast } from "../context/ToastContext";
+import { resolveImageUrl } from "../utils/imageUrl";
 
 export default function GestionMatieres() {
   const [matieres, setMatieres] = useState<MatiereItem[]>([]);
@@ -95,27 +96,35 @@ export default function GestionMatieres() {
     ? {
         nom: editingMatiere.nom,
         code: editingMatiere.code,
+        image: editingMatiere.image || editingMatiere.image_url || "",
         description: editingMatiere.description ?? "",
       }
-    : {};
+    : {
+        image: "/banner1.png",
+      };
 
   return (
-    <div className="space-y-6">
-      {/* Entête */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-        <div>
-          <h1 className="text-xl font-bold text-gray-900">Gestion des matières</h1>
-          <p className="text-sm text-gray-500">
-            Configurez les disciplines scolaires enseignées et associées aux cours et exercices
-          </p>
+    <div className="p-4 sm:p-6 lg:p-8 space-y-6 max-w-7xl mx-auto">
+      {/* En-tête */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-white p-6 rounded-2xl border border-gray-100 shadow-sm">
+        <div className="flex items-center gap-3">
+          <div className="w-10 h-10 rounded-xl bg-amber-50 text-amber-500 flex items-center justify-center font-bold">
+            <Library size={22} />
+          </div>
+          <div>
+            <h1 className="text-xl font-bold text-gray-900">Matières & Disciplines</h1>
+            <p className="text-xs text-gray-500">
+              Gérez les matières du programme scolaire, leurs codes officiels et illustrations.
+            </p>
+          </div>
         </div>
 
         <button
           onClick={openCreate}
-          className="flex items-center gap-2 text-sm font-medium bg-amber-500 text-white rounded-xl px-4 py-2.5 hover:bg-amber-600 shadow-sm transition-colors cursor-pointer self-start sm:self-auto"
+          className="inline-flex items-center gap-2 px-4 py-2.5 bg-amber-500 hover:bg-amber-600 text-white text-xs font-semibold rounded-xl shadow-sm transition-colors cursor-pointer self-start sm:self-auto"
         >
           <Plus size={16} />
-          Ajouter une matière
+          Nouvelle matière
         </button>
       </div>
 
@@ -157,7 +166,7 @@ export default function GestionMatieres() {
           {!search && (
             <button
               onClick={openCreate}
-              className="text-sm font-medium text-amber-600 hover:text-amber-700 mt-3"
+              className="text-sm font-medium text-amber-600 hover:text-amber-700 mt-3 cursor-pointer"
             >
               Ajouter une première matière
             </button>
@@ -168,6 +177,7 @@ export default function GestionMatieres() {
           <table className="w-full text-sm">
             <thead>
               <tr className="bg-gray-50/75 text-left text-xs text-gray-500 uppercase tracking-wider border-b border-gray-100">
+                <th className="px-5 py-3.5">Illustration</th>
                 <th className="px-5 py-3.5">Nom de la matière</th>
                 <th className="px-5 py-3.5">Code</th>
                 <th className="px-5 py-3.5">Description</th>
@@ -176,66 +186,89 @@ export default function GestionMatieres() {
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-100">
-              {filteredMatieres.map((matiere) => (
-                <tr key={matiere.id} className="hover:bg-amber-50/30 transition-colors">
-                  <td className="px-5 py-3.5 font-medium text-gray-900 flex items-center gap-2">
-                    <span className="w-2.5 h-2.5 rounded-full bg-amber-400"></span>
-                    {matiere.nom}
-                  </td>
-                  <td className="px-5 py-3.5">
-                    <span className="px-2.5 py-1 text-xs font-semibold rounded-md bg-gray-100 text-gray-700 font-mono">
-                      {matiere.code}
-                    </span>
-                  </td>
-                  <td className="px-5 py-3.5 text-gray-500 max-w-md truncate">
-                    {matiere.description || <span className="text-gray-300 italic">Aucune description</span>}
-                  </td>
-                  <td className="px-5 py-3.5 text-center">
-                    <span className="px-2.5 py-0.5 text-xs font-semibold rounded-full bg-amber-50 text-amber-600">
-                      {matiere.exercices_count ?? 0}
-                    </span>
-                  </td>
-                  <td className="px-5 py-3.5 text-right">
-                    <div className="flex items-center justify-end gap-1.5">
-                      <button
-                        onClick={() => openEdit(matiere)}
-                        title="Modifier"
-                        className="p-1.5 rounded-lg text-gray-400 hover:text-amber-600 hover:bg-amber-50 transition-colors"
-                      >
-                        <Pencil size={15} />
-                      </button>
-                      <button
-                        onClick={() => setDeleteTarget(matiere)}
-                        title="Supprimer"
-                        className="p-1.5 rounded-lg text-gray-400 hover:text-red-500 hover:bg-red-50 transition-colors"
-                      >
-                        <Trash2 size={15} />
-                      </button>
-                    </div>
-                  </td>
-                </tr>
-              ))}
+              {filteredMatieres.map((matiere) => {
+                const imgUrl = resolveImageUrl(matiere.image_url || matiere.image);
+                return (
+                  <tr key={matiere.id} className="hover:bg-amber-50/30 transition-colors">
+                    <td className="px-5 py-3.5">
+                      <div className="w-11 h-11 rounded-xl overflow-hidden bg-gray-100 border border-gray-200 shrink-0">
+                        {imgUrl ? (
+                          <img
+                            src={imgUrl}
+                            alt={matiere.nom}
+                            className="w-full h-full object-cover"
+                          />
+                        ) : (
+                          <div className="w-full h-full flex items-center justify-center text-amber-500 font-bold text-xs bg-amber-50">
+                            {matiere.code?.slice(0, 3) || "MAT"}
+                          </div>
+                        )}
+                      </div>
+                    </td>
+                    <td className="px-5 py-3.5 font-medium text-gray-900 flex items-center gap-2 pt-5">
+                      <span className="w-2.5 h-2.5 rounded-full bg-amber-400"></span>
+                      {matiere.nom}
+                    </td>
+                    <td className="px-5 py-3.5">
+                      <span className="px-2.5 py-1 text-xs font-semibold rounded-md bg-gray-100 text-gray-700 font-mono">
+                        {matiere.code}
+                      </span>
+                    </td>
+                    <td className="px-5 py-3.5 text-gray-500 max-w-md truncate">
+                      {matiere.description || <span className="text-gray-300 italic">Aucune description</span>}
+                    </td>
+                    <td className="px-5 py-3.5 text-center">
+                      <span className="px-2.5 py-0.5 text-xs font-semibold rounded-full bg-amber-50 text-amber-600">
+                        {matiere.exercices_count ?? 0}
+                      </span>
+                    </td>
+                    <td className="px-5 py-3.5 text-right">
+                      <div className="flex items-center justify-end gap-1.5">
+                        <button
+                          onClick={() => openEdit(matiere)}
+                          title="Modifier"
+                          className="p-1.5 rounded-lg text-gray-400 hover:text-amber-600 hover:bg-amber-50 transition-colors cursor-pointer"
+                        >
+                          <Pencil size={15} />
+                        </button>
+                        <button
+                          onClick={() => setDeleteTarget(matiere)}
+                          title="Supprimer"
+                          className="p-1.5 rounded-lg text-gray-400 hover:text-red-500 hover:bg-red-50 transition-colors cursor-pointer"
+                        >
+                          <Trash2 size={15} />
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                );
+              })}
             </tbody>
           </table>
         </div>
       )}
 
-      {/* Modal Ajout / Modification */}
+      {/* Modal Création / Édition */}
       <Modal open={modalOpen} onClose={closeModal}>
+        <div className="mb-3">
+          <h2 className="text-base font-bold text-gray-900">
+            {editingMatiere ? `Modifier la matière "${editingMatiere.nom}"` : "Créer une nouvelle matière"}
+          </h2>
+        </div>
         <ResourceForm
           schema={matiereSchema}
-          resourceId={editingMatiere?.id}
           initialValues={initialValues}
+          resourceId={editingMatiere?.id}
           onSuccess={handleFormSuccess}
           onCancel={closeModal}
         />
       </Modal>
 
-      {/* Modal confirmation suppression */}
+      {/* Modal Confirmation Suppression */}
       <ConfirmModal
         open={!!deleteTarget}
-        title={`Supprimer la matière "${deleteTarget?.nom}" ?`}
-        description="Cette action est irréversible. Les exercices et sujets rattachés à cette matière pourraient être affectés."
+        title="Supprimer la matière"
+        description={`Êtes-vous sûr de vouloir supprimer la matière "${deleteTarget?.nom}" ? Tous les cours et exercices associés peuvent être impactés.`}
         loading={deleting}
         onConfirm={handleConfirmDelete}
         onCancel={() => setDeleteTarget(null)}

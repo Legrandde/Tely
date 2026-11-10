@@ -11,6 +11,7 @@ export interface ToastItem {
 
 interface ToastContextValue {
   showToast: (message: string, type?: ToastType, duration?: number) => void;
+  addToast: (type: ToastType, message: string, duration?: number) => void;
   success: (message: string) => void;
   error: (message: string) => void;
   warning: (message: string) => void;
@@ -52,13 +53,20 @@ export function ToastProvider({ children }: { children: React.ReactNode }) {
     [removeToast]
   );
 
+  const addToast = useCallback(
+    (type: ToastType, message: string, duration?: number) => {
+      showToast(message, type, duration);
+    },
+    [showToast]
+  );
+
   const success = useCallback((msg: string) => showToast(msg, "success"), [showToast]);
   const error = useCallback((msg: string) => showToast(msg, "error"), [showToast]);
   const warning = useCallback((msg: string) => showToast(msg, "warning"), [showToast]);
   const info = useCallback((msg: string) => showToast(msg, "info"), [showToast]);
 
   return (
-    <ToastContext.Provider value={{ showToast, success, error, warning, info }}>
+    <ToastContext.Provider value={{ showToast, addToast, success, error, warning, info }}>
       {children}
       {/* Container de toasts */}
       <div className="fixed bottom-5 right-5 z-[9999] flex flex-col gap-2.5 max-w-sm w-full pointer-events-none px-4 sm:px-0">
@@ -78,9 +86,10 @@ export function ToastProvider({ children }: { children: React.ReactNode }) {
             <button
               type="button"
               onClick={() => removeToast(toast.id)}
-              className="text-gray-400 hover:text-gray-600 p-0.5 rounded-md hover:bg-gray-100 transition-colors"
+              className="text-gray-400 hover:text-gray-600 transition-colors shrink-0"
+              title="Fermer"
             >
-              <X size={14} />
+              <X size={15} />
             </button>
           </div>
         ))}
@@ -90,9 +99,9 @@ export function ToastProvider({ children }: { children: React.ReactNode }) {
 }
 
 export function useToast() {
-  const ctx = useContext(ToastContext);
-  if (!ctx) {
-    throw new Error("useToast must be used within a ToastProvider");
+  const context = useContext(ToastContext);
+  if (!context) {
+    throw new Error("useToast doit être utilisé dans un ToastProvider");
   }
-  return ctx;
+  return context;
 }

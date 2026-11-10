@@ -5,6 +5,8 @@ import DashbordAdmin from "../pages/DashbordAdmin";
 import DashboardProfesseur from "../pages/DashboardProfesseur";
 import ProfesseurOverView from "../pages/professeur/ProfesseurOverView";
 import ProfesseurRessources from "../pages/professeur/ProfesseurRessources";
+import AdminStatistiques from "../pages/admin/AdminStatistiques";
+import ProfilePage from "../pages/ProfilePage";
 
 import CourseDetailPage from "../pages/CourseDetailPage";
 
@@ -94,6 +96,14 @@ export const Route = createBrowserRouter([
         element: <OverView />,
       },
       {
+        path: "statistiques",
+        element: <AdminStatistiques />,
+      },
+      {
+        path: "profile",
+        element: <ProfilePage />,
+      },
+      {
         path: "exercices",
         element: <GestionExercices />,
       },
@@ -153,6 +163,10 @@ export const Route = createBrowserRouter([
         element: <ProfesseurOverView />,
       },
       {
+        path: "profile",
+        element: <ProfilePage />,
+      },
+      {
         path: "exercices",
         element: <GestionExercices />,
       },
@@ -188,6 +202,10 @@ export const Route = createBrowserRouter([
         element: <ProfesseurOverView />,
       },
       {
+        path: "profile",
+        element: <ProfilePage />,
+      },
+      {
         path: "exercices",
         element: <GestionExercices />,
       },
@@ -204,6 +222,14 @@ export const Route = createBrowserRouter([
         element: <ProfesseurRessources />,
       },
     ],
+  },
+  {
+    path: "profile",
+    element: (
+      <RequireAuth>
+        <ProfilePage />
+      </RequireAuth>
+    ),
   },
   {
     path: "ennoncer",

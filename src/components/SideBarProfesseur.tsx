@@ -7,6 +7,7 @@ import {
   ClipboardList,
   CheckCircle2,
   FileText,
+  User,
   LogOut,
 } from "lucide-react";
 import { useNavigate, useLocation } from "react-router-dom";
@@ -42,6 +43,7 @@ export default function SideBarProfesseur() {
     { route: "sujets", label: "Sujets Examens", icon: <ClipboardList size={19} /> },
     { route: "corrections", label: "Corrigés & Solutions", icon: <CheckCircle2 size={19} /> },
     { route: "ressources", label: "Documents & PDFs", icon: <FileText size={19} /> },
+    { route: "profile", label: "Mon Profil", icon: <User size={19} /> },
   ];
 
   return (
@@ -63,7 +65,7 @@ export default function SideBarProfesseur() {
         <button
           type="button"
           onClick={() => setCollapsed(!collapsed)}
-          className="p-1.5 rounded-lg text-gray-400 hover:text-amber-500 hover:bg-amber-50 transition-colors mx-auto"
+          className="p-1.5 rounded-lg text-gray-400 hover:text-amber-500 hover:bg-amber-50 transition-colors mx-auto cursor-pointer"
           title={collapsed ? "Agrandir" : "Réduire"}
         >
           <FiSidebar size={18} />
@@ -91,7 +93,11 @@ export default function SideBarProfesseur() {
 
       {/* Profil enseignant en bas */}
       {!collapsed && user && (
-        <div className="mb-2 p-2.5 rounded-xl bg-amber-50/60 border border-amber-100/70 flex items-center gap-2.5">
+        <div
+          onClick={() => navigate("profile")}
+          className="mb-2 p-2.5 rounded-xl bg-amber-50/60 border border-amber-100/70 flex items-center gap-2.5 cursor-pointer hover:bg-amber-100/60 transition-colors"
+          title="Consulter mon profil"
+        >
           <div className="w-8 h-8 rounded-full bg-amber-500 text-white text-xs font-bold flex items-center justify-center shrink-0">
             {user.prenom?.[0] ?? "P"}
           </div>
@@ -100,7 +106,7 @@ export default function SideBarProfesseur() {
               {user.prenom} {user.nom}
             </p>
             <span className="text-[10px] text-amber-700 font-medium block">
-              Enseignant certifié
+              Enseignant • Voir profil
             </span>
           </div>
         </div>

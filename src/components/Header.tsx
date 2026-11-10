@@ -1,8 +1,11 @@
 import { Search, Settings, Bell } from "lucide-react";
 import { useAuth } from "../context/authContext";
-import { useLocation } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
+import { resolveImageUrl } from "../utils/imageUrl";
 
 const TITLES: Record<string, string> = {
+  statistiques: "Statistiques & Audience",
+  profile: "Mon Profil Utilisateur",
   exercices: "Gestion des exercices",
   sujets: "Gestion des sujets d'examen",
   corrections: "Gestion des corrections",
@@ -18,6 +21,7 @@ const TITLES: Record<string, string> = {
 export default function Header({ title }: { title?: string }) {
   const { user } = useAuth();
   const location = useLocation();
+  const navigate = useNavigate();
 
   const getPageTitle = () => {
     if (title) return title;
@@ -35,12 +39,21 @@ export default function Header({ title }: { title?: string }) {
     : "";
   const initiales = nomComplet
     ? nomComplet
-        .split(" ")
-        .filter(Boolean)
-        .map((mot) => mot.charAt(0).toUpperCase())
-        .slice(0, 2)
-        .join("")
+    .split(" ")
+    .filter(Boolean)
+    .map((mot) => mot.charAt(0).toUpperCase())
+    .slice(0, 2)
+    .join("")
     : "?";
+
+  const profilePath =
+    user?.role === "administrateur"
+      ? "/Dashbord-admin/profile"
+      : user?.role === "professeur"
+      ? "/Dashboard-professeur/profile"
+      : "/profile";
+
+  const avatarUrl = resolveImageUrl(user?.avatar_url || user?.avatar);
 
   return (
     <div className="flex items-center h-16 justify-between px-6 bg-white border-b border-gray-100 w-full shrink-0">
@@ -61,11 +74,12 @@ export default function Header({ title }: { title?: string }) {
           />
         </div>
 
-        {/* Settings */}
+        {/* Settings -> Profil */}
         <button
           type="button"
-          title="Paramètres"
-          className="p-2 rounded-lg text-gray-400 hover:text-amber-500 hover:bg-amber-50 transition-colors"
+          onClick={() => navigate(profilePath)}
+          title="Mon Profil & Paramètres"
+          className="p-2 rounded-lg text-gray-400 hover:text-amber-500 hover:bg-amber-50 transition-colors cursor-pointer"
         >
           <Settings size={18} />
         </button>
@@ -75,7 +89,7 @@ export default function Header({ title }: { title?: string }) {
           <button
             type="button"
             title="Notifications"
-            className="p-2 rounded-lg text-gray-400 hover:text-amber-500 hover:bg-amber-50 transition-colors"
+            className="p-2 rounded-lg text-gray-400 hover:text-amber-500 hover:bg-amber-50 transition-colors cursor-pointer"
           >
             <Bell size={18} />
           </button>
@@ -84,14 +98,16 @@ export default function Header({ title }: { title?: string }) {
           </span>
         </div>
 
-        {/* Avatar */}
-        <div
-          className="w-9 h-9 rounded-full overflow-hidden cursor-pointer ring-2 ring-amber-500/30 shrink-0"
-          title={nomComplet || undefined}
+        {/* Avatar cliquable */}
+        <button
+          type="button"
+          onClick={() => navigate(profilePath)}
+          className="w-9 h-9 rounded-full overflow-hidden cursor-pointer ring-2 ring-amber-500/30 hover:ring-amber-500 shrink-0 transition-all"
+          title={`Profil de ${nomComplet || "l'utilisateur"}`}
         >
-          {user?.avatar ? (
+          {avatarUrl ? (
             <img
-              src={user.avatar}
+              src={avatarUrl}
               alt={nomComplet || "avatar"}
               referrerPolicy="no-referrer"
               className="w-full h-full object-cover"
@@ -101,7 +117,7 @@ export default function Header({ title }: { title?: string }) {
               {initiales}
             </div>
           )}
-        </div>
+        </button>
       </div>
     </div>
   );

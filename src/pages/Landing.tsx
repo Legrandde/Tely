@@ -1,6 +1,7 @@
 import { ArrowRight } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
+import { useEffect } from "react";
 import Service from "../components/Services";
 import { GoArrowRight } from "react-icons/go";
 import PartainerSponsor from "../components/PartenaireSponsort";
@@ -9,10 +10,10 @@ import { useAuth } from "../context/authContext";
 import TemoinSection from "../components/TemoinSection";
 import NouvelleLettre from "../components/NouvelleLettre";
 import FooterSection from "../components/FooterSection";
-
+import GoogleOneTap from "../components/auth/GoogleOneTap";
+import { trackEvent } from "../services/analyticsTracker";
 
 // ── Variants ────────────────────────────────────────────────────────────────
-
 const fadeUp = {
   hidden: { opacity: 0, y: 24 },
   show:   { opacity: 1, y: 0  },
@@ -32,10 +33,16 @@ export default function Landing() {
   const navigate = useNavigate();
   const { isAuthenticated } = useAuth();
 
+  useEffect(() => {
+    trackEvent("page_view", "/");
+  }, []);
+
   return (
     <div className="flex flex-col gap-7">
-      <div className="flex flex-col w-full  bg-amber-50 gap-4">
+      {/* Google One Tap */}
+      <GoogleOneTap />
 
+      <div className="flex flex-col w-full bg-amber-50 gap-4">
         <Header />
 
         {/* ── Hero text block ──────────────────────────────────────────────── */}
@@ -68,7 +75,7 @@ export default function Landing() {
             transition={{ duration: 0.55, ease: "easeOut" }}
           >
             <motion.button
-              onClick={()=> navigate('/exercices')}
+              onClick={() => navigate('/exercices')}
               whileHover={{ scale: 1.06, backgroundColor: "#fbbf24" }}
               whileTap={{ scale: 0.96 }}
               className="bg-amber-500 cursor-pointer p-1 rounded-lg flex justify-center items-center gap-4 transition-colors duration-200"
@@ -108,34 +115,32 @@ export default function Landing() {
         />
       </div>
 
-
-
       {/* Services sections ------------------------------------------------------------------ */}
-        <div className="flex flex-col p-3">
-          <motion.div transition={{ duration: 0.55, ease: "easeOut" }} variants={fadeUp}   className="flex md:flex-row gap-2 items-center j flex-col justify-center">
-            <Service titre="Exercices" rotation={-2}/>
-            <Service titre="Sujets Exams" couleur="bg-white" image="banniere.png" />
-            <Service titre="Corrigés" image="banner3.png" couleur="bg-amber-200" rotation={2}/>
-            
-          </motion.div >
-          <div className="flex bg-amber-50 p-3 items-center gap-7 mt-7 justify-center flex-col">
-            <h2 className="font-semibold text-2xl text-center">Commencez dès maintenant à vous exercer !</h2>
-            <p className="text-center w-full max-w-xl self-center">Des milliers d'exercices, d'anciens sujets d'examen et de corrigés détaillés vous attendent. Choisissez votre niveau et votre matière, entraînez-vous à votre rythme et suivez vos progrès pour aborder vos examens en toute confiance.</p>
-            <button onClick={() => navigate('/exercices')} className="p-1 shadow-xl cursor-pointer bg-black rounded-lg flex items-center gap-4 text-white px-3 py-2">Commencer la pratique <GoArrowRight /> </button>
-          </div>
+      <div className="flex flex-col p-3">
+        <motion.div transition={{ duration: 0.55, ease: "easeOut" }} variants={fadeUp} className="flex md:flex-row gap-2 items-center flex-col justify-center">
+          <Service titre="Exercices" rotation={-2}/>
+          <Service titre="Sujets Exams" couleur="bg-white" image="banniere.png" />
+          <Service titre="Corrigés" image="banner3.png" couleur="bg-amber-200" rotation={2}/>
+        </motion.div>
+
+        <div className="flex bg-amber-50 p-3 items-center gap-7 mt-7 justify-center flex-col">
+          <h2 className="font-semibold text-2xl text-center">Commencez dès maintenant à vous exercer !</h2>
+          <p className="text-center w-full max-w-xl self-center">Des milliers d'exercices, d'anciens sujets d'examen et de corrigés détaillés vous attendent. Choisissez votre niveau et votre matière, entraînez-vous à votre rythme et suivez vos progrès pour aborder vos examens en toute confiance.</p>
+          <button onClick={() => navigate('/exercices')} className="p-1 shadow-xl cursor-pointer bg-black rounded-lg flex items-center gap-4 text-white px-3 py-2">Commencer la pratique <GoArrowRight /> </button>
         </div>
-
-        {/* Section Partenaires */}
-        <PartainerSponsor />
-
-        {/* Section Témoignages */}
-        <TemoinSection />
-
-        {/* Section Newsletter */}
-        <NouvelleLettre />
-
-        {/* Section Footer */}
-        <FooterSection />
       </div>
+
+      {/* Section Partenaires */}
+      <PartainerSponsor />
+
+      {/* Section Témoignages */}
+      <TemoinSection />
+
+      {/* Section Newsletter */}
+      <NouvelleLettre />
+
+      {/* Section Footer */}
+      <FooterSection />
+    </div>
   );
 }

@@ -3,6 +3,7 @@ import { FiSidebar } from "react-icons/fi";
 import SideBarMenuItem from "./ui/SideBarMenuItem";
 import {
   LayoutDashboard,
+  TrendingUp,
   Users,
   GraduationCap,
   BookOpen,
@@ -11,6 +12,7 @@ import {
   Library,
   Layers,
   Tag,
+  User,
   LogOut,
 } from "lucide-react";
 import { useNavigate, useLocation } from "react-router-dom";
@@ -42,6 +44,7 @@ export default function SideBar() {
 
   const navItems = [
     { route: "", label: "Tableau de bord", icon: <LayoutDashboard size={19} /> },
+    { route: "statistiques", label: "Statistiques & Trafic", icon: <TrendingUp size={19} /> },
     { route: "exercices", label: "Exercices", icon: <BookOpen size={19} /> },
     { route: "sujets", label: "Sujets Examens", icon: <ClipboardList size={19} /> },
     { route: "corrections", label: "Corrections", icon: <CheckCircle2 size={19} /> },
@@ -50,6 +53,7 @@ export default function SideBar() {
     { route: "matieres", label: "Matières", icon: <Library size={19} /> },
     { route: "niveaux", label: "Niveaux", icon: <Layers size={19} /> },
     { route: "categories", label: "Catégories", icon: <Tag size={19} /> },
+    { route: "profile", label: "Mon Profil", icon: <User size={19} /> },
   ];
 
   return (
@@ -71,7 +75,7 @@ export default function SideBar() {
         <button
           type="button"
           onClick={() => setCollapsed(!collapsed)}
-          className="p-1.5 rounded-lg text-gray-400 hover:text-amber-500 hover:bg-amber-50 transition-colors mx-auto"
+          className="p-1.5 rounded-lg text-gray-400 hover:text-amber-500 hover:bg-amber-50 transition-colors mx-auto cursor-pointer"
           title={collapsed ? "Agrandir" : "Réduire"}
         >
           <FiSidebar size={18} />

@@ -3,6 +3,8 @@ export interface Matiere {
   nom: string;
   code: string;
   description?: string;
+  image?: string | null;
+  image_url?: string | null;
 }
 
 export interface Niveau {
@@ -15,7 +17,7 @@ export interface Niveau {
 export interface Categorie {
   id: string;
   nom: string;
-  [key: string]: unknown; // schéma non documenté, à préciser plus tard
+  [key: string]: unknown;
 }
 
 export interface Professeur {
@@ -39,6 +41,8 @@ export interface Exercice {
   type: ExerciceType;
   difficulte: Difficulte;
   est_actif: boolean;
+  image?: string | null;
+  image_url?: string | null;
   matiere: Matiere;
   niveau: Niveau;
   categorie: Categorie | null;
@@ -49,6 +53,16 @@ export interface Exercice {
   updated_at?: string;
 }
 
+export interface ExerciceFilters {
+  niveau_id?: string | number;
+  matiere_id?: string | number;
+  difficulte?: Difficulte;
+  type?: ExerciceType;
+  avec_correction?: boolean;
+  q?: string;
+  page?: number;
+}
+
 export interface PaginatedResponse<T> {
   current_page: number;
   data: T[];
@@ -57,14 +71,4 @@ export interface PaginatedResponse<T> {
   total: number;
   next_page_url: string | null;
   prev_page_url: string | null;
-}
-
-export interface ExerciceFilters {
-  niveau_id?: string;
-  matiere_id?: string;
-  difficulte?: Difficulte;
-  type?: ExerciceType;
-  avec_correction?: boolean;
-  q?: string;
-  page?: number;
 }

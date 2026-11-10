@@ -1,15 +1,6 @@
 import { createContext, useContext, useEffect, useState, type ReactNode } from "react";
 import { getAccess, clearAccess } from "../utils/storage";
-import { getMe } from "../services/authService";
-
-interface AuthUser {
-  id: number;
-  nom: string;
-  prenom: string;
-  email: string;
-  avatar: string | null;
-  role: "eleve" | "professeur" | "administrateur";
-}
+import { getMe, type AuthUser } from "../services/authService";
 
 interface AuthContextType {
   user: AuthUser | null;

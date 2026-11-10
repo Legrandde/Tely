@@ -7,6 +7,7 @@ import { exerciceSchema } from "../config/resourceSchemas";
 import type { Exercice } from "../types/exercice";
 import { deleteExercice, listExercices, listMatieres, listNiveaux } from "../services/resourceService";
 import { useToast } from "../context/ToastContext";
+import { resolveImageUrl } from "../utils/imageUrl";
 
 const DIFFICULTE_STYLES: Record<string, string> = {
   facile: "bg-emerald-50 text-emerald-700 border-emerald-100",
@@ -132,6 +133,7 @@ export default function GestionExercices() {
         enonce: editingExercice.enonce,
         type: editingExercice.type,
         difficulte: editingExercice.difficulte,
+        image: editingExercice.image || editingExercice.image_url || "",
         matiere_id: editingExercice.matiere?.id,
         niveau_id: editingExercice.niveau?.id,
         categorie_id: editingExercice.categorie?.id,
@@ -142,6 +144,7 @@ export default function GestionExercices() {
         type: "classique",
         difficulte: "moyen",
         est_actif: true,
+        image: "",
       };
 
   return (
@@ -378,6 +381,16 @@ export default function GestionExercices() {
                 <span>Niveau : <strong className="text-gray-800">{viewExercice.niveau?.libelle ?? "Non défini"}</strong></span>
               </div>
             </div>
+
+            {(viewExercice.image || viewExercice.image_url) && (
+              <div className="rounded-xl overflow-hidden max-h-56 border border-gray-200 bg-gray-100">
+                <img
+                  src={resolveImageUrl(viewExercice.image_url || viewExercice.image) || ""}
+                  alt={viewExercice.titre}
+                  className="w-full h-full object-cover"
+                />
+              </div>
+            )}
 
             <div className="bg-gray-50 rounded-xl p-4 border border-gray-100">
               <h3 className="text-xs font-semibold uppercase tracking-wider text-gray-500 mb-2">

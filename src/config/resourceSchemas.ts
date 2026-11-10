@@ -17,6 +17,13 @@ export const matiereSchema: ResourceSchema = {
   fields: [
     { name: "nom", label: "Nom", type: "text", required: true, placeholder: "Mathématiques" },
     { name: "code", label: "Code", type: "text", required: true, placeholder: "MATH" },
+    {
+      name: "image",
+      label: "Image d'illustration (obligatoire)",
+      type: "text",
+      required: true,
+      placeholder: "URL ou chemin de l'image (ex: /banner1.png ou https://...)",
+    },
     { name: "description", label: "Description", type: "textarea", placeholder: "Description de la matière" },
   ],
   columns: [
@@ -29,7 +36,12 @@ export const matiereSchema: ResourceSchema = {
   remove: deleteMatiere,
   toFormValues: (item) => {
     const raw = item as Record<string, unknown>;
-    return { nom: raw.nom, code: raw.code, description: raw.description };
+    return {
+      nom: raw.nom,
+      code: raw.code,
+      image: raw.image || raw.image_url || "",
+      description: raw.description,
+    };
   },
 };
 
@@ -122,6 +134,13 @@ export const exerciceSchema: ResourceSchema = {
     { name: "niveau_id", label: "Niveau", type: "select-async", required: true, loadOptions: loadNiveauOptions },
     { name: "categorie_id", label: "Catégorie", type: "select-async", loadOptions: loadCategorieOptions },
     { name: "professeur_id", label: "Professeur", type: "select-async", required: true, loadOptions: loadProfesseurOptions },
+    {
+      name: "image",
+      label: "Image d'illustration (optionnelle)",
+      type: "text",
+      required: false,
+      placeholder: "URL ou chemin de l'illustration facultative...",
+    },
     { name: "est_actif", label: "Actif", type: "checkbox" },
   ],
   columns: [
@@ -141,6 +160,7 @@ export const exerciceSchema: ResourceSchema = {
       enonce: raw.enonce,
       type: raw.type,
       difficulte: raw.difficulte,
+      image: (raw.image as string) || (raw.image_url as string) || "",
       matiere_id: typeof raw.matiere === "object" ? String(raw.matiere?.id) : raw.matiere_id ? String(raw.matiere_id) : undefined,
       niveau_id: typeof raw.niveau === "object" ? String(raw.niveau?.id) : raw.niveau_id ? String(raw.niveau_id) : undefined,
       categorie_id: typeof raw.categorie === "object" ? String(raw.categorie?.id) : raw.categorie_id ? String(raw.categorie_id) : undefined,
