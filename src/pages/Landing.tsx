@@ -11,6 +11,7 @@ import TemoinSection from "../components/TemoinSection";
 import NouvelleLettre from "../components/NouvelleLettre";
 import FooterSection from "../components/FooterSection";
 import GoogleOneTap from "../components/auth/GoogleOneTap";
+import ProfesseurJoinSection from "../components/landing/ProfesseurJoinSection";
 import { trackEvent } from "../services/analyticsTracker";
 
 // ── Variants ────────────────────────────────────────────────────────────────
@@ -90,7 +91,7 @@ export default function Landing() {
               >
                 <Link
                   to="/auth/login"
-                  className="cursor-pointer flex items-center gap-4 border-t border-b border-gray-100 hover:bg-black hover:text-white hover:rounded-lg justify-center shadow p-1 transition-all duration-200"
+                  className="cursor-pointer flex items-center gap-4 border-t border-b border-gray-100 hover:bg-black hover:text-white hover:rounded-lg justify-center shadow-xs p-1 transition-all duration-200"
                 >
                   <img
                     src="banniere.png"
@@ -135,6 +136,9 @@ export default function Landing() {
 
       {/* Section Témoignages */}
       <TemoinSection />
+
+      {/* ── Section Rejoindre en tant qu'enseignant ── */}
+      <ProfesseurJoinSection />
 
       {/* Section Newsletter */}
       <NouvelleLettre />

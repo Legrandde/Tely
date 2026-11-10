@@ -6,6 +6,7 @@ import DashboardProfesseur from "../pages/DashboardProfesseur";
 import ProfesseurOverView from "../pages/professeur/ProfesseurOverView";
 import ProfesseurRessources from "../pages/professeur/ProfesseurRessources";
 import AdminStatistiques from "../pages/admin/AdminStatistiques";
+import GestionCandidatures from "../pages/admin/GestionCandidatures";
 import ProfilePage from "../pages/ProfilePage";
 
 import CourseDetailPage from "../pages/CourseDetailPage";
@@ -98,6 +99,10 @@ export const Route = createBrowserRouter([
       {
         path: "statistiques",
         element: <AdminStatistiques />,
+      },
+      {
+        path: "candidatures",
+        element: <GestionCandidatures />,
       },
       {
         path: "profile",

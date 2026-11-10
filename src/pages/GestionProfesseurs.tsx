@@ -131,9 +131,9 @@ export default function GestionProfesseurs() {
       </div>
 
       {/* Barre d'outils / Recherche */}
-      <div className="flex items-center gap-3 bg-white p-3 rounded-xl border border-gray-100 shadow-sm">
-        <div className="flex items-center gap-2 bg-gray-50 rounded-lg px-3 py-2 flex-1 max-w-md">
-          <Search size={16} className="text-gray-400" />
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-white p-3 rounded-xl border border-gray-100 shadow-sm">
+        <div className="flex items-center gap-2 bg-gray-50 rounded-lg px-3 py-2 flex-1 w-full sm:max-w-md">
+          <Search size={16} className="text-gray-400 shrink-0" />
           <input
             type="text"
             value={search}
@@ -142,7 +142,7 @@ export default function GestionProfesseurs() {
             className="bg-transparent text-sm text-gray-800 outline-none w-full placeholder-gray-400"
           />
         </div>
-        <div className="ml-auto text-xs text-gray-500">
+        <div className="text-xs text-gray-500 whitespace-nowrap self-end sm:self-auto">
           Total : <span className="font-semibold text-gray-800">{filteredProfesseurs.length}</span> professeur(s)
         </div>
       </div>

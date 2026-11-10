@@ -4,20 +4,20 @@ import { Star } from "lucide-react";
 const testimonials = [
   {
     name: "Awa Diallo",
-    role: "Élève en Terminale",
-    avatar: "https://randomuser.me/api/portraits/women/65.jpg",
+    role: "Élève en Terminale S",
+    avatar: "https://images.unsplash.com/photo-1531746020798-e6953c6e8e04?auto=format&fit=crop&w=300&h=300&q=80",
     text: "Utiliser cette plateforme a tout changé pour moi. Les exercices et les anciens sujets rendent les révisions tellement plus simples !",
   },
   {
     name: "Mamadou Sow",
-    role: "Étudiant en prépa",
-    avatar: "https://randomuser.me/api/portraits/men/32.jpg",
+    role: "Étudiant en prépa scientifique",
+    avatar: "https://images.unsplash.com/photo-1522529599102-193c0d76b5b6?auto=format&fit=crop&w=300&h=300&q=80",
     text: "Des ressources exceptionnelles ! Les corrigés détaillés et la liberté de m'entraîner à mon rythme ont été essentiels dans ma progression.",
   },
   {
     name: "Fatou Ndiaye",
-    role: "Élève en 1ère",
-    avatar: "https://randomuser.me/api/portraits/women/44.jpg",
+    role: "Élève en 1ère L",
+    avatar: "https://images.unsplash.com/photo-1567532939604-b6b5b0db2604?auto=format&fit=crop&w=300&h=300&q=80",
     text: "Je recommande vivement ! Les solutions pas à pas et l'immense bibliothèque d'exercices ont vraiment renforcé ma compréhension.",
   },
 ];

@@ -1,10 +1,12 @@
-import { Search, Settings, Bell } from "lucide-react";
+import { Search, Settings, Bell, Menu } from "lucide-react";
 import { useAuth } from "../context/authContext";
 import { useLocation, useNavigate } from "react-router-dom";
 import { resolveImageUrl } from "../utils/imageUrl";
+import { useSidebar } from "../context/SidebarContext";
 
 const TITLES: Record<string, string> = {
   statistiques: "Statistiques & Audience",
+  candidatures: "Candidatures Enseignants",
   profile: "Mon Profil Utilisateur",
   exercices: "Gestion des exercices",
   sujets: "Gestion des sujets d'examen",
@@ -54,18 +56,28 @@ export default function Header({ title }: { title?: string }) {
       : "/profile";
 
   const avatarUrl = resolveImageUrl(user?.avatar_url || user?.avatar);
+  const { toggleMobile } = useSidebar();
 
   return (
-    <div className="flex items-center h-16 justify-between px-6 bg-white border-b border-gray-100 w-full shrink-0">
-      {/* Titre page */}
-      <div>
-        <h1 className="text-base font-bold text-gray-800">{getPageTitle()}</h1>
+    <div className="flex items-center h-16 justify-between px-3 sm:px-6 bg-white border-b border-gray-100 w-full shrink-0">
+      {/* Bouton Hamburger mobile + Titre page */}
+      <div className="flex items-center gap-2 min-w-0">
+        <button
+          type="button"
+          onClick={toggleMobile}
+          className="lg:hidden p-2 rounded-lg text-gray-600 hover:text-amber-500 hover:bg-amber-50 transition-colors cursor-pointer shrink-0"
+          aria-label="Ouvrir le menu latéral"
+          title="Menu de navigation"
+        >
+          <Menu size={20} />
+        </button>
+        <h1 className="text-sm sm:text-base font-bold text-gray-800 truncate">{getPageTitle()}</h1>
       </div>
 
       {/* Droite : search + icons + avatar */}
-      <div className="flex items-center gap-4">
+      <div className="flex items-center gap-2 sm:gap-4 shrink-0">
         {/* Search bar */}
-        <div className="hidden sm:flex items-center gap-2 bg-gray-50 rounded-xl px-3.5 py-2 w-64 border border-gray-100">
+        <div className="hidden md:flex items-center gap-2 bg-gray-50 rounded-xl px-3.5 py-2 w-48 lg:w-64 border border-gray-100">
           <Search size={15} className="text-gray-400 shrink-0" />
           <input
             type="text"
@@ -79,7 +91,7 @@ export default function Header({ title }: { title?: string }) {
           type="button"
           onClick={() => navigate(profilePath)}
           title="Mon Profil & Paramètres"
-          className="p-2 rounded-lg text-gray-400 hover:text-amber-500 hover:bg-amber-50 transition-colors cursor-pointer"
+          className="p-1.5 sm:p-2 rounded-lg text-gray-400 hover:text-amber-500 hover:bg-amber-50 transition-colors cursor-pointer"
         >
           <Settings size={18} />
         </button>
@@ -89,7 +101,7 @@ export default function Header({ title }: { title?: string }) {
           <button
             type="button"
             title="Notifications"
-            className="p-2 rounded-lg text-gray-400 hover:text-amber-500 hover:bg-amber-50 transition-colors cursor-pointer"
+            className="p-1.5 sm:p-2 rounded-lg text-gray-400 hover:text-amber-500 hover:bg-amber-50 transition-colors cursor-pointer"
           >
             <Bell size={18} />
           </button>

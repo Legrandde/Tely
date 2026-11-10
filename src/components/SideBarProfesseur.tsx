@@ -9,17 +9,21 @@ import {
   FileText,
   User,
   LogOut,
+  X,
 } from "lucide-react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { useAuth } from "../context/authContext";
+import { useSidebar } from "../context/SidebarContext";
 
 export default function SideBarProfesseur() {
   const [collapsed, setCollapsed] = useState(false);
   const navigate = useNavigate();
   const location = useLocation();
   const { logoutLocal, user } = useAuth();
+  const { isOpenMobile, closeMobile } = useSidebar();
 
   function handleLogout() {
+    closeMobile();
     logoutLocal();
     navigate("/auth/login");
   }
@@ -46,35 +50,47 @@ export default function SideBarProfesseur() {
     { route: "profile", label: "Mon Profil", icon: <User size={19} /> },
   ];
 
-  return (
-    <aside
-      className={`flex flex-col p-3 bg-white border-r border-gray-100 h-screen transition-all duration-300 shrink-0 select-none ${
-        collapsed ? "w-20" : "w-64"
-      }`}
-    >
+  const handleNavigate = (route: string) => {
+    navigate(route);
+    closeMobile();
+  };
+
+  const navContent = (isMobileView: boolean) => (
+    <>
       {/* Brand Header */}
       <div className="flex items-center justify-between pb-4 pt-1 px-2 border-b border-gray-100">
-        {!collapsed && (
+        {(!collapsed || isMobileView) && (
           <h1
-            onClick={() => navigate("")}
+            onClick={() => handleNavigate("")}
             className="text-amber-600 cursor-pointer italic font-bold text-base"
           >
             Tely Elearning
           </h1>
         )}
-        <button
-          type="button"
-          onClick={() => setCollapsed(!collapsed)}
-          className="p-1.5 rounded-lg text-gray-400 hover:text-amber-500 hover:bg-amber-50 transition-colors mx-auto cursor-pointer"
-          title={collapsed ? "Agrandir" : "Réduire"}
-        >
-          <FiSidebar size={18} />
-        </button>
+        {isMobileView ? (
+          <button
+            type="button"
+            onClick={closeMobile}
+            className="p-1.5 rounded-lg text-gray-400 hover:text-gray-700 hover:bg-gray-100 transition-colors cursor-pointer"
+            title="Fermer le menu"
+          >
+            <X size={20} />
+          </button>
+        ) : (
+          <button
+            type="button"
+            onClick={() => setCollapsed(!collapsed)}
+            className="p-1.5 rounded-lg text-gray-400 hover:text-amber-500 hover:bg-amber-50 transition-colors mx-auto cursor-pointer"
+            title={collapsed ? "Agrandir" : "Réduire"}
+          >
+            <FiSidebar size={18} />
+          </button>
+        )}
       </div>
 
       {/* Navigation Links */}
       <div className="flex flex-col gap-1 py-3 flex-1 overflow-y-auto overflow-x-hidden no-scrollbar">
-        {!collapsed && (
+        {(!collapsed || isMobileView) && (
           <span className="text-[11px] font-semibold text-gray-400 uppercase tracking-wider px-3 mb-1">
             Production pédagogique
           </span>
@@ -82,19 +98,19 @@ export default function SideBarProfesseur() {
         {navItems.map((item) => (
           <SideBarMenuItem
             key={item.route}
-            OnNavigate={() => navigate(item.route)}
+            OnNavigate={() => handleNavigate(item.route)}
             icons={item.icon}
             Titre={item.label}
             isActive={isRouteActive(item.route)}
-            collapsed={collapsed}
+            collapsed={isMobileView ? false : collapsed}
           />
         ))}
       </div>
 
       {/* Profil enseignant en bas */}
-      {!collapsed && user && (
+      {(!collapsed || isMobileView) && user && (
         <div
-          onClick={() => navigate("profile")}
+          onClick={() => handleNavigate("profile")}
           className="mb-2 p-2.5 rounded-xl bg-amber-50/60 border border-amber-100/70 flex items-center gap-2.5 cursor-pointer hover:bg-amber-100/60 transition-colors"
           title="Consulter mon profil"
         >
@@ -118,9 +134,39 @@ export default function SideBarProfesseur() {
           OnNavigate={handleLogout}
           icons={<LogOut size={19} />}
           Titre="Déconnexion"
-          collapsed={collapsed}
+          collapsed={isMobileView ? false : collapsed}
         />
       </div>
-    </aside>
+    </>
+  );
+
+  return (
+    <>
+      {/* ── Desktop Sidebar (lg screens and above) ── */}
+      <aside
+        className={`hidden lg:flex flex-col p-3 bg-white border-r border-gray-100 h-screen transition-all duration-300 shrink-0 select-none ${
+          collapsed ? "w-20" : "w-64"
+        }`}
+      >
+        {navContent(false)}
+      </aside>
+
+      {/* ── Mobile Drawer (under lg screens) ── */}
+      {isOpenMobile && (
+        <div className="fixed inset-0 z-50 lg:hidden flex">
+          {/* Backdrop */}
+          <div
+            onClick={closeMobile}
+            className="fixed inset-0 bg-black/40 backdrop-blur-xs transition-opacity"
+            aria-hidden="true"
+          />
+
+          {/* Drawer content */}
+          <aside className="relative flex flex-col w-72 max-w-[85vw] bg-white h-full p-4 shadow-2xl z-10 select-none animate-in slide-in-from-left duration-200">
+            {navContent(true)}
+          </aside>
+        </div>
+      )}
+    </>
   );
 }
