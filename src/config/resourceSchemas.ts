@@ -6,7 +6,9 @@ import {
   createExercice, updateExercice, listExercices, deleteExercice,
   createEleve, updateEleve, listEleves, deleteEleve,
   createProfesseur, updateProfesseur, listProfesseurs, deleteProfesseur,
-  loadMatiereOptions, loadNiveauOptions, loadProfesseurOptions,
+  createSujet, updateSujet, listSujets, deleteSujet,
+  createCorrection, updateCorrection, listCorrections, deleteCorrection,
+  loadMatiereOptions, loadNiveauOptions, loadProfesseurOptions, loadCategorieOptions, loadExerciceOptions,
 } from "../services/resourceService";
 
 export const matiereSchema: ResourceSchema = {
@@ -15,7 +17,7 @@ export const matiereSchema: ResourceSchema = {
   fields: [
     { name: "nom", label: "Nom", type: "text", required: true, placeholder: "Mathématiques" },
     { name: "code", label: "Code", type: "text", required: true, placeholder: "MATH" },
-    { name: "description", label: "Description", type: "textarea" },
+    { name: "description", label: "Description", type: "textarea", placeholder: "Description de la matière" },
   ],
   columns: [
     { key: "nom", label: "Nom" },
@@ -25,7 +27,10 @@ export const matiereSchema: ResourceSchema = {
   create: createMatiere,
   update: updateMatiere,
   remove: deleteMatiere,
-  toFormValues: (item) => ({ nom: item.nom, code: item.code, description: item.description }),
+  toFormValues: (item) => {
+    const raw = item as Record<string, unknown>;
+    return { nom: raw.nom, code: raw.code, description: raw.description };
+  },
 };
 
 export const niveauSchema: ResourceSchema = {
@@ -41,9 +46,11 @@ export const niveauSchema: ResourceSchema = {
       options: [
         { value: "Collège", label: "Collège" },
         { value: "Lycée", label: "Lycée" },
+        { value: "Primaire", label: "Primaire" },
+        { value: "Supérieur", label: "Supérieur" },
       ],
     },
-    { name: "ordre", label: "Ordre d'affichage", type: "number", required: true },
+    { name: "ordre", label: "Ordre d'affichage", type: "number", required: true, placeholder: "1" },
   ],
   columns: [
     { key: "libelle", label: "Libellé" },
@@ -54,15 +61,18 @@ export const niveauSchema: ResourceSchema = {
   create: createNiveau,
   update: updateNiveau,
   remove: deleteNiveau,
-  toFormValues: (item) => ({ libelle: item.libelle, cycle: item.cycle, ordre: item.ordre }),
+  toFormValues: (item) => {
+    const raw = item as Record<string, unknown>;
+    return { libelle: raw.libelle, cycle: raw.cycle, ordre: raw.ordre };
+  },
 };
 
 export const categorieSchema: ResourceSchema = {
   key: "categorie",
   title: "Catégorie",
   fields: [
-    { name: "nom", label: "Nom", type: "text", required: true },
-    { name: "couleur", label: "Couleur", type: "text", placeholder: "#f59e0b" },
+    { name: "nom", label: "Nom", type: "text", required: true, placeholder: "Algèbre" },
+    { name: "couleur", label: "Couleur (code HEX)", type: "text", placeholder: "#f59e0b" },
     { name: "icone", label: "Icône", type: "text", placeholder: "book" },
   ],
   columns: [
@@ -73,7 +83,10 @@ export const categorieSchema: ResourceSchema = {
   create: createCategorie,
   update: updateCategorie,
   remove: deleteCategorie,
-  toFormValues: (item) => ({ nom: item.nom, couleur: item.couleur, icone: item.icone }),
+  toFormValues: (item) => {
+    const raw = item as Record<string, unknown>;
+    return { nom: raw.nom, couleur: raw.couleur, icone: raw.icone };
+  },
 };
 
 export const exerciceSchema: ResourceSchema = {
@@ -107,7 +120,7 @@ export const exerciceSchema: ResourceSchema = {
     },
     { name: "matiere_id", label: "Matière", type: "select-async", required: true, loadOptions: loadMatiereOptions },
     { name: "niveau_id", label: "Niveau", type: "select-async", required: true, loadOptions: loadNiveauOptions },
-    { name: "categorie_id", label: "Catégorie", type: "select-async", loadOptions: async () => [] },
+    { name: "categorie_id", label: "Catégorie", type: "select-async", loadOptions: loadCategorieOptions },
     { name: "professeur_id", label: "Professeur", type: "select-async", required: true, loadOptions: loadProfesseurOptions },
     { name: "est_actif", label: "Actif", type: "checkbox" },
   ],
@@ -128,11 +141,94 @@ export const exerciceSchema: ResourceSchema = {
       enonce: raw.enonce,
       type: raw.type,
       difficulte: raw.difficulte,
-      matiere_id: typeof raw.matiere === "object" ? raw.matiere?.id : undefined,
-      niveau_id: typeof raw.niveau === "object" ? raw.niveau?.id : undefined,
-      categorie_id: typeof raw.categorie === "object" ? raw.categorie?.id : undefined,
-      professeur_id: typeof raw.professeur === "object" ? raw.professeur?.id : undefined,
+      matiere_id: typeof raw.matiere === "object" ? String(raw.matiere?.id) : raw.matiere_id ? String(raw.matiere_id) : undefined,
+      niveau_id: typeof raw.niveau === "object" ? String(raw.niveau?.id) : raw.niveau_id ? String(raw.niveau_id) : undefined,
+      categorie_id: typeof raw.categorie === "object" ? String(raw.categorie?.id) : raw.categorie_id ? String(raw.categorie_id) : undefined,
+      professeur_id: typeof raw.professeur === "object" ? String(raw.professeur?.id) : raw.professeur_id ? String(raw.professeur_id) : undefined,
       est_actif: raw.est_actif,
+    };
+  },
+};
+
+export const sujetSchema: ResourceSchema = {
+  key: "sujet",
+  title: "Sujet d'examen",
+  fields: [
+    { name: "titre", label: "Titre", type: "text", required: true, placeholder: "Ex: Baccalauréat Général S2 - Épreuve de Maths" },
+    { name: "annee", label: "Année", type: "number", required: true, placeholder: "2024" },
+    {
+      name: "session",
+      label: "Session",
+      type: "select",
+      required: true,
+      options: [
+        { value: "juin", label: "Juin (Session principale)" },
+        { value: "septembre", label: "Septembre (Remplacement)" },
+        { value: "janvier", label: "Janvier" },
+      ],
+    },
+    {
+      name: "type",
+      label: "Type d'examen",
+      type: "select",
+      required: true,
+      options: [
+        { value: "bac", label: "Baccalauréat" },
+        { value: "brevet", label: "BFEM / Brevet" },
+        { value: "composition", label: "Composition" },
+        { value: "autre", label: "Autre" },
+      ],
+    },
+    { name: "matiere_id", label: "Matière", type: "select-async", required: true, loadOptions: loadMatiereOptions },
+    { name: "niveau_id", label: "Niveau", type: "select-async", required: true, loadOptions: loadNiveauOptions },
+    { name: "ennonce", label: "Énoncé complet", type: "textarea", required: true, placeholder: "Texte ou consignes complètes de l'épreuve..." },
+  ],
+  columns: [
+    { key: "titre", label: "Titre" },
+    { key: "annee", label: "Année" },
+    { key: "session", label: "Session" },
+    { key: "type", label: "Type" },
+  ],
+  list: listSujets,
+  create: createSujet,
+  update: updateSujet,
+  remove: deleteSujet,
+  toFormValues: (item: Record<string, unknown>) => {
+    const raw = item as Record<string, { id?: string | number } | string | number>;
+    return {
+      titre: raw.titre,
+      annee: raw.annee,
+      session: raw.session,
+      type: raw.type,
+      matiere_id: typeof raw.matiere === "object" ? String(raw.matiere?.id) : raw.matiere_id ? String(raw.matiere_id) : undefined,
+      niveau_id: typeof raw.niveau === "object" ? String(raw.niveau?.id) : raw.niveau_id ? String(raw.niveau_id) : undefined,
+      ennonce: raw.ennonce,
+    };
+  },
+};
+
+export const correctionSchema: ResourceSchema = {
+  key: "correction",
+  title: "Correction",
+  fields: [
+    { name: "exercice_id", label: "Exercice associé", type: "select-async", required: true, loadOptions: loadExerciceOptions },
+    { name: "contenu", label: "Contenu détaillé de la solution", type: "textarea", required: true, placeholder: "Démonstration, étapes de résolution..." },
+    { name: "explication", label: "Remarques & conseils méthodologiques", type: "textarea", placeholder: "Conseils pour l'élève..." },
+  ],
+  columns: [
+    { key: "exercice", label: "Exercice", render: (item: Record<string, unknown>) => (item.exercice as { titre?: string })?.titre },
+    { key: "contenu", label: "Contenu" },
+  ],
+  list: listCorrections,
+  create: createCorrection,
+  update: updateCorrection,
+  remove: deleteCorrection,
+  toFormValues: (item: Record<string, unknown>) => {
+    const raw = item as Record<string, { id?: string | number } | string | number>;
+    return {
+      exercice_id: typeof raw.exercice === "object" ? String(raw.exercice?.id) : raw.exercice_id ? String(raw.exercice_id) : undefined,
+      contenu: raw.contenu,
+      explication: raw.explication,
     };
   },
 };
@@ -169,7 +265,7 @@ export const eleveSchema: ResourceSchema = {
     const raw = item as Record<string, { id?: string | number } | string | number>;
     return {
       matricule: raw.matricule,
-      niveau_id: typeof raw.niveau === "object" ? raw.niveau?.id : undefined,
+      niveau_id: typeof raw.niveau === "object" ? String(raw.niveau?.id) : raw.niveau_id ? String(raw.niveau_id) : undefined,
       classe: raw.classe,
     };
   },
@@ -209,6 +305,8 @@ export const RESOURCE_SCHEMAS: Record<string, ResourceSchema> = {
   niveau: niveauSchema,
   categorie: categorieSchema,
   exercice: exerciceSchema,
+  sujet: sujetSchema,
+  correction: correctionSchema,
   eleve: eleveSchema,
   professeur: professeurSchema,
 };

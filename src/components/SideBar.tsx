@@ -1,5 +1,3 @@
-"use client";
-
 import { useState } from "react";
 import { FiSidebar } from "react-icons/fi";
 import SideBarMenuItem from "./ui/SideBarMenuItem";
@@ -9,14 +7,19 @@ import {
   GraduationCap,
   BookOpen,
   ClipboardList,
+  CheckCircle2,
+  Library,
+  Layers,
+  Tag,
   LogOut,
 } from "lucide-react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import { useAuth } from "../context/authContext";
 
 export default function SideBar() {
   const [collapsed, setCollapsed] = useState(false);
   const navigate = useNavigate();
+  const location = useLocation();
   const { logoutLocal } = useAuth();
 
   function handleLogout() {
@@ -24,40 +27,85 @@ export default function SideBar() {
     navigate("/auth/login");
   }
 
+  const currentPath = location.pathname.toLowerCase();
+
+  const isRouteActive = (route: string) => {
+    if (route === "") {
+      return (
+        currentPath === "/dashbord-admin" ||
+        currentPath === "/dashbord-admin/" ||
+        currentPath === "/dashbord-admin/overview"
+      );
+    }
+    return currentPath.includes(`/dashbord-admin/${route.toLowerCase()}`);
+  };
+
+  const navItems = [
+    { route: "", label: "Tableau de bord", icon: <LayoutDashboard size={19} /> },
+    { route: "exercices", label: "Exercices", icon: <BookOpen size={19} /> },
+    { route: "sujets", label: "Sujets Examens", icon: <ClipboardList size={19} /> },
+    { route: "corrections", label: "Corrections", icon: <CheckCircle2 size={19} /> },
+    { route: "eleves", label: "Élèves", icon: <Users size={19} /> },
+    { route: "professeurs", label: "Professeurs", icon: <GraduationCap size={19} /> },
+    { route: "matieres", label: "Matières", icon: <Library size={19} /> },
+    { route: "niveaux", label: "Niveaux", icon: <Layers size={19} /> },
+    { route: "categories", label: "Catégories", icon: <Tag size={19} /> },
+  ];
+
   return (
-    <div
-      className={`flex flex-col p-2 gap-4 bg-white rounded h-screen shadow transition-all duration-300 ${
-        collapsed ? "w-16" : "w-72"
+    <aside
+      className={`flex flex-col p-3 bg-white border-r border-gray-100 h-screen transition-all duration-300 shrink-0 select-none ${
+        collapsed ? "w-20" : "w-64"
       }`}
     >
-      <div className="flex p-3 items-center justify-between">
+      {/* Brand Header */}
+      <div className="flex items-center justify-between pb-4 pt-1 px-2 border-b border-gray-100">
         {!collapsed && (
-          <h1 className="text-amber-500 text-base">Tely E-learning</h1>
+          <h1
+            onClick={() => navigate("")}
+            className="text-amber-600 cursor-pointer italic font-bold text-base"
+          >
+            Tely Elearning
+          </h1>
         )}
-        <FiSidebar
-          size={20}
-          className="cursor-pointer text-amber-500"
+        <button
+          type="button"
           onClick={() => setCollapsed(!collapsed)}
-        />
+          className="p-1.5 rounded-lg text-gray-400 hover:text-amber-500 hover:bg-amber-50 transition-colors mx-auto"
+          title={collapsed ? "Agrandir" : "Réduire"}
+        >
+          <FiSidebar size={18} />
+        </button>
       </div>
 
-      <div className="flex border-gray-200 border flex-col gap-1">
-        <SideBarMenuItem OnNavigate={() => navigate('')} icons={<LayoutDashboard size={20} />} Titre="Tableau de bord" collapsed={collapsed} />
-        <SideBarMenuItem OnNavigate={() => navigate('eleves')} icons={<Users size={20} />} Titre="Utilisateurs" collapsed={collapsed} />
-        <SideBarMenuItem OnNavigate={() => navigate('professeurs')} icons={<GraduationCap size={20} />} Titre="Professeurs" collapsed={collapsed} />
-        <SideBarMenuItem OnNavigate={() => navigate('exercices')} icons={<BookOpen size={20} />} Titre="Exercices" collapsed={collapsed} />
-        <SideBarMenuItem OnNavigate={() => navigate('sujets')} icons={<ClipboardList size={20} />} Titre="Sujets Examens" collapsed={collapsed} />
+      {/* Navigation Links */}
+      <div className="flex flex-col gap-1.5 py-4 flex-1 overflow-y-auto">
+        {!collapsed && (
+          <span className="text-[11px] font-semibold text-gray-400 uppercase tracking-wider px-3 mb-1">
+            Gestion & Contenus
+          </span>
+        )}
+        {navItems.map((item) => (
+          <SideBarMenuItem
+            key={item.route}
+            OnNavigate={() => navigate(item.route)}
+            icons={item.icon}
+            Titre={item.label}
+            isActive={isRouteActive(item.route)}
+            collapsed={collapsed}
+          />
+        ))}
       </div>
 
-      {/* Déconnexion, poussée en bas */}
-      <div className="flex border-gray-200 border flex-col gap-1 mt-auto">
+      {/* Déconnexion en bas */}
+      <div className="pt-3 border-t border-gray-100 mt-auto">
         <SideBarMenuItem
           OnNavigate={handleLogout}
-          icons={<LogOut size={20} />}
+          icons={<LogOut size={19} />}
           Titre="Déconnexion"
           collapsed={collapsed}
         />
       </div>
-    </div>
+    </aside>
   );
 }

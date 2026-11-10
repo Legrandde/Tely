@@ -1,18 +1,17 @@
-import { useEffect, useState } from "react";
-import { Plus, Pencil, Trash2, BookOpen } from "lucide-react";
-
+import { useEffect, useState, useMemo } from "react";
+import { Plus, Pencil, Trash2, BookOpen, Search, Eye, Filter } from "lucide-react";
 import ConfirmModal from "../components/ui/ConfirmModal";
 import ResourceForm from "../components/form/ResourceForm";
-import { exerciceSchema } from "../config/resourceSchemas";
-
-import type { Exercice } from "../types/exercice";
-import { deleteExercice, listExercices } from "../services/resourceService";
 import Modal from "../components/ui/Modal";
+import { exerciceSchema } from "../config/resourceSchemas";
+import type { Exercice } from "../types/exercice";
+import { deleteExercice, listExercices, listMatieres, listNiveaux } from "../services/resourceService";
+import { useToast } from "../context/ToastContext";
 
 const DIFFICULTE_STYLES: Record<string, string> = {
-  facile: "bg-emerald-50 text-emerald-600",
-  moyen: "bg-amber-50 text-amber-600",
-  difficile: "bg-red-50 text-red-600",
+  facile: "bg-emerald-50 text-emerald-700 border-emerald-100",
+  moyen: "bg-amber-50 text-amber-700 border-amber-100",
+  difficile: "bg-red-50 text-red-700 border-red-100",
 };
 
 const TYPE_LABELS: Record<string, string> = {
@@ -24,23 +23,40 @@ const TYPE_LABELS: Record<string, string> = {
 
 export default function GestionExercices() {
   const [exercices, setExercices] = useState<Exercice[]>([]);
+  const [matieres, setMatieres] = useState<Array<{ id: string | number; nom: string }>>([]);
+  const [niveaux, setNiveaux] = useState<Array<{ id: string | number; libelle: string }>>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string>();
 
+  const [search, setSearch] = useState("");
+  const [filterMatiere, setFilterMatiere] = useState<string>("all");
+  const [filterNiveau, setFilterNiveau] = useState<string>("all");
+  const [filterDifficulte, setFilterDifficulte] = useState<string>("all");
+
   const [modalOpen, setModalOpen] = useState(false);
   const [editingExercice, setEditingExercice] = useState<Exercice | null>(null);
+  const [viewExercice, setViewExercice] = useState<Exercice | null>(null);
 
   const [deleteTarget, setDeleteTarget] = useState<Exercice | null>(null);
   const [deleting, setDeleting] = useState(false);
+  const toast = useToast();
 
   async function fetchExercices() {
     setLoading(true);
     setError(undefined);
     try {
-      const data = await listExercices();
-      setExercices(data);
+      const [exData, matData, nivData] = await Promise.all([
+        listExercices(),
+        listMatieres(),
+        listNiveaux(),
+      ]);
+      setExercices(exData);
+      setMatieres(matData);
+      setNiveaux(nivData);
     } catch (err: unknown) {
-      const errorMsg = (err as { response?: { data?: { message?: string } } })?.response?.data?.message ?? "Impossible de charger les exercices";
+      const errorMsg =
+        (err as { response?: { data?: { message?: string } } })?.response?.data?.message ??
+        "Impossible de charger les exercices";
       setError(errorMsg);
     } finally {
       setLoading(false);
@@ -48,26 +64,28 @@ export default function GestionExercices() {
   }
 
   useEffect(() => {
-    let isMounted = true;
-    listExercices()
-      .then((data) => {
-        if (isMounted) {
-          setExercices(data);
-          setError(undefined);
-          setLoading(false);
-        }
-      })
-      .catch((err: unknown) => {
-        if (isMounted) {
-          const errorMsg = (err as { response?: { data?: { message?: string } } })?.response?.data?.message ?? "Impossible de charger les exercices";
-          setError(errorMsg);
-          setLoading(false);
-        }
-      });
-    return () => {
-      isMounted = false;
-    };
+    fetchExercices();
   }, []);
+
+  const filteredExercices = useMemo(() => {
+    return exercices.filter((ex) => {
+      const matchSearch =
+        !search.trim() ||
+        ex.titre.toLowerCase().includes(search.toLowerCase()) ||
+        ex.enonce.toLowerCase().includes(search.toLowerCase()) ||
+        (ex.matiere?.nom && ex.matiere.nom.toLowerCase().includes(search.toLowerCase())) ||
+        (ex.niveau?.libelle && ex.niveau.libelle.toLowerCase().includes(search.toLowerCase()));
+
+      const matchMatiere =
+        filterMatiere === "all" || String(ex.matiere?.id) === String(filterMatiere);
+      const matchNiveau =
+        filterNiveau === "all" || String(ex.niveau?.id) === String(filterNiveau);
+      const matchDifficulte =
+        filterDifficulte === "all" || ex.difficulte === filterDifficulte;
+
+      return matchSearch && matchMatiere && matchNiveau && matchDifficulte;
+    });
+  }, [exercices, search, filterMatiere, filterNiveau, filterDifficulte]);
 
   function openCreate() {
     setEditingExercice(null);
@@ -85,6 +103,7 @@ export default function GestionExercices() {
   }
 
   function handleFormSuccess() {
+    toast.success(editingExercice ? "Exercice mis à jour avec succès" : "Nouvel exercice créé avec succès");
     closeModal();
     fetchExercices();
   }
@@ -95,10 +114,13 @@ export default function GestionExercices() {
     try {
       await deleteExercice(deleteTarget.id);
       setExercices((prev) => prev.filter((e) => e.id !== deleteTarget.id));
+      toast.success(`L'exercice "${deleteTarget.titre}" a été supprimé.`);
       setDeleteTarget(null);
     } catch (err: unknown) {
-      const errorMsg = (err as { response?: { data?: { message?: string } } })?.response?.data?.message ?? "Suppression impossible";
-      alert(errorMsg);
+      const errorMsg =
+        (err as { response?: { data?: { message?: string } } })?.response?.data?.message ??
+        "Suppression impossible";
+      toast.error(errorMsg);
     } finally {
       setDeleting(false);
     }
@@ -116,112 +138,203 @@ export default function GestionExercices() {
         professeur_id: editingExercice.professeur?.id,
         est_actif: editingExercice.est_actif,
       }
-    : {};
+    : {
+        type: "classique",
+        difficulte: "moyen",
+        est_actif: true,
+      };
 
   return (
-    <div>
+    <div className="space-y-6">
       {/* Entête */}
-      <div className="flex items-center justify-between mb-6">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
-          <h1 className="text-xl font-bold text-gray-900">
-            Gestion des exercices
-          </h1>
-          <p className="text-sm text-gray-400">
-            Ajoutez, modifiez ou supprimez des exercices
+          <h1 className="text-xl font-bold text-gray-900">Gestion des exercices</h1>
+          <p className="text-sm text-gray-500">
+            Créez, éditez et organisez l'ensemble de la banque d'exercices et travaux dirigés
           </p>
         </div>
 
         <button
           onClick={openCreate}
-          className="flex items-center gap-1.5 text-sm font-medium bg-amber-500 text-white rounded-lg px-4 py-2 hover:bg-amber-600 transition-colors"
+          className="flex items-center gap-2 text-sm font-medium bg-amber-500 text-white rounded-xl px-4 py-2.5 hover:bg-amber-600 shadow-sm transition-colors cursor-pointer self-start sm:self-auto"
         >
-          <Plus size={15} />
+          <Plus size={16} />
           Ajouter un exercice
         </button>
       </div>
 
+      {/* Barre d'outils / Recherche & Filtres */}
+      <div className="flex flex-col lg:flex-row items-center gap-3 bg-white p-3.5 rounded-xl border border-gray-100 shadow-sm">
+        <div className="flex items-center gap-2 bg-gray-50 rounded-lg px-3 py-2 flex-1 w-full lg:max-w-md">
+          <Search size={16} className="text-gray-400" />
+          <input
+            type="text"
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            placeholder="Rechercher par titre ou énoncé..."
+            className="bg-transparent text-sm text-gray-800 outline-none w-full placeholder-gray-400"
+          />
+        </div>
+
+        <div className="flex flex-wrap items-center gap-2 w-full lg:w-auto">
+          <div className="flex items-center gap-1.5 text-xs text-gray-500">
+            <Filter size={14} /> Matière :
+          </div>
+          <select
+            value={filterMatiere}
+            onChange={(e) => setFilterMatiere(e.target.value)}
+            className="text-xs border border-gray-200 rounded-lg px-2.5 py-2 bg-gray-50 text-gray-700 outline-none focus:ring-2 focus:ring-amber-200"
+          >
+            <option value="all">Toutes matières</option>
+            {matieres.map((m) => (
+              <option key={m.id} value={String(m.id)}>
+                {m.nom}
+              </option>
+            ))}
+          </select>
+
+          <div className="flex items-center gap-1.5 text-xs text-gray-500 ml-1">
+            Niveau :
+          </div>
+          <select
+            value={filterNiveau}
+            onChange={(e) => setFilterNiveau(e.target.value)}
+            className="text-xs border border-gray-200 rounded-lg px-2.5 py-2 bg-gray-50 text-gray-700 outline-none focus:ring-2 focus:ring-amber-200"
+          >
+            <option value="all">Tous niveaux</option>
+            {niveaux.map((n) => (
+              <option key={n.id} value={String(n.id)}>
+                {n.libelle}
+              </option>
+            ))}
+          </select>
+
+          <div className="flex items-center gap-1.5 text-xs text-gray-500 ml-1">
+            Difficulté :
+          </div>
+          <select
+            value={filterDifficulte}
+            onChange={(e) => setFilterDifficulte(e.target.value)}
+            className="text-xs border border-gray-200 rounded-lg px-2.5 py-2 bg-gray-50 text-gray-700 outline-none focus:ring-2 focus:ring-amber-200"
+          >
+            <option value="all">Toutes</option>
+            <option value="facile">Facile</option>
+            <option value="moyen">Moyen</option>
+            <option value="difficile">Difficile</option>
+          </select>
+        </div>
+
+        <div className="lg:ml-auto text-xs text-gray-500 whitespace-nowrap">
+          Total : <span className="font-semibold text-gray-800">{filteredExercices.length}</span> exercice(s)
+        </div>
+      </div>
+
       {/* Contenu */}
       {loading ? (
-        <p className="text-sm text-gray-400 text-center py-16">
+        <div className="py-20 text-center text-sm text-gray-400">
           Chargement des exercices...
-        </p>
+        </div>
       ) : error ? (
-        <p className="text-sm text-red-500 text-center py-16">{error}</p>
-      ) : exercices.length === 0 ? (
-        <div className="flex flex-col items-center justify-center py-16 text-center">
+        <div className="py-16 text-center text-sm text-red-500 bg-red-50 rounded-xl border border-red-100">
+          {error}
+        </div>
+      ) : filteredExercices.length === 0 ? (
+        <div className="flex flex-col items-center justify-center py-16 text-center bg-white rounded-2xl border border-gray-100">
           <div className="w-12 h-12 rounded-full bg-amber-50 flex items-center justify-center mb-3">
-            <BookOpen size={20} className="text-amber-500" />
+            <BookOpen size={22} className="text-amber-500" />
           </div>
-          <p className="text-sm text-gray-400">Aucun exercice pour le moment.</p>
-          <button
-            onClick={openCreate}
-            className="text-sm font-medium text-amber-600 hover:text-amber-700 mt-2"
-          >
-            Créer le premier exercice
-          </button>
+          <p className="text-sm text-gray-500 font-medium">Aucun exercice pour le moment</p>
+          <p className="text-xs text-gray-400 mt-1 max-w-sm">
+            {search || filterMatiere !== "all" || filterNiveau !== "all" || filterDifficulte !== "all"
+              ? "Aucun exercice ne correspond aux filtres appliqués."
+              : "Créez votre premier exercice avec son énoncé et ses caractéristiques."}
+          </p>
+          {!search && filterMatiere === "all" && filterNiveau === "all" && (
+            <button
+              onClick={openCreate}
+              className="text-sm font-medium text-amber-600 hover:text-amber-700 mt-3"
+            >
+              Créer le premier exercice
+            </button>
+          )}
         </div>
       ) : (
-        <div className="overflow-x-auto border border-gray-100 rounded-lg bg-white">
+        <div className="overflow-x-auto border border-gray-100 rounded-2xl bg-white shadow-sm">
           <table className="w-full text-sm">
             <thead>
-              <tr className="bg-gray-50 text-left text-xs text-gray-500 uppercase">
-                <th className="px-4 py-3">Titre</th>
-                <th className="px-4 py-3">Matière</th>
-                <th className="px-4 py-3">Niveau</th>
-                <th className="px-4 py-3">Type</th>
-                <th className="px-4 py-3">Difficulté</th>
-                <th className="px-4 py-3">Statut</th>
-                <th className="px-4 py-3 text-right">Actions</th>
+              <tr className="bg-gray-50/75 text-left text-xs text-gray-500 uppercase tracking-wider border-b border-gray-100">
+                <th className="px-5 py-3.5">Titre</th>
+                <th className="px-5 py-3.5">Matière</th>
+                <th className="px-5 py-3.5">Niveau</th>
+                <th className="px-5 py-3.5">Type</th>
+                <th className="px-5 py-3.5">Difficulté</th>
+                <th className="px-5 py-3.5 text-center">Statut</th>
+                <th className="px-5 py-3.5 text-right">Actions</th>
               </tr>
             </thead>
-            <tbody>
-              {exercices.map((exercice) => (
+            <tbody className="divide-y divide-gray-100">
+              {filteredExercices.map((exercice) => (
                 <tr
                   key={exercice.id}
-                  className="border-t border-gray-100 hover:bg-gray-50 transition-colors"
+                  className="hover:bg-amber-50/30 transition-colors"
                 >
-                  <td className="px-4 py-3 font-medium text-gray-900 max-w-xs truncate">
-                    {exercice.titre}
+                  <td className="px-5 py-3.5 font-medium text-gray-900 max-w-xs">
+                    <div className="truncate font-semibold">{exercice.titre}</div>
+                    <div className="text-xs text-gray-400 truncate max-w-sm font-normal">
+                      {exercice.enonce}
+                    </div>
                   </td>
-                  <td className="px-4 py-3 text-gray-600">
+                  <td className="px-5 py-3.5 text-gray-700">
                     {exercice.matiere?.nom ?? "—"}
                   </td>
-                  <td className="px-4 py-3 text-gray-600">
+                  <td className="px-5 py-3.5 text-gray-700">
                     {exercice.niveau?.libelle ?? "—"}
                   </td>
-                  <td className="px-4 py-3 text-gray-600">
-                    {TYPE_LABELS[exercice.type] ?? exercice.type}
+                  <td className="px-5 py-3.5 text-gray-600">
+                    <span className="text-xs px-2.5 py-1 rounded bg-gray-100 text-gray-700">
+                      {TYPE_LABELS[exercice.type] ?? exercice.type}
+                    </span>
                   </td>
-                  <td className="px-4 py-3">
+                  <td className="px-5 py-3.5">
                     <span
-                      className={`text-xs font-semibold px-2 py-0.5 rounded-full ${
-                        DIFFICULTE_STYLES[exercice.difficulte] ?? "bg-gray-50 text-gray-600"
+                      className={`text-xs font-semibold px-2.5 py-0.5 rounded-full border capitalize ${
+                        DIFFICULTE_STYLES[exercice.difficulte] ?? "bg-gray-50 text-gray-600 border-gray-100"
                       }`}
                     >
                       {exercice.difficulte}
                     </span>
                   </td>
-                  <td className="px-4 py-3">
+                  <td className="px-5 py-3.5 text-center">
                     <span
-                      className={`text-xs font-semibold px-2 py-0.5 rounded-full ${
+                      className={`text-xs font-semibold px-2.5 py-0.5 rounded-full ${
                         exercice.est_actif
-                          ? "bg-emerald-50 text-emerald-600"
+                          ? "bg-emerald-50 text-emerald-700"
                           : "bg-gray-100 text-gray-500"
                       }`}
                     >
                       {exercice.est_actif ? "Actif" : "Inactif"}
                     </span>
                   </td>
-                  <td className="px-4 py-3">
-                    <div className="flex items-center justify-end gap-2">
+                  <td className="px-5 py-3.5 text-right">
+                    <div className="flex items-center justify-end gap-1.5">
+                      <button
+                        onClick={() => setViewExercice(exercice)}
+                        title="Consulter l'énoncé"
+                        className="p-1.5 rounded-lg text-gray-400 hover:text-blue-600 hover:bg-blue-50 transition-colors"
+                      >
+                        <Eye size={15} />
+                      </button>
                       <button
                         onClick={() => openEdit(exercice)}
+                        title="Modifier"
                         className="p-1.5 rounded-lg text-gray-400 hover:text-amber-600 hover:bg-amber-50 transition-colors"
                       >
                         <Pencil size={15} />
                       </button>
                       <button
                         onClick={() => setDeleteTarget(exercice)}
+                        title="Supprimer"
                         className="p-1.5 rounded-lg text-gray-400 hover:text-red-500 hover:bg-red-50 transition-colors"
                       >
                         <Trash2 size={15} />
@@ -246,11 +359,53 @@ export default function GestionExercices() {
         />
       </Modal>
 
+      {/* Modal Visualisation Exercice */}
+      <Modal open={!!viewExercice} onClose={() => setViewExercice(null)}>
+        {viewExercice && (
+          <div className="space-y-4 max-h-[80vh] overflow-y-auto pr-1">
+            <div className="border-b border-gray-100 pb-3">
+              <div className="flex items-center gap-2 mb-1.5">
+                <span className="text-xs font-semibold px-2 py-0.5 rounded-full bg-amber-50 text-amber-700">
+                  {TYPE_LABELS[viewExercice.type] ?? viewExercice.type}
+                </span>
+                <span className={`text-xs font-semibold px-2 py-0.5 rounded-full capitalize ${DIFFICULTE_STYLES[viewExercice.difficulte]}`}>
+                  {viewExercice.difficulte}
+                </span>
+              </div>
+              <h2 className="text-lg font-bold text-gray-900">{viewExercice.titre}</h2>
+              <div className="flex gap-4 mt-2 text-xs text-gray-500">
+                <span>Matière : <strong className="text-gray-800">{viewExercice.matiere?.nom ?? "Non définie"}</strong></span>
+                <span>Niveau : <strong className="text-gray-800">{viewExercice.niveau?.libelle ?? "Non défini"}</strong></span>
+              </div>
+            </div>
+
+            <div className="bg-gray-50 rounded-xl p-4 border border-gray-100">
+              <h3 className="text-xs font-semibold uppercase tracking-wider text-gray-500 mb-2">
+                Énoncé de l'exercice
+              </h3>
+              <div className="text-sm text-gray-800 whitespace-pre-line leading-relaxed">
+                {viewExercice.enonce}
+              </div>
+            </div>
+
+            <div className="flex justify-end pt-2 border-t border-gray-100">
+              <button
+                type="button"
+                onClick={() => setViewExercice(null)}
+                className="px-4 py-2 text-sm font-medium bg-gray-100 text-gray-700 hover:bg-gray-200 rounded-lg transition-colors"
+              >
+                Fermer
+              </button>
+            </div>
+          </div>
+        )}
+      </Modal>
+
       {/* Modal confirmation suppression */}
       <ConfirmModal
         open={!!deleteTarget}
         title={`Supprimer "${deleteTarget?.titre}" ?`}
-        description="Cette action est irréversible. L'exercice sera définitivement supprimé."
+        description="Cette action est irréversible. L'exercice et ses éventuelles corrections associées seront définitivement supprimés."
         loading={deleting}
         onConfirm={handleConfirmDelete}
         onCancel={() => setDeleteTarget(null)}
