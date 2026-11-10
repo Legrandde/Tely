@@ -59,7 +59,7 @@ export default function OverView() {
   }));
 
   return (
-    <div className="flex flex-col gap-7 pb-8">
+    <div className="flex flex-col gap-7 pb-8 w-full max-w-full overflow-x-hidden min-w-0">
       {/* ── Entête Bienvenue avec image de fond ── */}
       <div className="relative overflow-hidden rounded-2xl bg-gradient-to-r from-amber-600 via-amber-500 to-orange-500 text-white shadow-sm min-h-[160px] flex items-center justify-between p-6 sm:p-8">
         {/* Image de fond avec fondu et opacité */}
@@ -87,7 +87,7 @@ export default function OverView() {
       </div>
 
       {/* ── Stat Cards ── */}
-      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
+      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3 sm:gap-4 w-full min-w-0">
         <StatCard label="Élèves inscrits" value={counts.eleves} percent={12.5} bgColor="bg-amber-50" />
         <StatCard label="Professeurs" value={counts.professeurs} percent={4.2} bgColor="bg-green-50" />
         <StatCard label="Exercices actifs" value={counts.exercices} percent={8.1} bgColor="bg-rose-50" />
@@ -96,9 +96,9 @@ export default function OverView() {
       </div>
 
       {/* ── Graphiques & Répartition ── */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 w-full min-w-0">
         {/* Exercices par Matière */}
-        <div className="lg:col-span-2 bg-white rounded-2xl p-5 shadow-sm border border-gray-100 flex flex-col">
+        <div className="lg:col-span-2 bg-white rounded-2xl p-5 shadow-sm border border-gray-100 flex flex-col min-w-0 overflow-hidden">
           <div className="flex items-center justify-between mb-4">
             <div>
               <h3 className="text-sm font-bold text-gray-900">Exercices par matière</h3>

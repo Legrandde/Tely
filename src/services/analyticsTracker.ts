@@ -135,11 +135,11 @@ export async function trackEvent(
       os: detectOS(),
       browser: detectBrowser(),
       device_type: detectDevice(),
+      timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
       metadata,
     };
 
-    // Use sendBeacon if available, otherwise axios
-    const apiBase = (import.meta.env.VITE_API_URL || "http://127.0.0.1:8000").replace(/\/$/, "");
+    const apiBase = (import.meta.env.VITE_API_URL || "http://localhost:8000").replace(/\/$/, "");
     const url = `${apiBase}/api/analytics/track`;
 
     if (navigator.sendBeacon) {

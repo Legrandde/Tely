@@ -83,7 +83,7 @@ export default function SideBar() {
       </div>
 
       {/* Navigation Links */}
-      <div className="flex flex-col gap-1.5 py-4 flex-1 overflow-y-auto">
+      <div className="flex flex-col gap-1 py-3 flex-1 overflow-y-auto overflow-x-hidden no-scrollbar">
         {!collapsed && (
           <span className="text-[11px] font-semibold text-gray-400 uppercase tracking-wider px-3 mb-1">
             Gestion & Contenus
