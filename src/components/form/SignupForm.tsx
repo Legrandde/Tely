@@ -57,8 +57,8 @@ export function SignupForm() {
         password_confirmation: values.confirmPassword,
         role: "eleve",
       });
-      if (user.role === "professeur") navigate("/professeur/dashboard");
-      else if (user.role === "administrateur") navigate("/dashbord-admin");
+      if (user.role === "professeur") navigate("/Dashboard-professeur");
+      else if (user.role === "administrateur") navigate("/Dashbord-admin");
       else navigate("/exercices");
     } catch (err: unknown) {
       const message =

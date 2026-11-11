@@ -1,12 +1,14 @@
-import { Search, Settings, Bell, Menu } from "lucide-react";
+import { Search, Settings, Menu } from "lucide-react";
 import { useAuth } from "../context/authContext";
 import { useLocation, useNavigate } from "react-router-dom";
 import { resolveImageUrl } from "../utils/imageUrl";
 import { useSidebar } from "../context/SidebarContext";
+import NotificationDropdown from "./notifications/NotificationDropdown";
 
 const TITLES: Record<string, string> = {
   statistiques: "Statistiques & Audience",
   candidatures: "Candidatures Enseignants",
+  parametres: "Paramètres & Configuration",
   profile: "Mon Profil Utilisateur",
   exercices: "Gestion des exercices",
   sujets: "Gestion des sujets d'examen",
@@ -55,6 +57,13 @@ export default function Header({ title }: { title?: string }) {
       ? "/Dashboard-professeur/profile"
       : "/profile";
 
+  const settingsPath =
+    user?.role === "administrateur"
+      ? "/Dashbord-admin/parametres"
+      : user?.role === "professeur"
+      ? "/Dashboard-professeur/parametres"
+      : "/parametres";
+
   const avatarUrl = resolveImageUrl(user?.avatar_url || user?.avatar);
   const { toggleMobile } = useSidebar();
 
@@ -86,29 +95,18 @@ export default function Header({ title }: { title?: string }) {
           />
         </div>
 
-        {/* Settings -> Profil */}
+        {/* Settings -> Paramètres */}
         <button
           type="button"
-          onClick={() => navigate(profilePath)}
-          title="Mon Profil & Paramètres"
+          onClick={() => navigate(settingsPath)}
+          title="Paramètres & Configuration"
           className="p-1.5 sm:p-2 rounded-lg text-gray-400 hover:text-amber-500 hover:bg-amber-50 transition-colors cursor-pointer"
         >
           <Settings size={18} />
         </button>
 
-        {/* Bell avec badge */}
-        <div className="relative">
-          <button
-            type="button"
-            title="Notifications"
-            className="p-1.5 sm:p-2 rounded-lg text-gray-400 hover:text-amber-500 hover:bg-amber-50 transition-colors cursor-pointer"
-          >
-            <Bell size={18} />
-          </button>
-          <span className="absolute top-1 right-1 bg-amber-500 text-white text-[10px] font-bold rounded-full w-4 h-4 flex items-center justify-center pointer-events-none">
-            3
-          </span>
-        </div>
+        {/* Bell avec dropdown interactif & temps réel */}
+        <NotificationDropdown />
 
         {/* Avatar cliquable */}
         <button

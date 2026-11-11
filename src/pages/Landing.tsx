@@ -1,7 +1,6 @@
 import { ArrowRight } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
-import { useEffect } from "react";
 import Service from "../components/Services";
 import { GoArrowRight } from "react-icons/go";
 import PartainerSponsor from "../components/PartenaireSponsort";
@@ -12,7 +11,6 @@ import NouvelleLettre from "../components/NouvelleLettre";
 import FooterSection from "../components/FooterSection";
 import GoogleOneTap from "../components/auth/GoogleOneTap";
 import ProfesseurJoinSection from "../components/landing/ProfesseurJoinSection";
-import { trackEvent } from "../services/analyticsTracker";
 
 // ── Variants ────────────────────────────────────────────────────────────────
 const fadeUp = {
@@ -33,10 +31,6 @@ const staggerContainer = {
 export default function Landing() {
   const navigate = useNavigate();
   const { isAuthenticated } = useAuth();
-
-  useEffect(() => {
-    trackEvent("page_view", "/");
-  }, []);
 
   return (
     <div className="flex flex-col gap-7">

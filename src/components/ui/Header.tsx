@@ -1,13 +1,14 @@
-import { Menu, X, LogOut } from "lucide-react";
+import { Menu, X, LogOut, LayoutDashboard } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
 import { motion, AnimatePresence, type Variants } from "framer-motion";
 import { useState } from "react";
 import { logout } from "../../services/authService";
 import { useAuth } from "../../context/authContext";
+import { resolveImageUrl } from "../../utils/imageUrl";
 
 const fadeDown: Variants = {
   hidden: { opacity: 0, y: -20 },
-  show:   { opacity: 1, y: 0  },
+  show: { opacity: 1, y: 0 },
 };
 
 const staggerContainer: Variants = {
@@ -22,13 +23,26 @@ const staggerContainer: Variants = {
 
 const navItemVariant: Variants = {
   hidden: { opacity: 0, y: -10 },
-  show:   { opacity: 1, y: 0,  transition: { duration: 0.35, ease: "easeOut" } },
+  show: { opacity: 1, y: 0, transition: { duration: 0.35, ease: "easeOut" } },
 };
 
 export default function Header() {
   const [menuOpen, setMenuOpen] = useState(false);
   const { user, isAuthenticated, logoutLocal } = useAuth();
   const navigate = useNavigate();
+
+  const getDashboardInfo = () => {
+    if (user?.role === "administrateur") {
+      return { path: "/Dashbord-admin", label: "Tableau de bord Admin" };
+    }
+    if (user?.role === "professeur") {
+      return { path: "/Dashboard-professeur", label: "Espace Enseignant" };
+    }
+    return { path: "/exercices", label: "Mon Espace" };
+  };
+
+  const dashboardInfo = getDashboardInfo();
+  const userAvatar = resolveImageUrl(user?.avatar_url || user?.avatar);
 
   async function handleLogout() {
     try {
@@ -55,12 +69,12 @@ export default function Header() {
           initial={{ opacity: 0, x: -16 }}
           animate={{ opacity: 1, x: 0 }}
           transition={{ duration: 0.5, ease: "easeOut" }}
-          onClick={()=> navigate("/")}
+          onClick={() => navigate("/")}
         >
           Tely Elearning
         </motion.h1>
 
-        {/* Desktop nav — identique à l'original */}
+        {/* Desktop nav */}
         <motion.div
           className="hidden md:flex items-center justify-center gap-4 mr-4"
           variants={staggerContainer}
@@ -69,33 +83,55 @@ export default function Header() {
         >
           {["Exercices", "Sujets", "Corrections"].map((item) => (
             <motion.span key={item} variants={navItemVariant} className="cursor-pointer">
-               <Link to={`/${item}`}>{item}</Link>
+              <Link to={`/${item}`}>{item}</Link>
             </motion.span>
           ))}
 
           {isAuthenticated ? (
             <motion.div variants={navItemVariant} className="flex items-center gap-3">
+              {/* Accès à son espace selon son rôle */}
+              <Link
+                to={dashboardInfo.path}
+                className="flex items-center gap-1.5 px-3.5 py-1.5 bg-amber-500 hover:bg-amber-400 text-black font-semibold text-xs rounded-lg shadow-sm transition-all cursor-pointer"
+              >
+                <LayoutDashboard size={14} />
+                <span>{dashboardInfo.label}</span>
+              </Link>
+
               <motion.button
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.97 }}
                 onClick={handleLogout}
-                className="flex items-center gap-1 p-1 rounded-lg cursor-pointer hover:bg-black hover:text-white transition-colors duration-200"
+                className="flex items-center gap-1 px-2.5 py-1.5 rounded-lg cursor-pointer hover:bg-black hover:text-white text-xs transition-colors duration-200"
               >
-                <LogOut size={16} />
+                <LogOut size={14} />
                 Déconnexion
               </motion.button>
-              {user?.avatar ? (
-                <img
-                  src={user.avatar}
-                  alt={user.nom}
-                  referrerPolicy="no-referrer"
-                  className="w-7 h-7 rounded-full object-cover"
-                />
-              ) : (
-                <div className="w-7 h-7 rounded-full bg-amber-500 text-white flex items-center justify-center text-xs font-semibold">
-                  {user?.nom?.charAt(0).toUpperCase()}
-                </div>
-              )}
+
+              <Link
+                to={
+                  user?.role === "administrateur"
+                    ? "/Dashbord-admin/profile"
+                    : user?.role === "professeur"
+                    ? "/Dashboard-professeur/profile"
+                    : "/profile"
+                }
+                className="cursor-pointer hover:opacity-85 transition-opacity"
+                title="Mon Profil"
+              >
+                {userAvatar ? (
+                  <img
+                    src={userAvatar}
+                    alt={user?.nom || "Avatar"}
+                    referrerPolicy="no-referrer"
+                    className="w-7 h-7 rounded-full object-cover ring-2 ring-amber-400/50"
+                  />
+                ) : (
+                  <div className="w-7 h-7 rounded-full bg-amber-500 text-white flex items-center justify-center text-xs font-semibold">
+                    {user?.prenom?.charAt(0).toUpperCase() || user?.nom?.charAt(0).toUpperCase() || "U"}
+                  </div>
+                )}
+              </Link>
             </motion.div>
           ) : (
             <>
@@ -122,7 +158,7 @@ export default function Header() {
         {/* Hamburger — mobile only */}
         <motion.button
           className="md:hidden p-1"
-          onClick={() => setMenuOpen(v => !v)}
+          onClick={() => setMenuOpen((v) => !v)}
           whileTap={{ scale: 0.93 }}
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
@@ -143,31 +179,45 @@ export default function Header() {
             className="md:hidden overflow-hidden flex flex-col gap-1 pt-2"
           >
             {["Exercices", "Anciens Sujets", "Corrections"].map((item) => (
-              <span key={item} className="cursor-default p-1">{item}</span>
+              <span key={item} className="cursor-default p-1">
+                {item}
+              </span>
             ))}
 
             {isAuthenticated ? (
               <>
+                <Link
+                  to={dashboardInfo.path}
+                  onClick={() => setMenuOpen(false)}
+                  className="flex items-center gap-2 px-3 py-2 bg-amber-500 text-black font-bold text-xs rounded-lg my-1 shadow-xs"
+                >
+                  <LayoutDashboard size={16} />
+                  <span>Accéder à {dashboardInfo.label}</span>
+                </Link>
+
                 <button
                   onClick={handleLogout}
-                  className="flex items-center gap-1 p-1 rounded-lg cursor-pointer hover:bg-black hover:text-white transition-colors duration-200 text-left"
+                  className="flex items-center gap-1.5 p-2 rounded-lg cursor-pointer hover:bg-black hover:text-white transition-colors duration-200 text-left text-xs"
                 >
                   <LogOut size={16} />
                   Déconnexion
                 </button>
                 <div className="flex items-center gap-2 p-1">
-                  {user?.avatar ? (
+                  {userAvatar ? (
                     <img
-                      src={user.avatar}
-                      alt={user.nom}
+                      src={userAvatar}
+                      alt={user?.nom || "Avatar"}
                       referrerPolicy="no-referrer"
                       className="w-7 h-7 rounded-full object-cover"
                     />
                   ) : (
                     <div className="w-7 h-7 rounded-full bg-amber-500 text-white flex items-center justify-center text-xs font-semibold">
-                      {user?.nom?.charAt(0).toUpperCase()}
+                      {user?.prenom?.charAt(0).toUpperCase() || user?.nom?.charAt(0).toUpperCase() || "U"}
                     </div>
                   )}
+                  <span className="text-xs font-medium text-gray-700">
+                    {user?.prenom} {user?.nom}
+                  </span>
                 </div>
               </>
             ) : (

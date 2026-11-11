@@ -8,7 +8,16 @@ export function GoogleCallback() {
   const navigate = useNavigate();
 
   useEffect(() => {
-    const token = params.get("token");
+    // Lecture sécurisée du token depuis le fragment hash (#token=) ou query (?token=)
+    const hash = window.location.hash;
+    const hashParams = new URLSearchParams(hash.startsWith("#") ? hash.substring(1) : hash);
+    const token = hashParams.get("token") || params.get("token");
+
+    // Nettoyage immédiat de l'URL pour ne pas laisser le token dans l'historique du navigateur
+    if (window.location.hash || window.location.search) {
+      window.history.replaceState(null, "", window.location.pathname);
+    }
+
     if (!token) {
       navigate("/login?error=google_auth_failed", { replace: true });
       return;
@@ -19,11 +28,10 @@ export function GoogleCallback() {
     getMe()
       .then((user) => {
         if (user.role === "professeur") {
-          navigate("/professeur/dashboard", { replace: true });
+          navigate("/Dashboard-professeur", { replace: true });
         } else if (user.role === "administrateur") {
-          navigate("/dashbord-admin", { replace: true });
+          navigate("/Dashbord-admin", { replace: true });
         } else {
-          // eleve
           navigate("/exercices", { replace: true });
         }
       })

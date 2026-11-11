@@ -34,9 +34,9 @@ export function LoginForm() {
     setLoading(true);
     try {
       const user = await login({ email, password });
-      if (user.role === "professeur") navigate("/Dashboard-professeur/overview");
-      else if (user.role === "administrateur") navigate("/Dashbord-admin/overview");
-      else navigate("/Exercices");
+      if (user.role === "professeur") navigate("/Dashboard-professeur");
+      else if (user.role === "administrateur") navigate("/Dashbord-admin");
+      else navigate("/exercices");
     } catch (err: unknown) {
       const message =
         (err as { response?: { data?: { message?: string } } })?.response?.data?.message ?? "Email ou mot de passe incorrect";

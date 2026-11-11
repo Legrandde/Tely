@@ -54,11 +54,11 @@ export default function GoogleOneTap() {
               addToast("success", `Connexion réussie ! Bienvenue ${loggedUser.prenom || loggedUser.nom}.`);
 
               if (loggedUser.role === "administrateur") {
-                navigate("/Dashbord-admin/overview");
+                navigate("/Dashbord-admin");
               } else if (loggedUser.role === "professeur") {
-                navigate("/Dashboard-professeur/overview");
+                navigate("/Dashboard-professeur");
               } else {
-                navigate("/Exercices");
+                navigate("/exercices");
               }
             } catch (err: unknown) {
               console.error("Google One Tap error:", err);

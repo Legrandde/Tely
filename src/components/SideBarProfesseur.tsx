@@ -8,6 +8,7 @@ import {
   CheckCircle2,
   FileText,
   User,
+  Settings,
   LogOut,
   X,
 } from "lucide-react";
@@ -48,6 +49,7 @@ export default function SideBarProfesseur() {
     { route: "corrections", label: "Corrigés & Solutions", icon: <CheckCircle2 size={19} /> },
     { route: "ressources", label: "Documents & PDFs", icon: <FileText size={19} /> },
     { route: "profile", label: "Mon Profil", icon: <User size={19} /> },
+    { route: "parametres", label: "Paramètres", icon: <Settings size={19} /> },
   ];
 
   const handleNavigate = (route: string) => {

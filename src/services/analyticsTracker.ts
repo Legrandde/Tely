@@ -139,17 +139,11 @@ export async function trackEvent(
       metadata,
     };
 
-    const apiBase = (import.meta.env.VITE_API_URL || "http://localhost:8000").replace(/\/$/, "");
-    const url = `${apiBase}/api/analytics/track`;
-
-    if (navigator.sendBeacon) {
-      const blob = new Blob([JSON.stringify(payload)], { type: "application/json" });
-      navigator.sendBeacon(url, blob);
-    } else {
-      await api.post("/api/analytics/track", payload);
+    await api.post("/api/analytics/track", payload);
+  } catch (err) {
+    if (import.meta.env.DEV) {
+      console.warn("[Analytics] Échec de l'envoi de l'événement:", err);
     }
-  } catch {
-    // Ignore tracking failures silently
   }
 }
 

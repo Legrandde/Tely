@@ -1,4 +1,6 @@
-import { createBrowserRouter } from "react-router-dom";
+import { useEffect } from "react";
+import { createBrowserRouter, Outlet, useLocation } from "react-router-dom";
+import { trackEvent } from "../services/analyticsTracker";
 import Landing from "../pages/Landing";
 import { AuthLayout } from "../pages/Login";
 import DashbordAdmin from "../pages/DashbordAdmin";
@@ -26,17 +28,31 @@ import GestionCorrections from "../pages/GestionCorrections";
 import GestionMatieres from "../pages/GestionMatieres";
 import GestionNiveaux from "../pages/GestionNiveaux";
 import GestionCategories from "../pages/GestionCategories";
+import ParametresPage from "../pages/ParametresPage";
 import NotFoundPage from "../pages/NotFound";
 import { RequireGuest } from "./RequireGuest";
 import { RequireAuth } from "./RequireAuth";
 import ListeSujets from "../pages/ListeSujets";
 import SujetDetailPage from "../pages/SujetsDetailPage";
 
+function RootAnalyticsTracker() {
+  const location = useLocation();
+
+  useEffect(() => {
+    trackEvent("page_view", location.pathname);
+  }, [location.pathname]);
+
+  return <Outlet />;
+}
+
 export const Route = createBrowserRouter([
   {
-    path: "/",
-    element: <Landing />,
-  },
+    element: <RootAnalyticsTracker />,
+    children: [
+      {
+        path: "/",
+        element: <Landing />,
+      },
   {
     path: "auth",
     element: <AuthLayout />,
@@ -109,6 +125,10 @@ export const Route = createBrowserRouter([
         element: <ProfilePage />,
       },
       {
+        path: "parametres",
+        element: <ParametresPage />,
+      },
+      {
         path: "exercices",
         element: <GestionExercices />,
       },
@@ -172,6 +192,10 @@ export const Route = createBrowserRouter([
         element: <ProfilePage />,
       },
       {
+        path: "parametres",
+        element: <ParametresPage />,
+      },
+      {
         path: "exercices",
         element: <GestionExercices />,
       },
@@ -209,6 +233,10 @@ export const Route = createBrowserRouter([
       {
         path: "profile",
         element: <ProfilePage />,
+      },
+      {
+        path: "parametres",
+        element: <ParametresPage />,
       },
       {
         path: "exercices",
@@ -249,11 +277,17 @@ export const Route = createBrowserRouter([
     element: <ListeExercices />,
   },
   {
+    path: "exercices",
+    element: <ListeExercices />,
+  },
+  {
     path: "sujets",
     element: <ListeSujets />,
   },
   {
     path: "*",
     element: <NotFoundPage />,
+  },
+    ],
   },
 ]);
