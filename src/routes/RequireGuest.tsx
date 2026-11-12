@@ -10,9 +10,9 @@ export function RequireGuest({ children }: RequireGuestProps) {
   const { user, isAuthenticated } = useAuth();
 
   if (isAuthenticated) {
-    if (user?.role === "professeur") return <Navigate to="/professeur/dashboard" replace />;
+    if (user?.role === "professeur") return <Navigate to="/Dashboard-professeur" replace />;
     if (user?.role === "administrateur") return <Navigate to="/Dashbord-admin" replace />;
-    return <Navigate to="/Exercices" replace />;
+    return <Navigate to="/exercices" replace />;
   }
 
   return <>{children}</>;

@@ -38,7 +38,30 @@ export default function GestionCategories() {
   }
 
   useEffect(() => {
-    fetchCategories();
+    let cancelled = false;
+
+    listCategories()
+      .then((data) => {
+        if (!cancelled) {
+          setCategories(data);
+          setError(undefined);
+        }
+      })
+      .catch((err: unknown) => {
+        if (!cancelled) {
+          const errorMsg =
+            (err as { response?: { data?: { message?: string } } })?.response?.data?.message ??
+            "Impossible de charger les catégories";
+          setError(errorMsg);
+        }
+      })
+      .finally(() => {
+        if (!cancelled) setLoading(false);
+      });
+
+    return () => {
+      cancelled = true;
+    };
   }, []);
 
   const filteredCategories = useMemo(() => {

@@ -40,7 +40,30 @@ export default function GestionCorrections() {
   }
 
   useEffect(() => {
-    fetchCorrections();
+    let cancelled = false;
+
+    listCorrections()
+      .then((data) => {
+        if (!cancelled) {
+          setCorrections(data);
+          setError(undefined);
+        }
+      })
+      .catch((err: unknown) => {
+        if (!cancelled) {
+          const errorMsg =
+            (err as { response?: { data?: { message?: string } } })?.response?.data?.message ??
+            "Impossible de charger les corrections";
+          setError(errorMsg);
+        }
+      })
+      .finally(() => {
+        if (!cancelled) setLoading(false);
+      });
+
+    return () => {
+      cancelled = true;
+    };
   }, []);
 
   const filteredCorrections = useMemo(() => {

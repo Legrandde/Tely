@@ -51,7 +51,30 @@ export default function GestionProfesseurs() {
   }
 
   useEffect(() => {
-    fetchProfesseurs();
+    let cancelled = false;
+
+    listProfesseurs()
+      .then((data) => {
+        if (!cancelled) {
+          setProfesseurs(Array.isArray(data) ? data : data.data ?? []);
+          setError(undefined);
+        }
+      })
+      .catch((err: unknown) => {
+        if (!cancelled) {
+          const errorMsg =
+            (err as { response?: { data?: { message?: string } } })?.response?.data?.message ??
+            "Impossible de charger les professeurs";
+          setError(errorMsg);
+        }
+      })
+      .finally(() => {
+        if (!cancelled) setLoading(false);
+      });
+
+    return () => {
+      cancelled = true;
+    };
   }, []);
 
   const filteredProfesseurs = useMemo(() => {

@@ -39,7 +39,30 @@ export default function GestionNiveaux() {
   }
 
   useEffect(() => {
-    fetchNiveaux();
+    let cancelled = false;
+
+    listNiveaux()
+      .then((data) => {
+        if (!cancelled) {
+          setNiveaux(data);
+          setError(undefined);
+        }
+      })
+      .catch((err: unknown) => {
+        if (!cancelled) {
+          const errorMsg =
+            (err as { response?: { data?: { message?: string } } })?.response?.data?.message ??
+            "Impossible de charger les niveaux";
+          setError(errorMsg);
+        }
+      })
+      .finally(() => {
+        if (!cancelled) setLoading(false);
+      });
+
+    return () => {
+      cancelled = true;
+    };
   }, []);
 
   const cycles = useMemo(() => {

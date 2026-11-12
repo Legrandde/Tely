@@ -1,4 +1,5 @@
 import { useEffect, useState, useMemo } from "react";
+import { useNavigate, useLocation } from "react-router-dom";
 import { Plus, Pencil, Trash2, BookOpen, Search, Eye, Filter } from "lucide-react";
 import ConfirmModal from "../components/ui/ConfirmModal";
 import ResourceForm from "../components/form/ResourceForm";
@@ -65,7 +66,32 @@ export default function GestionExercices() {
   }
 
   useEffect(() => {
-    fetchExercices();
+    let cancelled = false;
+
+    Promise.all([listExercices(), listMatieres(), listNiveaux()])
+      .then(([exData, matData, nivData]) => {
+        if (!cancelled) {
+          setExercices(exData);
+          setMatieres(matData);
+          setNiveaux(nivData);
+          setError(undefined);
+        }
+      })
+      .catch((err: unknown) => {
+        if (!cancelled) {
+          const errorMsg =
+            (err as { response?: { data?: { message?: string } } })?.response?.data?.message ??
+            "Impossible de charger les exercices";
+          setError(errorMsg);
+        }
+      })
+      .finally(() => {
+        if (!cancelled) setLoading(false);
+      });
+
+    return () => {
+      cancelled = true;
+    };
   }, []);
 
   const filteredExercices = useMemo(() => {
@@ -88,14 +114,17 @@ export default function GestionExercices() {
     });
   }, [exercices, search, filterMatiere, filterNiveau, filterDifficulte]);
 
+  const navigate = useNavigate();
+  const location = useLocation();
+  const isProfesseur = location.pathname.toLowerCase().includes("professeur");
+  const baseRoute = isProfesseur ? "/Dashboard-professeur/exercices" : "/Dashbord-admin/exercices";
+
   function openCreate() {
-    setEditingExercice(null);
-    setModalOpen(true);
+    navigate(`${baseRoute}/nouveau`);
   }
 
   function openEdit(exercice: Exercice) {
-    setEditingExercice(exercice);
-    setModalOpen(true);
+    navigate(`${baseRoute}/${exercice.id}/modifier`);
   }
 
   function closeModal() {

@@ -20,7 +20,18 @@ export function RequireAuth({ children, allowedRoles }: RequireAuthProps) {
   }
 
   if (!isAuthenticated) {
-    return <Navigate to="/auth/login" state={{ from: location }} replace />;
+    const isEnnonce = location.pathname.startsWith("/ennoncer");
+    const raison = isEnnonce
+      ? "Connectez-vous pour accéder à cet énoncé et à son corrigé."
+      : "Veuillez vous connecter pour accéder à cette page.";
+
+    return (
+      <Navigate
+        to="/auth/login"
+        state={{ from: location, raison }}
+        replace
+      />
+    );
   }
 
   if (allowedRoles && user && !allowedRoles.includes(user.role)) {

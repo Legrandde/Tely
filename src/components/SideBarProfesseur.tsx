@@ -7,6 +7,7 @@ import {
   ClipboardList,
   CheckCircle2,
   FileText,
+  Bell,
   User,
   Settings,
   LogOut,
@@ -48,6 +49,7 @@ export default function SideBarProfesseur() {
     { route: "sujets", label: "Sujets Examens", icon: <ClipboardList size={19} /> },
     { route: "corrections", label: "Corrigés & Solutions", icon: <CheckCircle2 size={19} /> },
     { route: "ressources", label: "Documents & PDFs", icon: <FileText size={19} /> },
+    { route: "notifications", label: "Notifications", icon: <Bell size={19} /> },
     { route: "profile", label: "Mon Profil", icon: <User size={19} /> },
     { route: "parametres", label: "Paramètres", icon: <Settings size={19} /> },
   ];

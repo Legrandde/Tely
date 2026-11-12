@@ -56,7 +56,31 @@ export default function GestionEleves() {
   }
 
   useEffect(() => {
-    fetchEleves();
+    let cancelled = false;
+
+    Promise.all([listEleves(), listNiveaux()])
+      .then(([data, nivData]) => {
+        if (!cancelled) {
+          setEleves(Array.isArray(data) ? data : data.data ?? []);
+          setNiveaux(nivData);
+          setError(undefined);
+        }
+      })
+      .catch((err: unknown) => {
+        if (!cancelled) {
+          const errorMsg =
+            (err as { response?: { data?: { message?: string } } })?.response?.data?.message ??
+            "Impossible de charger la liste des élèves";
+          setError(errorMsg);
+        }
+      })
+      .finally(() => {
+        if (!cancelled) setLoading(false);
+      });
+
+    return () => {
+      cancelled = true;
+    };
   }, []);
 
   const filteredEleves = useMemo(() => {

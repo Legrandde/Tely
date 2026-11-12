@@ -1,4 +1,5 @@
 import { useEffect, useState, useMemo } from "react";
+import { useNavigate, useLocation } from "react-router-dom";
 import { Plus, Pencil, Trash2, ClipboardList, Search, Eye, Filter, Calendar } from "lucide-react";
 import ConfirmModal from "../components/ui/ConfirmModal";
 import ResourceForm from "../components/form/ResourceForm";
@@ -57,7 +58,30 @@ export default function GestionSujets() {
   }
 
   useEffect(() => {
-    fetchSujets();
+    let cancelled = false;
+
+    listSujets()
+      .then((data) => {
+        if (!cancelled) {
+          setSujets(data);
+          setError(undefined);
+        }
+      })
+      .catch((err: unknown) => {
+        if (!cancelled) {
+          const errorMsg =
+            (err as { response?: { data?: { message?: string } } })?.response?.data?.message ??
+            "Impossible de charger les sujets d'examen";
+          setError(errorMsg);
+        }
+      })
+      .finally(() => {
+        if (!cancelled) setLoading(false);
+      });
+
+    return () => {
+      cancelled = true;
+    };
   }, []);
 
   const filteredSujets = useMemo(() => {
@@ -67,7 +91,7 @@ export default function GestionSujets() {
         s.titre.toLowerCase().includes(search.toLowerCase()) ||
         (s.matiere?.nom && s.matiere.nom.toLowerCase().includes(search.toLowerCase())) ||
         (s.niveau?.libelle && s.niveau.libelle.toLowerCase().includes(search.toLowerCase())) ||
-        (s.ennonce && s.ennonce.toLowerCase().includes(search.toLowerCase()));
+        ((s.ennonce || s.enonce) && (s.ennonce || s.enonce || "").toLowerCase().includes(search.toLowerCase()));
 
       const matchType = filterType === "all" || s.type === filterType;
       const matchSession = filterSession === "all" || s.session === filterSession;
@@ -76,14 +100,17 @@ export default function GestionSujets() {
     });
   }, [sujets, search, filterType, filterSession]);
 
+  const navigate = useNavigate();
+  const location = useLocation();
+  const isProfesseur = location.pathname.toLowerCase().includes("professeur");
+  const baseRoute = isProfesseur ? "/Dashboard-professeur/sujets" : "/Dashbord-admin/sujets";
+
   function openCreate() {
-    setEditingSujet(null);
-    setModalOpen(true);
+    navigate(`${baseRoute}/nouveau`);
   }
 
   function openEdit(sujet: SujetItem) {
-    setEditingSujet(sujet);
-    setModalOpen(true);
+    navigate(`${baseRoute}/${sujet.id}/modifier`);
   }
 
   async function openView(sujet: SujetItem) {

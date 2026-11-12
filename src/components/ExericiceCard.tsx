@@ -1,6 +1,7 @@
-import { GraduationCap, BookOpen } from "lucide-react";
+import { GraduationCap, BookOpen, Lock } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import type { Exercice } from "../types/exercice";
+import { useAuth } from "../context/authContext";
 
 interface ExerciceCardProps {
   exercice: Exercice;
@@ -36,6 +37,7 @@ function gradientFor(id: number) {
 export default function ExerciceCard({ exercice }: ExerciceCardProps) {
   const { id, titre, matiere, niveau, difficulte, type, professeur } = exercice;
   const navigate = useNavigate();
+  const { isAuthenticated } = useAuth();
 
   const auteur = professeur?.user
     ? `${professeur.user.prenom} ${professeur.user.nom}`.trim()
@@ -44,7 +46,7 @@ export default function ExerciceCard({ exercice }: ExerciceCardProps) {
   return (
     <div
       onClick={() => navigate(`/ennoncer?id=${id}`)}
-      className="flex flex-col bg-white rounded-lg border border-gray-100 overflow-hidden hover:shadow-md transition-shadow cursor-pointer"
+      className="flex flex-col bg-white rounded-lg border border-gray-100 overflow-hidden hover:shadow-md transition-shadow cursor-pointer group"
     >
       {/* Vignette */}
       <div
@@ -61,7 +63,7 @@ export default function ExerciceCard({ exercice }: ExerciceCardProps) {
       {/* Contenu */}
       <div className="flex flex-col p-3 gap-1.5">
         <p className="text-xs text-gray-400">par {auteur}</p>
-        <h3 className="font-semibold text-sm leading-snug line-clamp-2">
+        <h3 className="font-semibold text-sm leading-snug line-clamp-2 group-hover:text-amber-600 transition-colors">
           {matiere?.nom} — {titre}
         </h3>
 
@@ -84,7 +86,11 @@ export default function ExerciceCard({ exercice }: ExerciceCardProps) {
           >
             {difficulte}
           </span>
-          <button className="text-xs font-medium text-orange-600 hover:text-orange-700">
+          <button
+            type="button"
+            className="text-xs font-medium text-orange-600 hover:text-orange-700 flex items-center gap-1"
+          >
+            {!isAuthenticated && <Lock size={12} className="text-amber-600" />}
             Voir détails
           </button>
         </div>

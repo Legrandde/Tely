@@ -58,9 +58,11 @@ export default function ProfilePage() {
   // Loading states
   const [savingProfile, setSavingProfile] = useState(false);
   const [savingPassword, setSavingPassword] = useState(false);
+  const userRef = useRef(user);
 
   useEffect(() => {
-    if (user) {
+    if (user && user !== userRef.current) {
+      userRef.current = user;
       setNom(user.nom || "");
       setPrenom(user.prenom || "");
       setEmail(user.email || "");
@@ -73,14 +75,21 @@ export default function ProfilePage() {
   }, [user]);
 
   useEffect(() => {
+    let cancelled = false;
     if (user?.role === "eleve") {
-      api.get("/api/niveaux")
+      api
+        .get("/api/niveaux")
         .then((res) => {
-          const list = Array.isArray(res.data) ? res.data : res.data.data || [];
-          setNiveaux(list);
+          if (!cancelled) {
+            const list = Array.isArray(res.data) ? res.data : res.data.data || [];
+            setNiveaux(list);
+          }
         })
         .catch(() => {});
     }
+    return () => {
+      cancelled = true;
+    };
   }, [user?.role]);
 
   const handleAvatarChange = (e: React.ChangeEvent<HTMLInputElement>) => {

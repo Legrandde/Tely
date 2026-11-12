@@ -13,6 +13,7 @@ import {
   Library,
   Layers,
   Tag,
+  Bell,
   User,
   Settings,
   LogOut,
@@ -60,6 +61,7 @@ export default function SideBar() {
     { route: "matieres", label: "Matières", icon: <Library size={19} /> },
     { route: "niveaux", label: "Niveaux", icon: <Layers size={19} /> },
     { route: "categories", label: "Catégories", icon: <Tag size={19} /> },
+    { route: "notifications", label: "Notifications", icon: <Bell size={19} /> },
     { route: "profile", label: "Mon Profil", icon: <User size={19} /> },
     { route: "parametres", label: "Paramètres", icon: <Settings size={19} /> },
   ];

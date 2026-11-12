@@ -16,23 +16,6 @@ import {
   Cell,
 } from "recharts";
 
-const COUNTRY_FLAGS: Record<string, string> = {
-  SN: "🇸🇳",
-  CI: "🇨🇮",
-  FR: "🇫🇷",
-  GN: "🇬🇳",
-  ML: "🇲🇱",
-  CA: "🇨🇦",
-  CM: "🇨🇲",
-  MA: "🇲🇦",
-  TG: "🇹🇬",
-  BJ: "🇧🇯",
-  US: "🇺🇸",
-  BE: "🇧🇪",
-  NE: "🇳🇪",
-  BF: "🇧🇫",
-};
-
 const ACTION_COLORS: Record<string, { bg: string; text: string; label: string }> = {
   page_view: { bg: "bg-gray-100", text: "text-gray-700", label: "Page vue" },
   view_exercice: { bg: "bg-amber-50", text: "text-amber-700", label: "Exercice consulté" },
@@ -65,8 +48,31 @@ export default function AdminStatistiques() {
   };
 
   useEffect(() => {
-    loadData(period);
-  }, [period]);
+    let cancelled = false;
+
+    fetchAdminAnalytics(period)
+      .then((res) => {
+        if (!cancelled) {
+          startTransition(() => {
+            setData(res);
+          });
+        }
+      })
+      .catch(() => {
+        if (!cancelled) {
+          addToast("error", "Impossible de charger les statistiques d'audience.");
+        }
+      })
+      .finally(() => {
+        if (!cancelled) {
+          setLoading(false);
+        }
+      });
+
+    return () => {
+      cancelled = true;
+    };
+  }, [period, addToast, startTransition]);
 
   const summary = data?.summary ?? {
     total_visits: 0,
@@ -233,12 +239,13 @@ export default function AdminStatistiques() {
                 </div>
               ) : (
                 data?.countries.map((c, idx) => {
-                  const flag = COUNTRY_FLAGS[c.country_code] || "🌍";
                   return (
                     <div key={idx}>
                       <div className="flex items-center justify-between text-xs mb-1.5">
                         <span className="font-medium text-gray-700 flex items-center gap-1.5">
-                          <span className="text-sm">{flag}</span>
+                          <span className="px-1.5 py-0.5 text-[10px] font-bold font-mono bg-slate-100 text-slate-700 rounded border border-slate-200">
+                            {c.country_code || "GN"}
+                          </span>
                           {c.country}
                         </span>
                         <span className="font-semibold text-gray-900">
@@ -392,7 +399,7 @@ export default function AdminStatistiques() {
                       <span className="text-[11px] text-gray-400 font-mono">({act.ip_address})</span>
                     </p>
                     <span className="text-[11px] text-gray-400">
-                      {act.path} • {COUNTRY_FLAGS[act.country_code] || "🌍"} {act.country} • {act.os}
+                      {act.path} • [{act.country_code || "GN"}] {act.country} • {act.os}
                     </span>
                   </div>
                 </div>

@@ -60,6 +60,9 @@ export interface ExerciceFilters {
   type?: ExerciceType;
   avec_correction?: boolean;
   q?: string;
+  cycle?: string;
+  serie?: string;
+  tri?: string;
   page?: number;
 }
 

@@ -1,5 +1,6 @@
 import { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
+import { Lock } from "lucide-react";
 import { AppInput } from "../shared/ui/AppInput";
 import { AppButton } from "../shared/ui/AppButton";
 import { IconEye } from "../shared/ui/IconEye";
@@ -8,6 +9,9 @@ import { register, loginWithGoogle } from "../../services/authService";
 
 export function SignupForm() {
   const navigate = useNavigate();
+  const location = useLocation();
+  const stateRaison = (location.state as { raison?: string } | null)?.raison;
+
   const [values, setValues] = useState({
     nom: "",
     prenom: "",
@@ -27,6 +31,26 @@ export function SignupForm() {
     confirmPassword?: string;
     global?: string;
   }>({});
+
+  function getTargetRedirectPath(): string | null {
+    const fromState = (location.state as { from?: unknown } | null)?.from;
+    if (typeof fromState === "string") {
+      return fromState;
+    }
+    if (fromState && typeof fromState === "object" && "pathname" in fromState) {
+      const loc = fromState as { pathname: string; search?: string; hash?: string };
+      return `${loc.pathname}${loc.search || ""}${loc.hash || ""}`;
+    }
+    return null;
+  }
+
+  function handleGoogleLogin() {
+    const targetPath = getTargetRedirectPath();
+    if (targetPath) {
+      sessionStorage.setItem("auth_redirect", targetPath);
+    }
+    loginWithGoogle();
+  }
 
   function validate() {
     const e: typeof errors = {};
@@ -57,9 +81,19 @@ export function SignupForm() {
         password_confirmation: values.confirmPassword,
         role: "eleve",
       });
-      if (user.role === "professeur") navigate("/Dashboard-professeur");
-      else if (user.role === "administrateur") navigate("/Dashbord-admin");
-      else navigate("/exercices");
+
+      if (user.role === "professeur") {
+        navigate("/Dashboard-professeur", { replace: true });
+      } else if (user.role === "administrateur") {
+        navigate("/Dashbord-admin", { replace: true });
+      } else {
+        const targetPath = getTargetRedirectPath();
+        if (targetPath) {
+          navigate(targetPath, { replace: true });
+        } else {
+          navigate("/exercices", { replace: true });
+        }
+      }
     } catch (err: unknown) {
       const message =
         (err as { response?: { data?: { message?: string } } })?.response?.data?.message ?? "Une erreur est survenue, réessaie";
@@ -75,6 +109,13 @@ export function SignupForm() {
         Créer un compte
       </h1>
       <p className="text-sm text-gray-400 mb-7">Rejoins Tely et commence à t'exercer</p>
+
+      {stateRaison && (
+        <div className="flex items-center gap-2 text-xs text-amber-800 bg-amber-50 border border-amber-200 rounded-lg px-3 py-2.5 mb-3.5">
+          <Lock size={15} className="text-amber-600 shrink-0" />
+          <span>{stateRaison}</span>
+        </div>
+      )}
 
       {errors.global && (
         <div className="text-xs text-red-500 bg-red-50 border border-red-100 rounded-lg px-3 py-2 mb-3.5">
@@ -155,7 +196,7 @@ export function SignupForm() {
         <AppButton
           type="button"
           variant="outline"
-          onClick={loginWithGoogle}
+          onClick={handleGoogleLogin}
           iconLeft={<IconGoogle />}
           fullWidth
         >
@@ -175,8 +216,12 @@ export function SignupForm() {
 
       <p className="text-center text-xs text-gray-400 mt-5">
         Déjà un compte ?
-        <Link to="/auth/login" className="text-gray-900 font-semibold cursor-pointer ml-1 hover:underline">
-          Log in
+        <Link
+          to="/auth/login"
+          state={location.state}
+          className="text-gray-900 font-semibold cursor-pointer ml-1 hover:underline"
+        >
+          Connexion
         </Link>
       </p>
     </form>

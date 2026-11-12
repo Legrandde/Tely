@@ -83,8 +83,38 @@ export default function ProfesseurRessources() {
   }
 
   useEffect(() => {
-    fetchData();
-  }, []);
+    let cancelled = false;
+
+    Promise.all([
+      listRessources(),
+      listMatieres(),
+      listNiveaux(),
+    ])
+      .then(([resData, matData, nivData]) => {
+        if (!cancelled) {
+          setRessources(resData);
+          setMatieres(matData);
+          setNiveaux(nivData);
+          setError(undefined);
+        }
+      })
+      .catch((err: unknown) => {
+        if (!cancelled) {
+          const errorMsg =
+            (err as { response?: { data?: { message?: string } } })?.response?.data?.message ??
+            "Impossible de charger les ressources";
+          setError(errorMsg);
+          toast.error(errorMsg);
+        }
+      })
+      .finally(() => {
+        if (!cancelled) setLoading(false);
+      });
+
+    return () => {
+      cancelled = true;
+    };
+  }, [toast]);
 
   const filteredRessources = useMemo(() => {
     return ressources.filter((r) => {

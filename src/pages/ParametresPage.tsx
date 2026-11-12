@@ -15,12 +15,14 @@ import { useToast } from "../context/ToastContext";
 import { fetchParametres, saveParametres } from "../services/parametreService";
 import type { PlatformSettings } from "../types/parametre";
 
+type TabKey = "general" | "pedagogie" | "notifications" | "securite";
+
 export default function ParametresPage() {
   const { user } = useAuth();
   const { addToast } = useToast();
   const isAdmin = user?.role === "administrateur";
 
-  const [activeTab, setActiveTab] = useState<"general" | "pedagogie" | "notifications" | "securite">("general");
+  const [activeTab, setActiveTab] = useState<TabKey>("general");
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
 
@@ -119,20 +121,22 @@ export default function ParametresPage() {
 
       {/* ── Onglets de Navigation ── */}
       <div className="flex items-center gap-1.5 overflow-x-auto bg-white p-2 rounded-xl border border-gray-100 shadow-sm no-scrollbar text-xs">
-        {[
-          { key: "general", label: "Général", icon: <Globe size={15} /> },
-          ...(isAdmin
-            ? [
-                { key: "pedagogie", label: "Pédagogie & Inscriptions", icon: <GraduationCap size={15} /> },
-              ]
-            : []),
-          { key: "notifications", label: "Notifications & Alertes", icon: <Bell size={15} /> },
-          { key: "securite", label: "Sécurité & Sessions", icon: <Shield size={15} /> },
-        ].map((tab) => (
+        {(
+          [
+            { key: "general" as const, label: "Général", icon: <Globe size={15} /> },
+            ...(isAdmin
+              ? [
+                  { key: "pedagogie" as const, label: "Pédagogie & Inscriptions", icon: <GraduationCap size={15} /> },
+                ]
+              : []),
+            { key: "notifications" as const, label: "Notifications & Alertes", icon: <Bell size={15} /> },
+            { key: "securite" as const, label: "Sécurité & Sessions", icon: <Shield size={15} /> },
+          ] as Array<{ key: TabKey; label: string; icon: React.ReactNode }>
+        ).map((tab) => (
           <button
             key={tab.key}
             type="button"
-            onClick={() => setActiveTab(tab.key as any)}
+            onClick={() => setActiveTab(tab.key)}
             className={`flex items-center gap-2 px-4 py-2.5 rounded-lg font-semibold transition-all cursor-pointer whitespace-nowrap ${
               activeTab === tab.key
                 ? "bg-amber-500 text-white shadow-xs"

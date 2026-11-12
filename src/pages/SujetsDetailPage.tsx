@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { useNavigate, useSearchParams } from "react-router-dom";
+import { useLocation, useNavigate, useSearchParams } from "react-router-dom";
 import CourseDetailSkeleton from "../components/CourseDetailSkeleton";
 import type { LucideIcon } from "lucide-react";
 import {
@@ -18,6 +18,7 @@ import {
   Calendar,
   CalendarClock,
   GraduationCap,
+  CheckCircle,
 } from "lucide-react";
 import Header from "../components/ui/Header";
 import { getSujet } from "../services/sujetService";
@@ -63,8 +64,8 @@ const SESSION_LABELS: Record<string, string> = {
   janvier: "Session de Janvier",
 };
 
-// ── Longueur d'aperçu de l'énoncé pour les non-connectés ──────────────────
-const APERCU_LONGUEUR = 350;
+// Longueur d'amorce visible avant le flou pour les non-connectés
+const APERCU_LONGUEUR = 180;
 
 // ── Sous-composants ──────────────────────────────────────────────────────
 
@@ -90,15 +91,17 @@ function Row({ icon: Icon, label, value }: RowProps) {
 
 export default function SujetDetailPage() {
   const navigate = useNavigate();
+  const location = useLocation();
   const [searchParams] = useSearchParams();
   const sujetId = searchParams.get("id");
 
-  const { isAuthenticated } = useAuth();
+  const { isAuthenticated, isLoading: authLoading } = useAuth();
 
   const [sujet, setSujet] = useState<Sujet | null>(null);
   const [loading, setLoading] = useState(!!sujetId);
   const [error, setError] = useState<string | undefined>(!sujetId ? "Aucun sujet sélectionné." : undefined);
   const [activeTab, setActiveTab] = useState<Tab>("Énoncé");
+  const [copied, setCopied] = useState(false);
 
   useEffect(() => {
     if (!sujetId) return;
@@ -115,7 +118,9 @@ export default function SujetDetailPage() {
       })
       .catch((err: unknown) => {
         if (!cancelled) {
-          const errorMsg = (err as { response?: { data?: { message?: string } } })?.response?.data?.message ?? "Impossible de charger ce sujet.";
+          const errorMsg =
+            (err as { response?: { data?: { message?: string } } })?.response?.data?.message ??
+            "Impossible de charger ce sujet.";
           setError(errorMsg);
           setLoading(false);
         }
@@ -124,11 +129,15 @@ export default function SujetDetailPage() {
     return () => {
       cancelled = true;
     };
-  }, [sujetId]);
+  }, [sujetId, isAuthenticated]);
 
-  // Fonctions de navigation vers login/signup avec message contextuel
   function redirigerVersConnexion(raison?: string) {
-    navigate("/auth/login", { state: { from: location.pathname, raison } });
+    navigate("/auth/login", {
+      state: {
+        from: location.pathname + location.search,
+        raison: raison ?? "Connectez-vous pour débloquer le sujet d'examen complet et son corrigé.",
+      },
+    });
   }
 
   function gererActionProtegee(raison: string, action: () => void) {
@@ -140,7 +149,7 @@ export default function SujetDetailPage() {
   }
 
   // ── États de chargement / erreur ────────────────────────────────────────
-  if (loading) {
+  if (loading || authLoading) {
     return (
       <div className="min-h-screen bg-gray-50 text-gray-900">
         <div className="px-8 pt-4">
@@ -179,12 +188,27 @@ export default function SujetDetailPage() {
     ? `${sujet.professeur.user.prenom} ${sujet.professeur.user.nom}`.trim()
     : "Professeur";
 
-  const enonceCourt = sujet.ennonce.length > APERCU_LONGUEUR;
-  const enonceVisible = isAuthenticated || !enonceCourt
-    ? sujet.ennonce
-    : sujet.ennonce.slice(0, APERCU_LONGUEUR);
+  // Support du fallback entre ennonce et enonce
+  const texteSujet = sujet.ennonce || sujet.enonce || "";
+
+  // Si non connecté, l'énoncé complet est flouté
+  const enonceDebut = texteSujet.slice(0, APERCU_LONGUEUR);
+  const enonceReste = texteSujet.slice(APERCU_LONGUEUR);
 
   const exercicesTries = [...(sujet.exercices ?? [])].sort((a, b) => a.ordre - b.ordre);
+
+  function handleShare(label: string) {
+    const currentUrl = window.location.href;
+    if (label === "Copier le lien") {
+      navigator.clipboard.writeText(currentUrl);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    } else if (label === "WhatsApp") {
+      window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(`Regarde ce sujet d'examen sur Tely : ${currentUrl}`)}`, "_blank");
+    } else if (label === "Email") {
+      window.open(`mailto:?subject=${encodeURIComponent(`Sujet Tely : ${sujet?.titre}`)}&body=${encodeURIComponent(`Voici le lien : ${currentUrl}`)}`, "_self");
+    }
+  }
 
   return (
     <div className="min-h-screen bg-gray-50 text-gray-900">
@@ -193,9 +217,9 @@ export default function SujetDetailPage() {
       </div>
 
       <div className="max-w-6xl mx-auto px-4 py-10 grid grid-cols-1 lg:grid-cols-[1fr_360px] gap-10">
-        {/* Left column */}
+        {/* Colonne gauche */}
         <div>
-          <span className="text-xs font-semibold text-orange-600 bg-orange-100 px-2 py-1 rounded uppercase tracking-wide">
+          <span className="text-xs font-semibold text-orange-600 bg-orange-100 px-2.5 py-1 rounded-full uppercase tracking-wide">
             {sujet.matiere?.nom} • {sujet.niveau?.libelle}
           </span>
 
@@ -223,19 +247,20 @@ export default function SujetDetailPage() {
             </div>
           </div>
 
-          {/* Tabs */}
+          {/* Onglets */}
           <div className="flex gap-8 border-b border-gray-200 mt-6">
             {TABS.map((tab) => (
               <button
                 key={tab}
                 onClick={() => setActiveTab(tab)}
-                className={`pb-3 text-sm font-medium transition-colors relative ${
+                className={`pb-3 text-sm font-medium transition-colors relative flex items-center gap-1.5 ${
                   activeTab === tab
-                    ? "text-gray-900"
+                    ? "text-gray-900 font-semibold"
                     : "text-gray-400 hover:text-gray-600"
                 }`}
               >
                 {tab}
+                {!isAuthenticated && tab !== "Énoncé" && <Lock size={12} className="text-amber-500" />}
                 {activeTab === tab && (
                   <span className="absolute left-0 -bottom-px w-full h-0.5 bg-orange-500 rounded-full" />
                 )}
@@ -246,60 +271,88 @@ export default function SujetDetailPage() {
           {/* Contenu des onglets */}
           <div className="mt-6">
             {activeTab === "Énoncé" && (
-              <div className="bg-white border border-gray-200 rounded-xl p-6">
-                <h2 className="text-xl font-bold mb-4">Énoncé</h2>
-
-                <div className="relative">
-                  <p
-                    className={`text-gray-700 leading-relaxed whitespace-pre-line ${
-                      !isAuthenticated && enonceCourt ? "blur-[1.5px] select-none" : ""
-                    }`}
-                  >
-                    {enonceVisible}
-                    {!isAuthenticated && enonceCourt ? "…" : ""}
-                  </p>
-
-                  {!isAuthenticated && enonceCourt && (
-                    <div className="absolute inset-x-0 bottom-0 h-24 bg-gradient-to-t from-white via-white/90 to-transparent flex items-end justify-center pb-2">
-                      <button
-                        onClick={() =>
-                          redirigerVersConnexion(
-                            "Connecte-toi pour lire la suite de l'énoncé."
-                          )
-                        }
-                        className="flex items-center gap-2 bg-white border border-orange-200 shadow-sm text-orange-600 font-medium text-sm px-4 py-2 rounded-lg hover:bg-orange-50 transition-colors"
-                      >
-                        <Lock size={14} />
-                        Débloquer la suite de l'énoncé
-                      </button>
-                    </div>
+              <div className="bg-white border border-gray-200 rounded-xl p-6 shadow-sm">
+                <div className="flex items-center justify-between mb-4">
+                  <h2 className="text-xl font-bold">Énoncé officiel</h2>
+                  {!isAuthenticated && (
+                    <span className="text-xs bg-amber-50 text-amber-700 border border-amber-200 px-2.5 py-1 rounded-full flex items-center gap-1 font-medium">
+                      <Lock size={12} /> Connexion requise pour le sujet complet
+                    </span>
                   )}
                 </div>
+
+                {isAuthenticated ? (
+                  /* Affichage complet net lorsque connecté */
+                  <div className="text-gray-800 leading-relaxed whitespace-pre-line text-base">
+                    {texteSujet}
+                  </div>
+                ) : (
+                  /* Affichage flouté lorsque non connecté */
+                  <div className="relative">
+                    <p className="text-gray-700 leading-relaxed whitespace-pre-line">
+                      {enonceDebut}
+                    </p>
+                    <p className="text-gray-700 leading-relaxed whitespace-pre-line blur-[3.5px] select-none pointer-events-none mt-1">
+                      {enonceReste.length > 0
+                        ? enonceReste
+                        : "Épreuve complète : exercices obligatoires, problèmes au choix, figures géométriques et questions d'examen officielles..."}
+                    </p>
+
+                    {/* Overlay de verrouillage */}
+                    <div className="absolute inset-x-0 bottom-0 top-12 bg-gradient-to-t from-white via-white/80 to-transparent flex flex-col items-center justify-center p-6 text-center">
+                      <div className="bg-white/95 border border-amber-200 shadow-md rounded-xl p-5 max-w-md w-full flex flex-col items-center">
+                        <div className="w-10 h-10 rounded-full bg-amber-100 text-amber-700 flex items-center justify-center mb-2">
+                          <Lock size={20} />
+                        </div>
+                        <h3 className="font-semibold text-gray-900 text-base mb-1">
+                          Épreuve complète protégée
+                        </h3>
+                        <p className="text-xs text-gray-500 mb-4">
+                          Connecte-toi pour lire tout le sujet d'examen, accéder aux corrigés détaillés et télécharger les ressources.
+                        </p>
+                        <button
+                          onClick={() =>
+                            redirigerVersConnexion(
+                              "Connecte-toi pour débloquer le sujet d'examen complet et ses corrigés."
+                            )
+                          }
+                          className="bg-amber-600 hover:bg-amber-700 text-white font-medium text-sm px-5 py-2.5 rounded-lg shadow-sm transition-colors flex items-center gap-2"
+                        >
+                          <Lock size={14} />
+                          Se connecter pour débloquer
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                )}
               </div>
             )}
 
             {activeTab === "Corrigé" && (
-              <div className="bg-white border border-gray-200 rounded-xl p-6">
-                <h2 className="text-xl font-bold mb-4">Corrigés des exercices</h2>
+              <div className="bg-white border border-gray-200 rounded-xl p-6 shadow-sm">
+                <h2 className="text-xl font-bold mb-4">Corrigés des exercices du sujet</h2>
 
                 {!isAuthenticated ? (
                   <div className="flex flex-col items-center text-center py-10 text-gray-500">
-                    <Lock size={28} className="mb-3 text-orange-500" />
-                    <p className="font-medium">
-                      Les corrigés sont réservés aux élèves connectés.
+                    <div className="w-12 h-12 rounded-full bg-amber-50 text-amber-600 flex items-center justify-center mb-3">
+                      <Lock size={24} />
+                    </div>
+                    <p className="font-semibold text-gray-800 text-base">
+                      Les corrigés sont réservés aux utilisateurs connectés.
                     </p>
-                    <p className="text-sm mt-1 mb-4">
-                      Connecte-toi pour débloquer les corrections détaillées.
+                    <p className="text-sm text-gray-500 mt-1 mb-5 max-w-sm">
+                      Connecte-toi pour débloquer les corrections détaillées de chaque partie et exercice de ce sujet.
                     </p>
                     <button
                       onClick={() =>
                         redirigerVersConnexion(
-                          "Connecte-toi pour accéder aux corrigés de ce sujet."
+                          "Connecte-toi pour accéder aux corrigés de ce sujet d'examen."
                         )
                       }
-                      className="bg-emerald-600 hover:bg-emerald-700 text-white font-medium text-sm px-5 py-2.5 rounded-lg transition-colors"
+                      className="bg-emerald-600 hover:bg-emerald-700 text-white font-medium text-sm px-5 py-2.5 rounded-lg shadow-sm transition-colors flex items-center gap-2"
                     >
-                      Se connecter
+                      <Lock size={14} />
+                      Se connecter pour voir les corrigés
                     </button>
                   </div>
                 ) : exercicesTries.length > 0 ? (
@@ -307,7 +360,7 @@ export default function SujetDetailPage() {
                     {exercicesTries.map((ex, index) => (
                       <div
                         key={ex.id}
-                        className="border border-gray-100 rounded-lg p-4"
+                        className="border border-gray-100 rounded-lg p-4 bg-gray-50/50"
                       >
                         <p className="font-semibold text-sm text-gray-800 mb-2">
                           Exercice {ex.ordre ?? index + 1}
@@ -321,7 +374,7 @@ export default function SujetDetailPage() {
                             {ex.correction.explication && (
                               <div className="bg-amber-50 border border-amber-100 rounded-lg p-3 mt-2">
                                 <p className="text-xs font-semibold text-gray-800 mb-1">
-                                  Explication
+                                  Explication pédagogique
                                 </p>
                                 <p className="text-xs text-gray-600 whitespace-pre-line">
                                   {ex.correction.explication}
@@ -330,7 +383,7 @@ export default function SujetDetailPage() {
                             )}
                           </>
                         ) : (
-                          <p className="text-xs text-gray-400">
+                          <p className="text-xs text-gray-400 italic">
                             Corrigé indisponible pour cet exercice.
                           </p>
                         )}
@@ -339,9 +392,9 @@ export default function SujetDetailPage() {
                   </div>
                 ) : (
                   <div className="flex flex-col items-center text-center py-10 text-gray-500">
-                    <Lock size={28} className="mb-3 text-orange-500" />
-                    <p className="font-medium">
-                      Aucun corrigé disponible pour l'instant.
+                    <BookOpen size={28} className="mb-3 text-orange-500" />
+                    <p className="font-medium text-gray-700">
+                      Aucun corrigé disponible pour l'instant pour ce sujet.
                     </p>
                   </div>
                 )}
@@ -349,25 +402,36 @@ export default function SujetDetailPage() {
             )}
 
             {activeTab === "Ressources" && (
-              <div className="bg-white border border-gray-200 rounded-xl p-6">
-                <h2 className="text-xl font-bold mb-4">Ressources</h2>
+              <div className="bg-white border border-gray-200 rounded-xl p-6 shadow-sm">
+                <h2 className="text-xl font-bold mb-4">Ressources du sujet</h2>
                 <ul className="space-y-3">
                   <li className="flex items-center justify-between border border-gray-200 rounded-lg px-4 py-3">
                     <span className="flex items-center gap-2 text-sm text-gray-700">
                       <FileText size={16} className="text-orange-500" />
-                      Énoncé complet du sujet
+                      Énoncé officiel imprimable / PDF
                     </span>
                     <button
                       onClick={() =>
                         gererActionProtegee(
-                          "Connecte-toi pour télécharger les ressources.",
-                          () => console.log("Téléchargement de l'énoncé")
+                          "Connecte-toi pour télécharger et imprimer le sujet d'examen.",
+                          () => {
+                            const pdfLink = sujet.pdf_url || sujet.fichier_pdf;
+                            if (pdfLink) {
+                              window.open(pdfLink, "_blank");
+                            } else {
+                              window.print();
+                            }
+                          }
                         )
                       }
-                      className="flex items-center gap-1 text-sm font-medium text-orange-600 hover:text-orange-700"
+                      className="flex items-center gap-1.5 text-sm font-medium text-orange-600 hover:text-orange-700"
                     >
                       {isAuthenticated ? <Download size={14} /> : <Lock size={14} />}
-                      Télécharger
+                      {isAuthenticated
+                        ? sujet.pdf_url || sujet.fichier_pdf
+                          ? "Télécharger le PDF"
+                          : "Imprimer / Sauvegarder"
+                        : "Connexion requise"}
                     </button>
                   </li>
                 </ul>
@@ -378,7 +442,7 @@ export default function SujetDetailPage() {
 
         {/* Sidebar droite */}
         <aside>
-          <div className="bg-white border border-gray-200 rounded-xl p-6 sticky top-6">
+          <div className="bg-white border border-gray-200 rounded-xl p-6 sticky top-6 shadow-sm">
             <div className="flex items-center gap-3">
               <span className="text-lg font-bold">
                 {TYPE_LABELS[sujet.type] ?? sujet.type}
@@ -437,12 +501,12 @@ export default function SujetDetailPage() {
                   Connecte-toi
                 </p>
                 <p>
-                  Accède à tous les sujets, corrigés et suis ta progression.
+                  Accède à tous les sujets d'examens complets, corrigés et annales officielles.
                 </p>
                 <button
                   onClick={() =>
                     redirigerVersConnexion(
-                      "Connecte-toi pour profiter de tous les sujets."
+                      "Connecte-toi pour profiter de tous les sujets et corrigés."
                     )
                   }
                   className="inline-block mt-2 font-medium text-orange-600 hover:text-orange-700"
@@ -473,17 +537,20 @@ export default function SujetDetailPage() {
 
             <hr className="my-5 border-gray-200" />
 
-            <p className="text-sm font-semibold mb-3">Partager ce sujet :</p>
+            <div className="flex items-center justify-between mb-3">
+              <p className="text-sm font-semibold">Partager ce sujet :</p>
+              {copied && (
+                <span className="text-xs text-emerald-600 flex items-center gap-1">
+                  <CheckCircle size={12} /> Lien copié
+                </span>
+              )}
+            </div>
             <div className="flex gap-2 flex-wrap">
               {SHARE_BUTTONS.map(({ icon: Icon, label }) => (
                 <button
                   key={label}
                   title={label}
-                  onClick={() => {
-                    if (label === "Copier le lien") {
-                      navigator.clipboard.writeText(window.location.href);
-                    }
-                  }}
+                  onClick={() => handleShare(label)}
                   className="w-9 h-9 flex items-center justify-center rounded-lg border border-gray-200 text-gray-500 hover:bg-gray-50 transition-colors"
                 >
                   <Icon size={15} />

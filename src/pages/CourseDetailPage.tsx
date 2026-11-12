@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { useNavigate, useSearchParams } from "react-router-dom";
+import { useLocation, useNavigate, useSearchParams } from "react-router-dom";
 import CourseDetailSkeleton from "../components/CourseDetailSkeleton";
 import type { LucideIcon } from "lucide-react";
 import {
@@ -16,10 +16,10 @@ import {
   MessageCircle,
   Sparkles,
   BookOpen,
+  CheckCircle,
 } from "lucide-react";
 import Header from "../components/ui/Header";
 import { getExercice } from "../services/exerciceService";
-
 import type { Exercice } from "../types/exercice";
 import { useAuth } from "../context/authContext";
 
@@ -61,8 +61,8 @@ const TYPE_LABELS: Record<string, string> = {
   sujet_examen: "Sujet d'examen",
 };
 
-// ── Longueur d'aperçu de l'énoncé pour les non-connectés ──────────────────
-const APERCU_LONGUEUR = 350;
+// Longueur d'amorce visible avant le flou pour les non-connectés
+const APERCU_LONGUEUR = 180;
 
 // ── Sous-composants ──────────────────────────────────────────────────────
 
@@ -88,15 +88,17 @@ function Row({ icon: Icon, label, value }: RowProps) {
 
 export default function CourseDetailPage() {
   const navigate = useNavigate();
+  const location = useLocation();
   const [searchParams] = useSearchParams();
   const exerciceId = searchParams.get("id");
 
-  const { isAuthenticated } = useAuth();
+  const { isAuthenticated, isLoading: authLoading } = useAuth();
 
   const [exercice, setExercice] = useState<Exercice | null>(null);
   const [loading, setLoading] = useState(!!exerciceId);
   const [error, setError] = useState<string | undefined>(!exerciceId ? "Aucun exercice sélectionné." : undefined);
   const [activeTab, setActiveTab] = useState<Tab>("Énoncé");
+  const [copied, setCopied] = useState(false);
 
   useEffect(() => {
     if (!exerciceId) return;
@@ -113,7 +115,9 @@ export default function CourseDetailPage() {
       })
       .catch((err: unknown) => {
         if (!cancelled) {
-          const errorMsg = (err as { response?: { data?: { message?: string } } })?.response?.data?.message ?? "Impossible de charger cet exercice.";
+          const errorMsg =
+            (err as { response?: { data?: { message?: string } } })?.response?.data?.message ??
+            "Impossible de charger cet exercice.";
           setError(errorMsg);
           setLoading(false);
         }
@@ -122,11 +126,15 @@ export default function CourseDetailPage() {
     return () => {
       cancelled = true;
     };
-  }, [exerciceId]);
+  }, [exerciceId, isAuthenticated]);
 
-  // Fonctions de navigation vers login/signup avec message contextuel
   function redirigerVersConnexion(raison?: string) {
-    navigate("/auth/login", { state: { from: location.pathname, raison } });
+    navigate("/auth/login", {
+      state: {
+        from: location.pathname + location.search,
+        raison: raison ?? "Connectez-vous pour débloquer l'énoncé complet et son corrigé.",
+      },
+    });
   }
 
   function gererActionProtegee(raison: string, action: () => void) {
@@ -138,16 +146,16 @@ export default function CourseDetailPage() {
   }
 
   // ── États de chargement / erreur ────────────────────────────────────────
-  if (loading) {
-  return (
-    <div className="min-h-screen bg-gray-50 text-gray-900">
-      <div className="px-8 pt-4">
-        <Header />
+  if (loading || authLoading) {
+    return (
+      <div className="min-h-screen bg-gray-50 text-gray-900">
+        <div className="px-8 pt-4">
+          <Header />
+        </div>
+        <CourseDetailSkeleton />
       </div>
-      <CourseDetailSkeleton />
-    </div>
-  );
-}
+    );
+  }
 
   if (error || !exercice) {
     return (
@@ -177,12 +185,24 @@ export default function CourseDetailPage() {
     ? `${exercice.professeur.user.prenom} ${exercice.professeur.user.nom}`.trim()
     : "Professeur";
 
-  const enonceCourt = exercice.enonce.length > APERCU_LONGUEUR;
-  const enonceVisible = isAuthenticated || !enonceCourt
-    ? exercice.enonce
-    : exercice.enonce.slice(0, APERCU_LONGUEUR);
-
   const correction = (exercice as unknown as { correction?: { contenu?: string; explication?: string } })?.correction;
+
+  // Si non connecté, l'énoncé complet est flouté
+  const enonceDebut = exercice.enonce.slice(0, APERCU_LONGUEUR);
+  const enonceReste = exercice.enonce.slice(APERCU_LONGUEUR);
+
+  function handleShare(label: string) {
+    const currentUrl = window.location.href;
+    if (label === "Copier le lien") {
+      navigator.clipboard.writeText(currentUrl);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    } else if (label === "WhatsApp") {
+      window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(`Regarde cet exercice sur Tely : ${currentUrl}`)}`, "_blank");
+    } else if (label === "Email") {
+      window.open(`mailto:?subject=${encodeURIComponent(`Exercice Tely : ${exercice?.titre}`)}&body=${encodeURIComponent(`Voici le lien : ${currentUrl}`)}`, "_self");
+    }
+  }
 
   return (
     <div className="min-h-screen bg-gray-50 text-gray-900">
@@ -191,9 +211,9 @@ export default function CourseDetailPage() {
       </div>
 
       <div className="max-w-6xl mx-auto px-4 py-10 grid grid-cols-1 lg:grid-cols-[1fr_360px] gap-10">
-        {/* Left column */}
+        {/* Colonne gauche */}
         <div>
-          <span className="text-xs font-semibold text-orange-600 bg-orange-100 px-2 py-1 rounded uppercase tracking-wide">
+          <span className="text-xs font-semibold text-orange-600 bg-orange-100 px-2.5 py-1 rounded-full uppercase tracking-wide">
             {exercice.matiere?.nom} • {exercice.niveau?.libelle}
           </span>
 
@@ -221,19 +241,20 @@ export default function CourseDetailPage() {
             </div>
           </div>
 
-          {/* Tabs */}
+          {/* Onglets */}
           <div className="flex gap-8 border-b border-gray-200 mt-6">
             {TABS.map((tab) => (
               <button
                 key={tab}
                 onClick={() => setActiveTab(tab)}
-                className={`pb-3 text-sm font-medium transition-colors relative ${
+                className={`pb-3 text-sm font-medium transition-colors relative flex items-center gap-1.5 ${
                   activeTab === tab
-                    ? "text-gray-900"
+                    ? "text-gray-900 font-semibold"
                     : "text-gray-400 hover:text-gray-600"
                 }`}
               >
                 {tab}
+                {!isAuthenticated && tab !== "Énoncé" && <Lock size={12} className="text-amber-500" />}
                 {activeTab === tab && (
                   <span className="absolute left-0 -bottom-px w-full h-0.5 bg-orange-500 rounded-full" />
                 )}
@@ -244,49 +265,76 @@ export default function CourseDetailPage() {
           {/* Contenu des onglets */}
           <div className="mt-6">
             {activeTab === "Énoncé" && (
-              <div className="bg-white border border-gray-200 rounded-xl p-6">
-                <h2 className="text-xl font-bold mb-4">Énoncé</h2>
-
-                <div className="relative">
-                  <p
-                    className={`text-gray-700 leading-relaxed whitespace-pre-line ${
-                      !isAuthenticated && enonceCourt ? "blur-[1.5px] select-none" : ""
-                    }`}
-                  >
-                    {enonceVisible}
-                    {!isAuthenticated && enonceCourt ? "…" : ""}
-                  </p>
-
-                  {!isAuthenticated && enonceCourt && (
-                    <div className="absolute inset-x-0 bottom-0 h-24 bg-gradient-to-t from-white via-white/90 to-transparent flex items-end justify-center pb-2">
-                      <button
-                        onClick={() =>
-                          redirigerVersConnexion(
-                            "Connecte-toi pour lire la suite de l'énoncé."
-                          )
-                        }
-                        className="flex items-center gap-2 bg-white border border-orange-200 shadow-sm text-orange-600 font-medium text-sm px-4 py-2 rounded-lg hover:bg-orange-50 transition-colors"
-                      >
-                        <Lock size={14} />
-                        Débloquer la suite de l'énoncé
-                      </button>
-                    </div>
+              <div className="bg-white border border-gray-200 rounded-xl p-6 shadow-sm">
+                <div className="flex items-center justify-between mb-4">
+                  <h2 className="text-xl font-bold">Énoncé de l'exercice</h2>
+                  {!isAuthenticated && (
+                    <span className="text-xs bg-amber-50 text-amber-700 border border-amber-200 px-2.5 py-1 rounded-full flex items-center gap-1 font-medium">
+                      <Lock size={12} /> Connexion requise pour l'énoncé complet
+                    </span>
                   )}
                 </div>
+
+                {isAuthenticated ? (
+                  /* Affichage complet net lorsque connecté */
+                  <div className="text-gray-800 leading-relaxed whitespace-pre-line text-base">
+                    {exercice.enonce}
+                  </div>
+                ) : (
+                  /* Affichage flouté lorsque non connecté */
+                  <div className="relative">
+                    <p className="text-gray-700 leading-relaxed whitespace-pre-line">
+                      {enonceDebut}
+                    </p>
+                    <p className="text-gray-700 leading-relaxed whitespace-pre-line blur-[3.5px] select-none pointer-events-none mt-1">
+                      {enonceReste.length > 0
+                        ? enonceReste
+                        : "Consignes détaillées, questions théoriques, équations, calculs et développement complet de l'exercice à résoudre pas à pas..."}
+                    </p>
+
+                    {/* Overlay de verrouillage */}
+                    <div className="absolute inset-x-0 bottom-0 top-12 bg-gradient-to-t from-white via-white/80 to-transparent flex flex-col items-center justify-center p-6 text-center">
+                      <div className="bg-white/95 border border-amber-200 shadow-md rounded-xl p-5 max-w-md w-full flex flex-col items-center">
+                        <div className="w-10 h-10 rounded-full bg-amber-100 text-amber-700 flex items-center justify-center mb-2">
+                          <Lock size={20} />
+                        </div>
+                        <h3 className="font-semibold text-gray-900 text-base mb-1">
+                          Énoncé complet protégé
+                        </h3>
+                        <p className="text-xs text-gray-500 mb-4">
+                          Connecte-toi pour lire l'énoncé complet, accéder au corrigé et télécharger les ressources.
+                        </p>
+                        <button
+                          onClick={() =>
+                            redirigerVersConnexion(
+                              "Connecte-toi pour débloquer l'énoncé complet et son corrigé."
+                            )
+                          }
+                          className="bg-amber-600 hover:bg-amber-700 text-white font-medium text-sm px-5 py-2.5 rounded-lg shadow-sm transition-colors flex items-center gap-2"
+                        >
+                          <Lock size={14} />
+                          Se connecter pour débloquer
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                )}
               </div>
             )}
 
             {activeTab === "Corrigé" && (
-              <div className="bg-white border border-gray-200 rounded-xl p-6">
+              <div className="bg-white border border-gray-200 rounded-xl p-6 shadow-sm">
                 <h2 className="text-xl font-bold mb-4">Corrigé</h2>
                 {!isAuthenticated ? (
                   <div className="flex flex-col items-center text-center py-10 text-gray-500">
-                    <Lock size={28} className="mb-3 text-orange-500" />
-                    <p className="font-medium">
-                      Le corrigé est réservé aux élèves connectés.
+                    <div className="w-12 h-12 rounded-full bg-amber-50 text-amber-600 flex items-center justify-center mb-3">
+                      <Lock size={24} />
+                    </div>
+                    <p className="font-semibold text-gray-800 text-base">
+                      Le corrigé est réservé aux utilisateurs connectés.
                     </p>
-                    <p className="text-sm mt-1 mb-4">
-                      Connecte-toi pour débloquer la correction détaillée.
+                    <p className="text-sm text-gray-500 mt-1 mb-5 max-w-sm">
+                      Connecte-toi pour débloquer la solution détaillée étape par étape et les explications pédagogiques.
                     </p>
                     <button
                       onClick={() =>
@@ -294,22 +342,23 @@ export default function CourseDetailPage() {
                           "Connecte-toi pour accéder au corrigé de cet exercice."
                         )
                       }
-                      className="bg-emerald-600 hover:bg-emerald-700 text-white font-medium text-sm px-5 py-2.5 rounded-lg transition-colors"
+                      className="bg-emerald-600 hover:bg-emerald-700 text-white font-medium text-sm px-5 py-2.5 rounded-lg shadow-sm transition-colors flex items-center gap-2"
                     >
-                      Se connecter
+                      <Lock size={14} />
+                      Se connecter pour voir le corrigé
                     </button>
                   </div>
                 ) : correction?.contenu ? (
                   <div className="space-y-4">
-                    <p className="text-gray-700 leading-relaxed whitespace-pre-line">
+                    <div className="text-gray-800 leading-relaxed whitespace-pre-line text-base">
                       {correction.contenu}
-                    </p>
+                    </div>
                     {correction.explication && (
-                      <div className="bg-amber-50 border border-amber-100 rounded-lg p-4">
-                        <p className="text-sm font-semibold text-gray-800 mb-1">
-                          Explication
+                      <div className="bg-amber-50 border border-amber-100 rounded-lg p-4 mt-4">
+                        <p className="text-sm font-semibold text-gray-900 mb-1">
+                          Explication pédagogique
                         </p>
-                        <p className="text-sm text-gray-600 whitespace-pre-line">
+                        <p className="text-sm text-gray-700 whitespace-pre-line">
                           {correction.explication}
                         </p>
                       </div>
@@ -317,9 +366,9 @@ export default function CourseDetailPage() {
                   </div>
                 ) : (
                   <div className="flex flex-col items-center text-center py-10 text-gray-500">
-                    <Lock size={28} className="mb-3 text-orange-500" />
-                    <p className="font-medium">
-                      Aucun corrigé disponible pour l'instant.
+                    <BookOpen size={28} className="mb-3 text-orange-500" />
+                    <p className="font-medium text-gray-700">
+                      Aucun corrigé disponible pour cet exercice pour l'instant.
                     </p>
                   </div>
                 )}
@@ -327,25 +376,25 @@ export default function CourseDetailPage() {
             )}
 
             {activeTab === "Ressources" && (
-              <div className="bg-white border border-gray-200 rounded-xl p-6">
-                <h2 className="text-xl font-bold mb-4">Ressources</h2>
+              <div className="bg-white border border-gray-200 rounded-xl p-6 shadow-sm">
+                <h2 className="text-xl font-bold mb-4">Ressources associées</h2>
                 <ul className="space-y-3">
                   <li className="flex items-center justify-between border border-gray-200 rounded-lg px-4 py-3">
                     <span className="flex items-center gap-2 text-sm text-gray-700">
                       <FileText size={16} className="text-orange-500" />
-                      Énoncé complet
+                      Énoncé imprimable / PDF
                     </span>
                     <button
                       onClick={() =>
                         gererActionProtegee(
-                          "Connecte-toi pour télécharger les ressources.",
-                          () => console.log("Téléchargement de l'énoncé")
+                          "Connecte-toi pour télécharger et imprimer les ressources.",
+                          () => window.print()
                         )
                       }
-                      className="flex items-center gap-1 text-sm font-medium text-orange-600 hover:text-orange-700"
+                      className="flex items-center gap-1.5 text-sm font-medium text-orange-600 hover:text-orange-700"
                     >
                       {isAuthenticated ? <Download size={14} /> : <Lock size={14} />}
-                      Télécharger
+                      {isAuthenticated ? "Imprimer / Sauvegarder" : "Connexion requise"}
                     </button>
                   </li>
                 </ul>
@@ -356,7 +405,7 @@ export default function CourseDetailPage() {
 
         {/* Sidebar droite */}
         <aside>
-          <div className="bg-white border border-gray-200 rounded-xl p-6 sticky top-6">
+          <div className="bg-white border border-gray-200 rounded-xl p-6 sticky top-6 shadow-sm">
             <div className="flex items-center gap-3">
               <span className="text-lg font-bold">
                 {TYPE_LABELS[exercice.type] ?? exercice.type}
@@ -410,12 +459,12 @@ export default function CourseDetailPage() {
                   Connecte-toi
                 </p>
                 <p>
-                  Accède à tous les énoncés, corrigés et suis ta progression.
+                  Accède à tous les énoncés complets, corrigés et suis ta progression.
                 </p>
                 <button
                   onClick={() =>
                     redirigerVersConnexion(
-                      "Connecte-toi pour profiter de tous les exercices."
+                      "Connecte-toi pour profiter de tous les exercices et corrigés."
                     )
                   }
                   className="inline-block mt-2 font-medium text-orange-600 hover:text-orange-700"
@@ -442,17 +491,20 @@ export default function CourseDetailPage() {
 
             <hr className="my-5 border-gray-200" />
 
-            <p className="text-sm font-semibold mb-3">Partager cet exercice :</p>
+            <div className="flex items-center justify-between mb-3">
+              <p className="text-sm font-semibold">Partager cet exercice :</p>
+              {copied && (
+                <span className="text-xs text-emerald-600 flex items-center gap-1">
+                  <CheckCircle size={12} /> Lien copié
+                </span>
+              )}
+            </div>
             <div className="flex gap-2 flex-wrap">
               {SHARE_BUTTONS.map(({ icon: Icon, label }) => (
                 <button
                   key={label}
                   title={label}
-                  onClick={() => {
-                    if (label === "Copier le lien") {
-                      navigator.clipboard.writeText(window.location.href);
-                    }
-                  }}
+                  onClick={() => handleShare(label)}
                   className="w-9 h-9 flex items-center justify-center rounded-lg border border-gray-200 text-gray-500 hover:bg-gray-50 transition-colors"
                 >
                   <Icon size={15} />

@@ -1,5 +1,6 @@
 import { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
+import { Lock } from "lucide-react";
 import { AppInput } from "../shared/ui/AppInput";
 import { AppButton } from "../shared/ui/AppButton";
 import { IconEye } from "../shared/ui/IconEye";
@@ -9,12 +10,35 @@ import GoogleOneTap from "../auth/GoogleOneTap";
 
 export function LoginForm() {
   const navigate = useNavigate();
+  const location = useLocation();
+  const stateRaison = (location.state as { raison?: string } | null)?.raison;
+
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [remember, setRemember] = useState(true);
   const [loading, setLoading] = useState(false);
   const [errors, setErrors] = useState<{ email?: string; password?: string; global?: string }>({});
+
+  function getTargetRedirectPath(): string | null {
+    const fromState = (location.state as { from?: unknown } | null)?.from;
+    if (typeof fromState === "string") {
+      return fromState;
+    }
+    if (fromState && typeof fromState === "object" && "pathname" in fromState) {
+      const loc = fromState as { pathname: string; search?: string; hash?: string };
+      return `${loc.pathname}${loc.search || ""}${loc.hash || ""}`;
+    }
+    return null;
+  }
+
+  function handleGoogleLogin() {
+    const targetPath = getTargetRedirectPath();
+    if (targetPath) {
+      sessionStorage.setItem("auth_redirect", targetPath);
+    }
+    loginWithGoogle();
+  }
 
   function validate() {
     const e: { email?: string; password?: string } = {};
@@ -34,9 +58,19 @@ export function LoginForm() {
     setLoading(true);
     try {
       const user = await login({ email, password });
-      if (user.role === "professeur") navigate("/Dashboard-professeur");
-      else if (user.role === "administrateur") navigate("/Dashbord-admin");
-      else navigate("/exercices");
+
+      if (user.role === "professeur") {
+        navigate("/Dashboard-professeur", { replace: true });
+      } else if (user.role === "administrateur") {
+        navigate("/Dashbord-admin", { replace: true });
+      } else {
+        const targetPath = getTargetRedirectPath();
+        if (targetPath) {
+          navigate(targetPath, { replace: true });
+        } else {
+          navigate("/exercices", { replace: true });
+        }
+      }
     } catch (err: unknown) {
       const message =
         (err as { response?: { data?: { message?: string } } })?.response?.data?.message ?? "Email ou mot de passe incorrect";
@@ -54,6 +88,13 @@ export function LoginForm() {
           Bienvenue !
         </h1>
         <p className="text-sm text-gray-400 mb-7">Entrer vos informations</p>
+
+        {stateRaison && (
+          <div className="flex items-center gap-2 text-xs text-amber-800 bg-amber-50 border border-amber-200 rounded-lg px-3 py-2.5 mb-3.5">
+            <Lock size={15} className="text-amber-600 shrink-0" />
+            <span>{stateRaison}</span>
+          </div>
+        )}
 
         {errors.global && (
           <div className="text-xs text-red-500 bg-red-50 border border-red-100 rounded-lg px-3 py-2 mb-3.5">
@@ -106,7 +147,7 @@ export function LoginForm() {
           <AppButton
             type="button"
             variant="outline"
-            onClick={loginWithGoogle}
+            onClick={handleGoogleLogin}
             iconLeft={<IconGoogle />}
             fullWidth
           >
@@ -120,7 +161,11 @@ export function LoginForm() {
 
         <p className="text-center text-xs text-gray-400 mt-5">
           Vous n'avez pas de compte ?
-          <Link to="/auth/signup" className="text-gray-900 font-semibold cursor-pointer ml-1 hover:underline">
+          <Link
+            to="/auth/signup"
+            state={location.state}
+            className="text-gray-900 font-semibold cursor-pointer ml-1 hover:underline"
+          >
             Inscription
           </Link>
         </p>

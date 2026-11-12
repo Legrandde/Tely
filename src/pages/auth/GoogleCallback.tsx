@@ -19,7 +19,7 @@ export function GoogleCallback() {
     }
 
     if (!token) {
-      navigate("/login?error=google_auth_failed", { replace: true });
+      navigate("/auth/login?error=google_auth_failed", { replace: true });
       return;
     }
 
@@ -28,16 +28,29 @@ export function GoogleCallback() {
     getMe()
       .then((user) => {
         if (user.role === "professeur") {
+          sessionStorage.removeItem("auth_redirect");
           navigate("/Dashboard-professeur", { replace: true });
-        } else if (user.role === "administrateur") {
-          navigate("/Dashbord-admin", { replace: true });
-        } else {
-          navigate("/exercices", { replace: true });
+          return;
         }
+
+        if (user.role === "administrateur") {
+          sessionStorage.removeItem("auth_redirect");
+          navigate("/Dashbord-admin", { replace: true });
+          return;
+        }
+
+        const redirectPath = sessionStorage.getItem("auth_redirect");
+        if (redirectPath) {
+          sessionStorage.removeItem("auth_redirect");
+          navigate(redirectPath, { replace: true });
+          return;
+        }
+
+        navigate("/exercices", { replace: true });
       })
       .catch(() => {
         clearAccess();
-        navigate("/login?error=google_auth_failed", { replace: true });
+        navigate("/auth/login?error=google_auth_failed", { replace: true });
       });
   }, [params, navigate]);
 

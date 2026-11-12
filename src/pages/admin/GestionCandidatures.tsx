@@ -76,8 +76,28 @@ export default function GestionCandidatures() {
   };
 
   useEffect(() => {
-    fetchList();
-  }, []);
+    let cancelled = false;
+
+    listCandidatures()
+      .then((res) => {
+        if (!cancelled) {
+          setCandidatures(res.candidatures.data || []);
+          setCounts(res.counts);
+        }
+      })
+      .catch(() => {
+        if (!cancelled) {
+          addToast("error", "Impossible de charger les candidatures.");
+        }
+      })
+      .finally(() => {
+        if (!cancelled) setLoading(false);
+      });
+
+    return () => {
+      cancelled = true;
+    };
+  }, [addToast]);
 
   const filteredCandidatures = useMemo(() => {
     return candidatures.filter((c) => {

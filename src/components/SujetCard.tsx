@@ -1,7 +1,7 @@
-
 import { useNavigate } from "react-router-dom";
 import type { SujetInterface } from "../types/Sujet";
-import { BookOpen } from "lucide-react";
+import { BookOpen, Lock } from "lucide-react";
+import { useAuth } from "../context/authContext";
 
 const TYPE_LABELS: Record<string, string> = {
   classique: "Exercice",
@@ -32,11 +32,12 @@ interface SujetProps {
 
 export default function SujetCard({ sujet }: SujetProps) {
   const navigate = useNavigate();
+  const { isAuthenticated } = useAuth();
 
   return (
     <div
       onClick={() => navigate(`/ennoncer-sujet?id=${sujet.id}`)}
-      className="flex flex-col bg-white rounded-lg border border-gray-100 overflow-hidden hover:shadow-md transition-shadow cursor-pointer"
+      className="flex flex-col bg-white rounded-lg border border-gray-100 overflow-hidden hover:shadow-md transition-shadow cursor-pointer group"
     >
       {/* Vignette */}
       <div
@@ -57,7 +58,7 @@ export default function SujetCard({ sujet }: SujetProps) {
           En {sujet.annee}
         </p>
 
-        <h3 className="font-semibold text-sm leading-snug line-clamp-2">
+        <h3 className="font-semibold text-sm leading-snug line-clamp-2 group-hover:text-amber-600 transition-colors">
           {sujet.matiere.nom} — {sujet.titre}
         </h3>
 
@@ -69,7 +70,11 @@ export default function SujetCard({ sujet }: SujetProps) {
         </div>
 
         <div className="flex items-center justify-between mt-2 pt-2 border-t border-gray-100">
-          <button className="text-xs font-medium text-orange-600 hover:text-orange-700">
+          <button
+            type="button"
+            className="text-xs font-medium text-orange-600 hover:text-orange-700 flex items-center gap-1"
+          >
+            {!isAuthenticated && <Lock size={12} className="text-amber-600" />}
             Voir détails
           </button>
         </div>
