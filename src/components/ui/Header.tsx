@@ -5,6 +5,7 @@ import { useState } from "react";
 import { logout } from "../../services/authService";
 import { useAuth } from "../../context/authContext";
 import { resolveImageUrl } from "../../utils/imageUrl";
+import ConfirmModal from "./ConfirmModal";
 
 const fadeDown: Variants = {
   hidden: { opacity: 0, y: -20 },
@@ -28,6 +29,8 @@ const navItemVariant: Variants = {
 
 export default function Header() {
   const [menuOpen, setMenuOpen] = useState(false);
+  const [confirmLogoutOpen, setConfirmLogoutOpen] = useState(false);
+  const [loggingOut, setLoggingOut] = useState(false);
   const { user, isAuthenticated, logoutLocal } = useAuth();
   const navigate = useNavigate();
 
@@ -44,10 +47,13 @@ export default function Header() {
   const dashboardInfo = getDashboardInfo();
   const userAvatar = resolveImageUrl(user?.avatar_url || user?.avatar);
 
-  async function handleLogout() {
+  async function confirmLogout() {
+    setLoggingOut(true);
     try {
       await logout();
     } finally {
+      setLoggingOut(false);
+      setConfirmLogoutOpen(false);
       logoutLocal();
       setMenuOpen(false);
       navigate("/");
@@ -104,7 +110,7 @@ export default function Header() {
               <motion.button
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.97 }}
-                onClick={handleLogout}
+                onClick={() => setConfirmLogoutOpen(true)}
                 className="flex items-center gap-1 px-2.5 py-1.5 rounded-lg cursor-pointer hover:bg-black hover:text-white text-xs transition-colors duration-200"
               >
                 <LogOut size={14} />
@@ -207,7 +213,7 @@ export default function Header() {
                 </Link>
 
                 <button
-                  onClick={handleLogout}
+                  onClick={() => setConfirmLogoutOpen(true)}
                   className="flex items-center gap-1.5 p-2 rounded-lg cursor-pointer hover:bg-black hover:text-white transition-colors duration-200 text-left text-xs"
                 >
                   <LogOut size={16} />
@@ -252,6 +258,17 @@ export default function Header() {
           </motion.div>
         )}
       </AnimatePresence>
+
+      <ConfirmModal
+        open={confirmLogoutOpen}
+        title="Confirmer la déconnexion"
+        description="Êtes-vous sûr de vouloir vous déconnecter de votre session ?"
+        confirmLabel="Se déconnecter"
+        loadingLabel="Déconnexion..."
+        loading={loggingOut}
+        onConfirm={confirmLogout}
+        onCancel={() => setConfirmLogoutOpen(false)}
+      />
     </motion.header>
   );
 }

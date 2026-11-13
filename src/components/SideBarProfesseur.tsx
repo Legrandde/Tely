@@ -16,18 +16,29 @@ import {
 import { useNavigate, useLocation } from "react-router-dom";
 import { useAuth } from "../context/authContext";
 import { useSidebar } from "../context/SidebarContext";
+import { logout } from "../services/authService";
+import ConfirmModal from "./ui/ConfirmModal";
 
 export default function SideBarProfesseur() {
   const [collapsed, setCollapsed] = useState(false);
+  const [confirmLogoutOpen, setConfirmLogoutOpen] = useState(false);
+  const [loggingOut, setLoggingOut] = useState(false);
   const navigate = useNavigate();
   const location = useLocation();
   const { logoutLocal, user } = useAuth();
   const { isOpenMobile, closeMobile } = useSidebar();
 
-  function handleLogout() {
-    closeMobile();
-    logoutLocal();
-    navigate("/auth/login");
+  async function confirmLogout() {
+    setLoggingOut(true);
+    try {
+      await logout();
+    } finally {
+      setLoggingOut(false);
+      setConfirmLogoutOpen(false);
+      closeMobile();
+      logoutLocal();
+      navigate("/auth/login");
+    }
   }
 
   const currentPath = location.pathname.toLowerCase();
@@ -139,7 +150,7 @@ export default function SideBarProfesseur() {
       {/* Déconnexion en bas */}
       <div className="pt-2 border-t border-gray-100">
         <SideBarMenuItem
-          OnNavigate={handleLogout}
+          OnNavigate={() => setConfirmLogoutOpen(true)}
           icons={<LogOut size={19} />}
           Titre="Déconnexion"
           collapsed={isMobileView ? false : collapsed}
@@ -175,6 +186,17 @@ export default function SideBarProfesseur() {
           </aside>
         </div>
       )}
+
+      <ConfirmModal
+        open={confirmLogoutOpen}
+        title="Confirmer la déconnexion"
+        description="Êtes-vous sûr de vouloir vous déconnecter de votre espace enseignant ?"
+        confirmLabel="Se déconnecter"
+        loadingLabel="Déconnexion..."
+        loading={loggingOut}
+        onConfirm={confirmLogout}
+        onCancel={() => setConfirmLogoutOpen(false)}
+      />
     </>
   );
 }

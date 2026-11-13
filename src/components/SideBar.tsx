@@ -22,18 +22,29 @@ import {
 import { useNavigate, useLocation } from "react-router-dom";
 import { useAuth } from "../context/authContext";
 import { useSidebar } from "../context/SidebarContext";
+import { logout } from "../services/authService";
+import ConfirmModal from "./ui/ConfirmModal";
 
 export default function SideBar() {
   const [collapsed, setCollapsed] = useState(false);
+  const [confirmLogoutOpen, setConfirmLogoutOpen] = useState(false);
+  const [loggingOut, setLoggingOut] = useState(false);
   const navigate = useNavigate();
   const location = useLocation();
   const { logoutLocal } = useAuth();
   const { isOpenMobile, closeMobile } = useSidebar();
 
-  function handleLogout() {
-    closeMobile();
-    logoutLocal();
-    navigate("/auth/login");
+  async function confirmLogout() {
+    setLoggingOut(true);
+    try {
+      await logout();
+    } finally {
+      setLoggingOut(false);
+      setConfirmLogoutOpen(false);
+      closeMobile();
+      logoutLocal();
+      navigate("/auth/login");
+    }
   }
 
   const currentPath = location.pathname.toLowerCase();
@@ -130,7 +141,7 @@ export default function SideBar() {
       {/* Déconnexion en bas */}
       <div className="pt-3 border-t border-gray-100 mt-auto">
         <SideBarMenuItem
-          OnNavigate={handleLogout}
+          OnNavigate={() => setConfirmLogoutOpen(true)}
           icons={<LogOut size={19} />}
           Titre="Déconnexion"
           collapsed={isMobileView ? false : collapsed}
@@ -166,6 +177,17 @@ export default function SideBar() {
           </aside>
         </div>
       )}
+
+      <ConfirmModal
+        open={confirmLogoutOpen}
+        title="Confirmer la déconnexion"
+        description="Êtes-vous sûr de vouloir vous déconnecter du tableau de bord administrateur ?"
+        confirmLabel="Se déconnecter"
+        loadingLabel="Déconnexion..."
+        loading={loggingOut}
+        onConfirm={confirmLogout}
+        onCancel={() => setConfirmLogoutOpen(false)}
+      />
     </>
   );
 }

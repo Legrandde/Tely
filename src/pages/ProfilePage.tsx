@@ -19,6 +19,7 @@ import { updateProfile, updatePassword } from "../services/authService";
 import { resolveImageUrl } from "../utils/imageUrl";
 import api from "../api/axio";
 import { useNavigate } from "react-router-dom";
+import ConfirmModal from "../components/ui/ConfirmModal";
 
 interface NiveauOption {
   id: number;
@@ -57,6 +58,8 @@ export default function ProfilePage() {
   // Loading states
   const [savingProfile, setSavingProfile] = useState(false);
   const [savingPassword, setSavingPassword] = useState(false);
+  const [confirmRemoveAvatarOpen, setConfirmRemoveAvatarOpen] = useState(false);
+  const [confirmPasswordOpen, setConfirmPasswordOpen] = useState(false);
   const userRef = useRef(user);
 
   useEffect(() => {
@@ -107,6 +110,7 @@ export default function ProfilePage() {
     setAvatarFile(null);
     setAvatarPreview(null);
     if (fileInputRef.current) fileInputRef.current.value = "";
+    setConfirmRemoveAvatarOpen(false);
   };
 
   const handleProfileSubmit = async (e: React.FormEvent) => {
@@ -152,7 +156,7 @@ export default function ProfilePage() {
     }
   };
 
-  const handlePasswordSubmit = async (e: React.FormEvent) => {
+  const handlePasswordSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!currentPassword) {
       addToast("warning", "Veuillez renseigner votre mot de passe actuel.");
@@ -166,7 +170,10 @@ export default function ProfilePage() {
       addToast("warning", "La confirmation du mot de passe ne correspond pas.");
       return;
     }
+    setConfirmPasswordOpen(true);
+  };
 
+  const confirmPasswordChange = async () => {
     setSavingPassword(true);
     try {
       await updatePassword({
@@ -178,6 +185,7 @@ export default function ProfilePage() {
       setCurrentPassword("");
       setNewPassword("");
       setPasswordConfirmation("");
+      setConfirmPasswordOpen(false);
     } catch (err: unknown) {
       const errorMsg =
         (err as { response?: { data?: { message?: string } } })?.response?.data?.message ||
@@ -280,7 +288,7 @@ export default function ProfilePage() {
             {avatarPreview && (
               <button
                 type="button"
-                onClick={removeAvatar}
+                onClick={() => setConfirmRemoveAvatarOpen(true)}
                 className="inline-flex items-center gap-1.5 text-xs text-red-600 hover:text-red-700 font-medium pt-1 cursor-pointer"
               >
                 <Trash2 size={13} /> Supprimer la photo
@@ -514,6 +522,27 @@ export default function ProfilePage() {
           </form>
         </div>
       </div>
+
+      <ConfirmModal
+        open={confirmRemoveAvatarOpen}
+        title="Supprimer la photo de profil"
+        description="Êtes-vous sûr de vouloir retirer votre photo de profil ? N'oubliez pas d'enregistrer votre profil pour valider ce changement."
+        confirmLabel="Retirer la photo"
+        onConfirm={removeAvatar}
+        onCancel={() => setConfirmRemoveAvatarOpen(false)}
+      />
+
+      <ConfirmModal
+        open={confirmPasswordOpen}
+        title="Confirmer le changement de mot de passe"
+        description="Êtes-vous sûr de vouloir modifier votre mot de passe de connexion ?"
+        confirmLabel="Confirmer"
+        loadingLabel="Modification..."
+        variant="warning"
+        loading={savingPassword}
+        onConfirm={confirmPasswordChange}
+        onCancel={() => setConfirmPasswordOpen(false)}
+      />
     </div>
   );
 }

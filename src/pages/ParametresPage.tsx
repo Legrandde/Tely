@@ -13,6 +13,7 @@ import { useAuth } from "../context/authContext";
 import { useToast } from "../context/ToastContext";
 import { fetchParametres, saveParametres } from "../services/parametreService";
 import type { PlatformSettings } from "../types/parametre";
+import ConfirmModal from "../components/ui/ConfirmModal";
 
 type TabKey = "general" | "pedagogie" | "notifications" | "securite";
 
@@ -24,6 +25,7 @@ export default function ParametresPage() {
   const [activeTab, setActiveTab] = useState<TabKey>("general");
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
+  const [confirmMaintenanceOpen, setConfirmMaintenanceOpen] = useState(false);
 
   const [form, setForm] = useState<PlatformSettings>({
     site_nom: "Tely Elearning",
@@ -59,6 +61,10 @@ export default function ParametresPage() {
   };
 
   const handleToggle = (key: keyof PlatformSettings) => {
+    if (key === "mode_maintenance" && form.mode_maintenance !== "1") {
+      setConfirmMaintenanceOpen(true);
+      return;
+    }
     setForm((prev) => ({
       ...prev,
       [key]: prev[key] === "1" ? "0" : "1",
@@ -504,6 +510,19 @@ export default function ParametresPage() {
         </div>
       </form>
       )}
+
+      <ConfirmModal
+        open={confirmMaintenanceOpen}
+        title="Activer le mode maintenance ?"
+        description="L'activation du mode maintenance rendra l'application temporairement inaccessible aux élèves."
+        confirmLabel="Activer"
+        variant="warning"
+        onConfirm={() => {
+          setForm((prev) => ({ ...prev, mode_maintenance: "1" }));
+          setConfirmMaintenanceOpen(false);
+        }}
+        onCancel={() => setConfirmMaintenanceOpen(false)}
+      />
     </div>
   );
 }
