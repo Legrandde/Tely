@@ -14,7 +14,6 @@ import {
   Copy,
   Mail,
   MessageCircle,
-  Sparkles,
   BookOpen,
   CheckCircle,
 } from "lucide-react";
@@ -60,9 +59,6 @@ const TYPE_LABELS: Record<string, string> = {
   probleme: "Problème",
   sujet_examen: "Sujet d'examen",
 };
-
-// Longueur d'amorce visible avant le flou pour les non-connectés
-const APERCU_LONGUEUR = 180;
 
 // ── Sous-composants ──────────────────────────────────────────────────────
 
@@ -189,9 +185,6 @@ export default function CourseDetailPage() {
   const correction = (exercice as unknown as { correction?: { contenu?: string; explication?: string } })?.correction;
 
   const enonceTexte = exercice.enonce || "";
-  // Si non connecté, l'énoncé complet est flouté
-  const enonceDebut = enonceTexte.slice(0, APERCU_LONGUEUR);
-  const enonceReste = enonceTexte.slice(APERCU_LONGUEUR);
 
   function handleShare(label: string) {
     const currentUrl = window.location.href;
@@ -268,59 +261,10 @@ export default function CourseDetailPage() {
           <div className="mt-6">
             {activeTab === "Énoncé" && (
               <div className="bg-white border border-gray-200 rounded-xl p-6 shadow-sm">
-                <div className="flex items-center justify-between mb-4">
-                  <h2 className="text-xl font-bold">Énoncé de l'exercice</h2>
-                  {!isAuthenticated && (
-                    <span className="text-xs bg-amber-50 text-amber-700 border border-amber-200 px-2.5 py-1 rounded-full flex items-center gap-1 font-medium">
-                      <Lock size={12} /> Connexion requise pour l'énoncé complet
-                    </span>
-                  )}
+                <h2 className="text-xl font-bold mb-4">Énoncé de l'exercice</h2>
+                <div className="text-gray-800 leading-relaxed whitespace-pre-line text-base">
+                  {enonceTexte}
                 </div>
-
-                {isAuthenticated ? (
-                  /* Affichage complet net lorsque connecté */
-                  <div className="text-gray-800 leading-relaxed whitespace-pre-line text-base">
-                    {exercice.enonce}
-                  </div>
-                ) : (
-                  /* Affichage flouté lorsque non connecté */
-                  <div className="relative">
-                    <p className="text-gray-700 leading-relaxed whitespace-pre-line">
-                      {enonceDebut}
-                    </p>
-                    <p className="text-gray-700 leading-relaxed whitespace-pre-line blur-[3.5px] select-none pointer-events-none mt-1">
-                      {enonceReste.length > 0
-                        ? enonceReste
-                        : "Consignes détaillées, questions théoriques, équations, calculs et développement complet de l'exercice à résoudre pas à pas..."}
-                    </p>
-
-                    {/* Overlay de verrouillage */}
-                    <div className="absolute inset-x-0 bottom-0 top-12 bg-gradient-to-t from-white via-white/80 to-transparent flex flex-col items-center justify-center p-6 text-center">
-                      <div className="bg-white/95 border border-amber-200 shadow-md rounded-xl p-5 max-w-md w-full flex flex-col items-center">
-                        <div className="w-10 h-10 rounded-full bg-amber-100 text-amber-700 flex items-center justify-center mb-2">
-                          <Lock size={20} />
-                        </div>
-                        <h3 className="font-semibold text-gray-900 text-base mb-1">
-                          Énoncé complet protégé
-                        </h3>
-                        <p className="text-xs text-gray-500 mb-4">
-                          Connecte-toi pour lire l'énoncé complet, accéder au corrigé et télécharger les ressources.
-                        </p>
-                        <button
-                          onClick={() =>
-                            redirigerVersConnexion(
-                              "Connecte-toi pour débloquer l'énoncé complet et son corrigé."
-                            )
-                          }
-                          className="bg-amber-600 hover:bg-amber-700 text-white font-medium text-sm px-5 py-2.5 rounded-lg shadow-sm transition-colors flex items-center gap-2"
-                        >
-                          <Lock size={14} />
-                          Se connecter pour débloquer
-                        </button>
-                      </div>
-                    </div>
-                  </div>
-                )}
               </div>
             )}
 
@@ -453,28 +397,6 @@ export default function CourseDetailPage() {
               {!isAuthenticated && <Lock size={14} />}
               Voir le corrigé
             </button>
-
-            {!isAuthenticated && (
-              <div className="mt-4 bg-amber-50 border border-amber-100 rounded-lg p-3 text-xs text-gray-600">
-                <p className="font-semibold text-gray-800 mb-1 flex items-center gap-1">
-                  <Sparkles size={13} className="text-orange-500" />
-                  Connecte-toi
-                </p>
-                <p>
-                  Accède à tous les énoncés complets, corrigés et suis ta progression.
-                </p>
-                <button
-                  onClick={() =>
-                    redirigerVersConnexion(
-                      "Connecte-toi pour profiter de tous les exercices et corrigés."
-                    )
-                  }
-                  className="inline-block mt-2 font-medium text-orange-600 hover:text-orange-700"
-                >
-                  Se connecter →
-                </button>
-              </div>
-            )}
 
             <hr className="my-5 border-gray-200" />
 

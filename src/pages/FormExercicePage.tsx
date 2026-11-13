@@ -10,7 +10,6 @@ import {
   Eye,
   BookOpen,
   GraduationCap,
-  Sparkles,
   Image as ImageIcon,
 } from "lucide-react";
 import {
@@ -671,8 +670,7 @@ export default function FormExercicePage() {
           <div className="lg:col-span-4 space-y-5 lg:sticky lg:top-24">
             {/* Publication */}
             <div className="bg-white rounded-2xl border border-slate-200/90 p-5 shadow-2xs">
-              <h3 className="text-sm font-bold text-slate-900 mb-3 flex items-center gap-2">
-                <Sparkles size={16} className="text-amber-500" />
+              <h3 className="text-sm font-bold text-slate-900 mb-3">
                 Publication & Disponibilité
               </h3>
 

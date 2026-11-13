@@ -10,7 +10,6 @@ import {
   Trash2,
   ExternalLink,
   Clock,
-  Sparkles,
 } from "lucide-react";
 import {
   listCandidatures,
@@ -555,7 +554,7 @@ export default function GestionCandidatures() {
 
             <div className="p-3 bg-emerald-50 text-emerald-800 rounded-xl text-xs space-y-1">
               <div className="font-bold flex items-center gap-1">
-                <Sparkles size={14} className="text-emerald-600" /> Accès accordé
+                <CheckCircle size={14} className="text-emerald-600" /> Accès accordé
               </div>
               <p className="text-[11px] text-emerald-700">
                 L'enseignant aura accès au Tableau de bord Professeur pour publier des exercices, corrigés et ressources.
@@ -594,7 +593,7 @@ export default function GestionCandidatures() {
         {credentialsModal && (
           <div className="space-y-4 text-center">
             <div className="w-14 h-14 rounded-full bg-emerald-100 text-emerald-600 flex items-center justify-center mx-auto">
-              <Sparkles size={28} />
+              <CheckCircle size={28} />
             </div>
 
             <div>
