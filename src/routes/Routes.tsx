@@ -158,16 +158,8 @@ export const Route = createBrowserRouter([
         element: <GestionEleves />,
       },
       {
-        path: "Eleves",
-        element: <Navigate to="/Dashbord-admin/eleves" replace />,
-      },
-      {
         path: "professeurs",
         element: <GestionProfesseurs />,
-      },
-      {
-        path: "Professeurs",
-        element: <Navigate to="/Dashbord-admin/professeurs" replace />,
       },
       {
         path: "matieres",
@@ -247,15 +239,7 @@ export const Route = createBrowserRouter([
     ],
   },
   {
-    path: "dashboard-professeur/*",
-    element: <Navigate to="/Dashboard-professeur" replace />,
-  },
-  {
     path: "dashboard-admin/*",
-    element: <Navigate to="/Dashbord-admin" replace />,
-  },
-  {
-    path: "Dashboard-admin/*",
     element: <Navigate to="/Dashbord-admin" replace />,
   },
   {
@@ -283,20 +267,28 @@ export const Route = createBrowserRouter([
     element: <SujetDetailPage />,
   },
   {
-    path: "Exercices",
-    element: <Navigate to="/exercices" replace />,
+    path: "exercices/:id",
+    element: <CourseDetailPage />,
+  },
+  {
+    path: "exercice/:id",
+    element: <CourseDetailPage />,
   },
   {
     path: "exercices",
     element: <ListeExercices />,
   },
   {
-    path: "Sujets",
-    element: <Navigate to="/sujets" replace />,
+    path: "exercice",
+    element: <Navigate to="/exercices" replace />,
   },
   {
     path: "sujets",
     element: <ListeSujets />,
+  },
+  {
+    path: "sujet",
+    element: <Navigate to="/sujets" replace />,
   },
   {
     path: "*",

@@ -8,7 +8,6 @@ import {
   CheckCircle2,
   AlertCircle,
   Eye,
-  Loader2,
   BookOpen,
   GraduationCap,
   Sparkles,
@@ -234,9 +233,104 @@ export default function FormExercicePage() {
 
   if (fetchingInitial) {
     return (
-      <div className="min-h-screen bg-slate-50 flex flex-col items-center justify-center p-6">
-        <Loader2 size={36} className="text-amber-500 animate-spin mb-3" />
-        <p className="text-sm font-medium text-slate-600">Chargement de l'exercice...</p>
+      <div className="min-h-screen bg-slate-50/70 pb-16 animate-pulse">
+        {/* Sticky Top Bar Skeleton */}
+        <div className="bg-white border-b border-slate-200 sticky top-0 z-20 px-4 sm:px-8 py-3.5 shadow-2xs">
+          <div className="max-w-7xl mx-auto flex flex-wrap items-center justify-between gap-4">
+            <div className="flex items-center gap-3">
+              <div className="w-9 h-9 rounded-xl bg-slate-100" />
+              <div className="space-y-1.5">
+                <div className="h-3 w-36 bg-slate-100 rounded" />
+                <div className="h-5 w-52 bg-slate-200 rounded" />
+              </div>
+            </div>
+            <div className="flex items-center gap-2.5">
+              <div className="h-9 w-20 rounded-xl bg-slate-100 border border-slate-200" />
+              <div className="h-9 w-36 rounded-xl bg-amber-200/70" />
+            </div>
+          </div>
+        </div>
+
+        {/* 12-Col Grid Skeleton */}
+        <div className="max-w-7xl mx-auto px-4 sm:px-8 pt-6 grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+          {/* Colonne Gauche (8 cols) */}
+          <div className="lg:col-span-8 space-y-6">
+            {/* Carte 1 : Métadonnées */}
+            <div className="bg-white rounded-2xl border border-slate-200/90 p-5 sm:p-6 shadow-2xs space-y-5">
+              <div className="flex items-center gap-2.5 pb-3 border-b border-slate-100">
+                <div className="w-8 h-8 rounded-lg bg-amber-100" />
+                <div className="space-y-1.5">
+                  <div className="h-4 w-48 bg-slate-200 rounded" />
+                  <div className="h-3 w-64 bg-slate-100 rounded" />
+                </div>
+              </div>
+              <div className="space-y-4">
+                <div>
+                  <div className="h-3.5 w-36 bg-slate-200 rounded mb-1.5" />
+                  <div className="h-10 w-full bg-slate-100 rounded-xl border border-slate-200" />
+                </div>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div>
+                    <div className="h-3.5 w-24 bg-slate-200 rounded mb-1.5" />
+                    <div className="h-10 w-full bg-slate-100 rounded-xl border border-slate-200" />
+                  </div>
+                  <div>
+                    <div className="h-3.5 w-28 bg-slate-200 rounded mb-1.5" />
+                    <div className="h-10 w-full bg-slate-100 rounded-xl border border-slate-200" />
+                  </div>
+                </div>
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                  {[1, 2, 3].map((i) => (
+                    <div key={i}>
+                      <div className="h-3.5 w-24 bg-slate-200 rounded mb-1.5" />
+                      <div className="h-10 w-full bg-slate-100 rounded-xl border border-slate-200" />
+                    </div>
+                  ))}
+                </div>
+                <div>
+                  <div className="h-3.5 w-44 bg-slate-200 rounded mb-1.5" />
+                  <div className="h-10 w-full bg-slate-100 rounded-xl border border-slate-200" />
+                </div>
+              </div>
+            </div>
+
+            {/* Carte 2 : Énoncé & Importation PDF */}
+            <div className="bg-white rounded-2xl border border-slate-200/90 p-5 sm:p-6 shadow-2xs space-y-4">
+              <div className="flex items-center justify-between pb-3 border-b border-slate-100">
+                <div className="flex items-center gap-2.5">
+                  <div className="w-8 h-8 rounded-lg bg-amber-100" />
+                  <div className="space-y-1.5">
+                    <div className="h-4 w-44 bg-slate-200 rounded" />
+                    <div className="h-3 w-56 bg-slate-100 rounded" />
+                  </div>
+                </div>
+                <div className="h-8 w-36 bg-slate-100 rounded-xl" />
+              </div>
+              <div className="h-28 w-full rounded-xl border-2 border-dashed border-slate-200 bg-slate-50/70" />
+              <div className="h-64 w-full rounded-xl bg-slate-100 border border-slate-200" />
+            </div>
+          </div>
+
+          {/* Colonne Droite (4 cols) */}
+          <div className="lg:col-span-4 space-y-5">
+            <div className="bg-white rounded-2xl border border-slate-200/90 p-5 shadow-2xs space-y-4">
+              <div className="h-4 w-44 bg-slate-200 rounded" />
+              <div className="h-10 w-full bg-slate-50 rounded-xl border border-slate-100" />
+              <div className="space-y-2">
+                <div className="h-4 w-full bg-slate-100 rounded" />
+                <div className="h-4 w-full bg-slate-100 rounded" />
+              </div>
+              <div className="h-10 w-full bg-amber-200/70 rounded-xl" />
+              <div className="h-9 w-full bg-slate-100 rounded-xl" />
+            </div>
+            <div className="bg-white rounded-2xl border border-slate-200/90 p-5 shadow-2xs space-y-3">
+              <div className="h-3.5 w-36 bg-slate-200 rounded" />
+              {[1, 2, 3, 4].map((i) => (
+                <div key={i} className="h-12 w-full bg-slate-50 rounded-xl" />
+              ))}
+            </div>
+          </div>
+        </div>
       </div>
     );
   }
@@ -286,10 +380,7 @@ export default function FormExercicePage() {
               className="inline-flex items-center gap-2 px-5 py-2 text-sm font-semibold text-white bg-amber-500 hover:bg-amber-600 rounded-xl shadow-xs transition-all disabled:opacity-60 cursor-pointer"
             >
               {loading ? (
-                <>
-                  <Loader2 size={16} className="animate-spin" />
-                  <span>Enregistrement...</span>
-                </>
+                <span className="inline-block h-4 w-28 bg-white/30 rounded animate-pulse" />
               ) : (
                 <>
                   <Save size={16} />
@@ -518,12 +609,10 @@ export default function FormExercicePage() {
                   />
 
                   {extractingPdf ? (
-                    <div className="flex flex-col items-center gap-2">
-                      <Loader2 size={32} className="text-amber-500 animate-spin" />
-                      <p className="text-sm font-semibold text-amber-900">
-                        Extraction du contenu PDF en cours...
-                      </p>
-                      <p className="text-xs text-amber-700">Lecture et formatage de l'énoncé</p>
+                    <div className="w-full max-w-md mx-auto space-y-2.5 animate-pulse py-1">
+                      <div className="h-3.5 bg-amber-200/80 rounded w-3/4 mx-auto" />
+                      <div className="h-2.5 bg-amber-200/60 rounded w-full" />
+                      <div className="h-2.5 bg-amber-200/60 rounded w-5/6 mx-auto" />
                     </div>
                   ) : pdfSuccessName ? (
                     <div className="flex flex-col items-center gap-1.5 text-emerald-800">
@@ -615,10 +704,7 @@ export default function FormExercicePage() {
                   className="w-full flex items-center justify-center gap-2 px-4 py-2.5 text-sm font-bold text-white bg-amber-500 hover:bg-amber-600 rounded-xl shadow-xs transition-all disabled:opacity-60 cursor-pointer"
                 >
                   {loading ? (
-                    <>
-                      <Loader2 size={16} className="animate-spin" />
-                      <span>Enregistrement...</span>
-                    </>
+                    <span className="inline-block h-4 w-32 bg-white/30 rounded animate-pulse" />
                   ) : (
                     <>
                       <Save size={16} />

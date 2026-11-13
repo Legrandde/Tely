@@ -81,9 +81,12 @@ export default function Header() {
           initial="hidden"
           animate="show"
         >
-          {["Exercices", "Sujets", "Corrections"].map((item) => (
-            <motion.span key={item} variants={navItemVariant} className="cursor-pointer">
-              <Link to={`/${item}`}>{item}</Link>
+          {[
+            { label: "Exercices", to: "/exercices" },
+            { label: "Sujets", to: "/sujets" },
+          ].map((item) => (
+            <motion.span key={item.label} variants={navItemVariant} className="cursor-pointer">
+              <Link to={item.to}>{item.label}</Link>
             </motion.span>
           ))}
 
@@ -178,10 +181,18 @@ export default function Header() {
             transition={{ duration: 0.25, ease: "easeInOut" }}
             className="md:hidden overflow-hidden flex flex-col gap-1 pt-2"
           >
-            {["Exercices", "Anciens Sujets", "Corrections"].map((item) => (
-              <span key={item} className="cursor-default p-1">
-                {item}
-              </span>
+            {[
+              { label: "Exercices", to: "/exercices" },
+              { label: "Anciens Sujets", to: "/sujets" },
+            ].map((item) => (
+              <Link
+                key={item.label}
+                to={item.to}
+                onClick={() => setMenuOpen(false)}
+                className="cursor-pointer p-1 hover:text-amber-600 transition-colors"
+              >
+                {item.label}
+              </Link>
             ))}
 
             {isAuthenticated ? (

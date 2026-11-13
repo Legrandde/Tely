@@ -37,7 +37,10 @@ export function AppButton({
       `}
     >
       {loading ? (
-        <span className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+        <span className="flex items-center gap-2 animate-pulse">
+          <span className="w-4 h-4 rounded bg-current opacity-25" />
+          <span className="h-3.5 w-24 rounded bg-current opacity-25" />
+        </span>
       ) : (
         <>
           {iconLeft && <span className="flex items-center">{iconLeft}</span>}

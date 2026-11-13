@@ -40,19 +40,19 @@ export default function ModernFilterBar({
   onReset,
   placeholder = "Chercher un chapitre, une notion...",
 }: ModernFilterBarProps) {
-  const { matieres, niveaux } = useReferenceData();
+  const { matieres = [], niveaux = [] } = useReferenceData();
 
   // Liste unique des cycles
   const cycles = useMemo(() => {
-    const list = Array.from(new Set(niveaux.map((n) => n.cycle).filter(Boolean)));
+    const list = Array.from(new Set((niveaux || []).map((n) => n.cycle).filter(Boolean)));
     return list.length > 0 ? list : ["Élémentaire", "Collège", "Lycée"];
   }, [niveaux]);
 
   // Niveaux filtrés par cycle si un cycle est choisi
   const filteredNiveaux = useMemo(() => {
-    if (!values.cycle) return niveaux;
-    return niveaux.filter(
-      (n) => n.cycle.toLowerCase() === values.cycle?.toLowerCase()
+    if (!values.cycle) return niveaux || [];
+    return (niveaux || []).filter(
+      (n) => n.cycle?.toLowerCase() === values.cycle?.toLowerCase()
     );
   }, [niveaux, values.cycle]);
 
@@ -69,8 +69,8 @@ export default function ModernFilterBar({
     const next = { ...values, [key]: val || undefined };
     // Si on change de cycle et que le niveau choisi n'est plus dedans, on le réinitialise
     if (key === "cycle" && val) {
-      const match = niveaux.find(
-        (n) => String(n.id) === String(values.niveau_id) && n.cycle.toLowerCase() === val.toLowerCase()
+      const match = (niveaux || []).find(
+        (n) => String(n.id) === String(values.niveau_id) && n.cycle?.toLowerCase() === val.toLowerCase()
       );
       if (!match) {
         delete next.niveau_id;
@@ -80,7 +80,7 @@ export default function ModernFilterBar({
   }
 
   return (
-    <div className="w-full relative rounded-2xl bg-white/70 backdrop-blur-xs border border-slate-100 p-4 sm:p-5 shadow-xs mb-8 overflow-hidden bg-[radial-gradient(#cbd5e1_1.2px,transparent_1.2px)] [background-size:20px_20px]">
+    <div className="w-full mb-8">
       {/* ── 1. Champ de recherche principal ── */}
       <div className="relative w-full mb-3.5">
         <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-slate-400">

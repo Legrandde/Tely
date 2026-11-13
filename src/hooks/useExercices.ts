@@ -14,8 +14,13 @@ export function useExercices(filters: ExerciceFilters = {}) {
     getExercices(filters)
       .then((result) => {
         if (!cancelled) {
-          setExercices(result.data);
-          setTotalPages(result.last_page);
+          const items = Array.isArray(result?.data)
+            ? result.data
+            : Array.isArray(result)
+            ? (result as unknown as Exercice[])
+            : [];
+          setExercices(items);
+          setTotalPages(result?.last_page || 1);
           setError(null);
           setLoading(false);
         }

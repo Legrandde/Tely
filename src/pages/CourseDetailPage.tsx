@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { useLocation, useNavigate, useSearchParams } from "react-router-dom";
+import { useLocation, useNavigate, useParams, useSearchParams } from "react-router-dom";
 import CourseDetailSkeleton from "../components/CourseDetailSkeleton";
 import type { LucideIcon } from "lucide-react";
 import {
@@ -89,8 +89,9 @@ function Row({ icon: Icon, label, value }: RowProps) {
 export default function CourseDetailPage() {
   const navigate = useNavigate();
   const location = useLocation();
+  const { id: paramId } = useParams<{ id: string }>();
   const [searchParams] = useSearchParams();
-  const exerciceId = searchParams.get("id");
+  const exerciceId = paramId || searchParams.get("id");
 
   const { isAuthenticated, isLoading: authLoading } = useAuth();
 
@@ -187,9 +188,10 @@ export default function CourseDetailPage() {
 
   const correction = (exercice as unknown as { correction?: { contenu?: string; explication?: string } })?.correction;
 
+  const enonceTexte = exercice.enonce || "";
   // Si non connecté, l'énoncé complet est flouté
-  const enonceDebut = exercice.enonce.slice(0, APERCU_LONGUEUR);
-  const enonceReste = exercice.enonce.slice(APERCU_LONGUEUR);
+  const enonceDebut = enonceTexte.slice(0, APERCU_LONGUEUR);
+  const enonceReste = enonceTexte.slice(APERCU_LONGUEUR);
 
   function handleShare(label: string) {
     const currentUrl = window.location.href;

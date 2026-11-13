@@ -6,7 +6,6 @@ import {
   Bell,
   Shield,
   Save,
-  Loader2,
   CheckCircle2,
   AlertTriangle,
 } from "lucide-react";
@@ -108,9 +107,7 @@ export default function ParametresPage() {
           className="flex items-center gap-2 px-5 py-2.5 bg-amber-500 hover:bg-amber-600 text-white text-xs font-semibold rounded-xl shadow-sm transition-colors cursor-pointer self-start sm:self-auto"
         >
           {saving ? (
-            <>
-              <Loader2 size={15} className="animate-spin" /> Enregistrement...
-            </>
+            <span className="inline-block h-3.5 w-28 bg-white/30 rounded animate-pulse" />
           ) : (
             <>
               <Save size={15} /> Enregistrer les réglages
@@ -150,6 +147,37 @@ export default function ParametresPage() {
       </div>
 
       {/* ── Formulaire des Paramètres ── */}
+      {loading ? (
+        <div className="bg-white rounded-2xl border border-gray-100 p-6 shadow-sm space-y-6 animate-pulse">
+          <div className="flex items-center gap-2 border-b border-gray-100 pb-3">
+            <div className="w-4 h-4 rounded bg-amber-200" />
+            <div className="h-4 w-44 bg-gray-200 rounded" />
+          </div>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
+            <div>
+              <div className="h-3.5 w-48 bg-gray-200 rounded mb-2" />
+              <div className="h-10 w-full bg-gray-100 rounded-xl border border-gray-200" />
+            </div>
+            <div>
+              <div className="h-3.5 w-52 bg-gray-200 rounded mb-2" />
+              <div className="h-10 w-full bg-gray-100 rounded-xl border border-gray-200" />
+            </div>
+          </div>
+          <div>
+            <div className="h-3.5 w-56 bg-gray-200 rounded mb-2" />
+            <div className="h-20 w-full bg-gray-100 rounded-xl border border-gray-200" />
+          </div>
+          <div className="pt-4 border-t border-gray-100">
+            <div className="flex items-center justify-between p-4 rounded-xl bg-gray-50 border border-gray-100">
+              <div className="space-y-1.5 flex-1 pr-4">
+                <div className="h-3.5 w-36 bg-gray-200 rounded" />
+                <div className="h-3 w-3/4 bg-gray-100 rounded" />
+              </div>
+              <div className="w-11 h-6 rounded-full bg-gray-200 shrink-0" />
+            </div>
+          </div>
+        </div>
+      ) : (
       <form onSubmit={handleSubmit} className="space-y-6">
         {/* Onglet Général */}
         {activeTab === "general" && (
@@ -466,9 +494,7 @@ export default function ParametresPage() {
             className="flex items-center gap-2 px-6 py-2.5 bg-amber-500 hover:bg-amber-600 text-white text-xs font-bold rounded-xl shadow-sm transition-colors cursor-pointer"
           >
             {saving ? (
-              <>
-                <Loader2 size={15} className="animate-spin" /> Enregistrement...
-              </>
+              <span className="inline-block h-3.5 w-32 bg-white/30 rounded animate-pulse" />
             ) : (
               <>
                 <Save size={15} /> Enregistrer les modifications
@@ -477,6 +503,7 @@ export default function ParametresPage() {
           </button>
         </div>
       </form>
+      )}
     </div>
   );
 }

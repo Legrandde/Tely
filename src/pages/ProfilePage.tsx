@@ -11,7 +11,6 @@ import {
   Hash,
   Layers,
   ArrowLeft,
-  Loader2,
   Trash2,
 } from "lucide-react";
 import { useAuth } from "../context/authContext";
@@ -425,9 +424,7 @@ export default function ProfilePage() {
                 className="px-5 py-2.5 bg-amber-500 hover:bg-amber-600 disabled:opacity-50 text-white text-xs font-bold rounded-xl shadow-xs inline-flex items-center gap-2 transition-all cursor-pointer"
               >
                 {savingProfile ? (
-                  <>
-                    <Loader2 size={16} className="animate-spin" /> Enregistrement...
-                  </>
+                  <span className="inline-block h-4 w-32 bg-white/30 rounded animate-pulse" />
                 ) : (
                   <>
                     <Save size={16} /> Mettre à jour mon profil
@@ -506,9 +503,7 @@ export default function ProfilePage() {
                 className="w-full py-2.5 bg-gray-900 hover:bg-black disabled:opacity-50 text-white text-xs font-bold rounded-xl shadow-xs inline-flex items-center justify-center gap-2 transition-all cursor-pointer"
               >
                 {savingPassword ? (
-                  <>
-                    <Loader2 size={16} className="animate-spin" /> Modification...
-                  </>
+                  <span className="inline-block h-4 w-32 bg-white/30 rounded animate-pulse" />
                 ) : (
                   <>
                     <Lock size={15} /> Changer le mot de passe

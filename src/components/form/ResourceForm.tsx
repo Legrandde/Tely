@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { FileText, Loader2 } from "lucide-react";
+import { FileText } from "lucide-react";
 import api from "../../api/axio";
 import type { FieldConfig, ResourceSchema, SelectOption } from "../../types/forms";
 
@@ -143,14 +143,10 @@ export default function ResourceForm({
                       : "bg-amber-50 hover:bg-amber-100 text-amber-700 border-amber-200"
                   }`}
                 >
-                  {extractingField === field.name ? (
-                    <Loader2 size={13} className="animate-spin" />
-                  ) : (
-                    <FileText size={13} />
-                  )}
+                  <FileText size={13} />
                   <span>
                     {extractingField === field.name
-                      ? "Extraction du PDF en cours..."
+                      ? "Extraction du PDF..."
                       : "Importer depuis un PDF"}
                   </span>
                   <input
@@ -167,13 +163,22 @@ export default function ResourceForm({
                 </label>
               </div>
             )}
-            <textarea
-              value={(values[field.name] as string) ?? ""}
-              onChange={(e) => setValue(field.name, e.target.value)}
-              placeholder={field.placeholder}
-              rows={isEnonceField ? 6 : 4}
-              className={baseInputClass}
-            />
+            {extractingField === field.name ? (
+              <div className="w-full border border-gray-200 rounded-lg p-3 space-y-2.5 bg-gray-50 animate-pulse">
+                <div className="h-3 bg-gray-200 rounded w-3/4" />
+                <div className="h-3 bg-gray-200 rounded w-full" />
+                <div className="h-3 bg-gray-200 rounded w-5/6" />
+                <div className="h-3 bg-gray-200 rounded w-2/3" />
+              </div>
+            ) : (
+              <textarea
+                value={(values[field.name] as string) ?? ""}
+                onChange={(e) => setValue(field.name, e.target.value)}
+                placeholder={field.placeholder}
+                rows={isEnonceField ? 6 : 4}
+                className={baseInputClass}
+              />
+            )}
           </div>
         );
       }
@@ -220,16 +225,18 @@ export default function ResourceForm({
 
       case "select-async": {
         const options = asyncOptions[field.name] ?? [];
+        if (loadingOptions) {
+          return (
+            <div className="h-9 w-full bg-gray-100 border border-gray-200 rounded-lg animate-pulse" />
+          );
+        }
         return (
           <select
             value={(values[field.name] as string) ?? ""}
             onChange={(e) => setValue(field.name, e.target.value)}
-            disabled={loadingOptions}
             className={baseInputClass}
           >
-            <option value="">
-              {loadingOptions ? "Chargement..." : "Sélectionner..."}
-            </option>
+            <option value="">Sélectionner...</option>
             {options.map((opt) => (
               <option key={opt.value} value={opt.value}>
                 {opt.label}

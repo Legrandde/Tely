@@ -21,6 +21,7 @@ const DIFFICULTE_COLORS: Record<string, string> = {
 
 export default function OverView() {
   const [stats, setStats] = useState<AdminStats | null>(null);
+  const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -33,6 +34,9 @@ export default function OverView() {
       })
       .catch(() => {
         // Fallback or error handled silently
+      })
+      .finally(() => {
+        if (isMounted) setLoading(false);
       });
 
     return () => {
@@ -88,11 +92,11 @@ export default function OverView() {
 
       {/* ── Stat Cards ── */}
       <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3 sm:gap-4 w-full min-w-0">
-        <StatCard label="Élèves inscrits" value={counts.eleves} percent={12.5} bgColor="bg-amber-50" />
-        <StatCard label="Professeurs" value={counts.professeurs} percent={4.2} bgColor="bg-green-50" />
-        <StatCard label="Exercices actifs" value={counts.exercices} percent={8.1} bgColor="bg-rose-50" />
-        <StatCard label="Sujets d'examen" value={counts.sujets} percent={15.0} bgColor="bg-sky-50" />
-        <StatCard label="Matières actives" value={counts.matieres} percent={0} bgColor="bg-purple-50" />
+        <StatCard label="Élèves inscrits" value={counts.eleves} percent={12.5} bgColor="bg-amber-50" loading={loading} />
+        <StatCard label="Professeurs" value={counts.professeurs} percent={4.2} bgColor="bg-green-50" loading={loading} />
+        <StatCard label="Exercices actifs" value={counts.exercices} percent={8.1} bgColor="bg-rose-50" loading={loading} />
+        <StatCard label="Sujets d'examen" value={counts.sujets} percent={15.0} bgColor="bg-sky-50" loading={loading} />
+        <StatCard label="Matières actives" value={counts.matieres} percent={0} bgColor="bg-purple-50" loading={loading} />
       </div>
 
       {/* ── Graphiques & Répartition ── */}
@@ -110,7 +114,19 @@ export default function OverView() {
           </div>
 
           <div className="h-64 w-full">
-            {matiereChartData.length === 0 ? (
+            {loading ? (
+              <div className="h-full flex items-end justify-between gap-4 px-4 pb-6 pt-4 animate-pulse">
+                {[45, 75, 55, 90, 60, 80, 40].map((h, i) => (
+                  <div key={i} className="flex-1 flex flex-col items-center gap-2 h-full justify-end">
+                    <div
+                      className="w-full max-w-[42px] bg-amber-200/70 rounded-t-md"
+                      style={{ height: `${h}%` }}
+                    />
+                    <div className="h-2.5 w-10 bg-gray-100 rounded" />
+                  </div>
+                ))}
+              </div>
+            ) : matiereChartData.length === 0 ? (
               <div className="h-full flex items-center justify-center text-xs text-gray-400">
                 Aucune donnée d'exercices disponible
               </div>
@@ -202,7 +218,7 @@ export default function OverView() {
               <p className="text-xs text-gray-400">Contenus récemment publiés</p>
             </div>
             <button
-              onClick={() => navigate("exercices")}
+              onClick={() => navigate("/Dashbord-admin/exercices")}
               className="text-xs font-semibold text-amber-600 hover:text-amber-700 cursor-pointer"
             >
               Voir tout
@@ -210,7 +226,19 @@ export default function OverView() {
           </div>
 
           <div className="divide-y divide-gray-50">
-            {(stats?.derniers_exercices ?? []).length === 0 ? (
+            {loading ? (
+              <div className="divide-y divide-gray-50 animate-pulse">
+                {[1, 2, 3, 4].map((i) => (
+                  <div key={i} className="py-2.5 flex items-center justify-between gap-3">
+                    <div className="space-y-1.5 flex-1">
+                      <div className="h-3.5 w-3/5 bg-gray-200 rounded" />
+                      <div className="h-2.5 w-2/5 bg-gray-100 rounded" />
+                    </div>
+                    <div className="h-5 w-14 bg-gray-100 rounded-full shrink-0" />
+                  </div>
+                ))}
+              </div>
+            ) : (stats?.derniers_exercices ?? []).length === 0 ? (
               <div className="py-8 text-center text-xs text-gray-400">
                 Aucun exercice pour le moment
               </div>
@@ -246,7 +274,7 @@ export default function OverView() {
               <p className="text-xs text-gray-400">Épreuves officielles enregistrées</p>
             </div>
             <button
-              onClick={() => navigate("sujets")}
+              onClick={() => navigate("/Dashbord-admin/sujets")}
               className="text-xs font-semibold text-amber-600 hover:text-amber-700 cursor-pointer"
             >
               Voir tout
@@ -254,7 +282,19 @@ export default function OverView() {
           </div>
 
           <div className="divide-y divide-gray-50">
-            {(stats?.derniers_sujets ?? []).length === 0 ? (
+            {loading ? (
+              <div className="divide-y divide-gray-50 animate-pulse">
+                {[1, 2, 3, 4].map((i) => (
+                  <div key={i} className="py-2.5 flex items-center justify-between gap-3">
+                    <div className="space-y-1.5 flex-1">
+                      <div className="h-3.5 w-3/5 bg-gray-200 rounded" />
+                      <div className="h-2.5 w-2/5 bg-gray-100 rounded" />
+                    </div>
+                    <div className="h-5 w-14 bg-purple-50 rounded-full shrink-0" />
+                  </div>
+                ))}
+              </div>
+            ) : (stats?.derniers_sujets ?? []).length === 0 ? (
               <div className="py-8 text-center text-xs text-gray-400">
                 Aucun sujet d'examen pour le moment
               </div>

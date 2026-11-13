@@ -55,7 +55,11 @@ export default function SideBarProfesseur() {
   ];
 
   const handleNavigate = (route: string) => {
-    navigate(route);
+    if (!route) {
+      navigate("/Dashboard-professeur");
+    } else {
+      navigate(`/Dashboard-professeur/${route}`);
+    }
     closeMobile();
   };
 

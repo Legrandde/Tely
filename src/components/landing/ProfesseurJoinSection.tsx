@@ -1,6 +1,6 @@
 import { useState, useRef } from "react";
 import { GoArrowRight } from "react-icons/go";
-import { X, CheckCircle2, Loader2, Upload } from "lucide-react";
+import { X, CheckCircle2, Upload } from "lucide-react";
 import { useToast } from "../../context/ToastContext";
 import { submitCandidature } from "../../services/candidatureService";
 
@@ -317,9 +317,7 @@ export default function ProfesseurJoinSection() {
                     className="px-5 py-2 bg-amber-500 hover:bg-amber-400 font-semibold text-black text-xs rounded-lg shadow-sm transition-colors cursor-pointer flex items-center gap-1.5"
                   >
                     {loading ? (
-                      <>
-                        <Loader2 size={14} className="animate-spin" /> Envoi...
-                      </>
+                      <span className="inline-block h-3.5 w-28 bg-black/20 rounded animate-pulse" />
                     ) : (
                       "Soumettre ma candidature"
                     )}

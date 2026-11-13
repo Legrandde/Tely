@@ -314,8 +314,54 @@ export default function ProfesseurRessources() {
 
       {/* Contenu */}
       {loading ? (
-        <div className="py-20 text-center text-sm text-gray-400">
-          Chargement des documents pédagogiques...
+        <div className="overflow-x-auto border border-gray-100 rounded-2xl bg-white shadow-sm animate-pulse">
+          <table className="w-full text-sm">
+            <thead>
+              <tr className="bg-gray-50/75 text-left text-xs text-gray-500 uppercase tracking-wider border-b border-gray-100">
+                <th className="px-5 py-3.5">Document</th>
+                <th className="px-5 py-3.5">Type</th>
+                <th className="px-5 py-3.5">Matière & Niveau</th>
+                <th className="px-5 py-3.5">Enseignant</th>
+                <th className="px-5 py-3.5 text-center">Fichier</th>
+                <th className="px-5 py-3.5 text-right">Actions</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-gray-100">
+              {[1, 2, 3, 4, 5].map((i) => (
+                <tr key={i}>
+                  <td className="px-5 py-3.5 max-w-xs">
+                    <div className="flex items-center gap-2.5">
+                      <div className="w-8 h-8 rounded-lg bg-red-50 shrink-0" />
+                      <div className="space-y-1.5">
+                        <div className="h-4 w-40 bg-gray-200 rounded" />
+                        <div className="h-3 w-48 bg-gray-100 rounded" />
+                      </div>
+                    </div>
+                  </td>
+                  <td className="px-5 py-3.5">
+                    <div className="h-5 w-24 bg-amber-50 rounded-full" />
+                  </td>
+                  <td className="px-5 py-3.5 space-y-1.5">
+                    <div className="h-3.5 w-24 bg-gray-200 rounded" />
+                    <div className="h-3 w-20 bg-gray-100 rounded" />
+                  </td>
+                  <td className="px-5 py-3.5">
+                    <div className="h-3.5 w-28 bg-gray-100 rounded" />
+                  </td>
+                  <td className="px-5 py-3.5 text-center">
+                    <div className="h-5 w-16 bg-gray-100 rounded-md mx-auto" />
+                  </td>
+                  <td className="px-5 py-3.5 text-right">
+                    <div className="flex items-center justify-end gap-1.5">
+                      <div className="w-7 h-7 rounded-lg bg-gray-100" />
+                      <div className="w-7 h-7 rounded-lg bg-gray-100" />
+                      <div className="w-7 h-7 rounded-lg bg-gray-100" />
+                    </div>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
         </div>
       ) : error ? (
         <div className="py-16 text-center text-sm text-red-500 bg-red-50 rounded-xl border border-red-100">

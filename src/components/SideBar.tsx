@@ -67,7 +67,11 @@ export default function SideBar() {
   ];
 
   const handleNavigate = (route: string) => {
-    navigate(route);
+    if (!route) {
+      navigate("/Dashbord-admin");
+    } else {
+      navigate(`/Dashbord-admin/${route}`);
+    }
     closeMobile();
   };
 

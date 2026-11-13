@@ -9,7 +9,6 @@ import {
   Copy,
   Trash2,
   ExternalLink,
-  Loader2,
   Clock,
   Sparkles,
 } from "lucide-react";
@@ -247,8 +246,58 @@ export default function GestionCandidatures() {
 
       {/* ── Table des Candidatures ── */}
       {loading ? (
-        <div className="py-20 text-center text-xs text-gray-400 bg-white rounded-2xl border border-gray-100">
-          Chargement des candidatures...
+        <div className="overflow-x-auto border border-gray-100 rounded-2xl bg-white shadow-xs animate-pulse">
+          <table className="w-full text-left text-xs">
+            <thead>
+              <tr className="bg-gray-50/75 border-b border-gray-100 text-gray-500 uppercase tracking-wider text-[10px]">
+                <th className="py-3.5 pl-4">Candidat</th>
+                <th className="py-3.5">Discipline</th>
+                <th className="py-3.5">Établissement & Diplôme</th>
+                <th className="py-3.5">Expérience</th>
+                <th className="py-3.5">CV</th>
+                <th className="py-3.5">Statut</th>
+                <th className="py-3.5 pr-4 text-right">Actions</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-gray-100">
+              {[1, 2, 3, 4, 5].map((i) => (
+                <tr key={i}>
+                  <td className="py-3.5 pl-4">
+                    <div className="flex items-center gap-2.5">
+                      <div className="w-8 h-8 rounded-full bg-amber-100 shrink-0" />
+                      <div className="space-y-1.5">
+                        <div className="h-3.5 w-32 bg-gray-200 rounded" />
+                        <div className="h-2.5 w-40 bg-gray-100 rounded" />
+                      </div>
+                    </div>
+                  </td>
+                  <td className="py-3.5">
+                    <div className="h-5 w-28 bg-amber-50 rounded-md" />
+                  </td>
+                  <td className="py-3.5 space-y-1.5">
+                    <div className="h-3.5 w-32 bg-gray-200 rounded" />
+                    <div className="h-2.5 w-24 bg-gray-100 rounded" />
+                  </td>
+                  <td className="py-3.5">
+                    <div className="h-3.5 w-14 bg-gray-200 rounded" />
+                  </td>
+                  <td className="py-3.5">
+                    <div className="h-6 w-20 bg-indigo-50 rounded-lg" />
+                  </td>
+                  <td className="py-3.5">
+                    <div className="h-5 w-24 bg-amber-50 rounded-full" />
+                  </td>
+                  <td className="py-3.5 pr-4 text-right">
+                    <div className="flex items-center justify-end gap-1.5">
+                      <div className="w-7 h-7 rounded-lg bg-gray-100" />
+                      <div className="w-7 h-7 rounded-lg bg-gray-100" />
+                      <div className="w-7 h-7 rounded-lg bg-gray-100" />
+                    </div>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
         </div>
       ) : filteredCandidatures.length === 0 ? (
         <div className="py-16 text-center bg-white rounded-2xl border border-gray-100 space-y-2">
@@ -528,9 +577,7 @@ export default function GestionCandidatures() {
                 className="px-5 py-2 bg-emerald-600 hover:bg-emerald-700 disabled:opacity-50 text-white text-xs font-bold rounded-xl shadow-xs transition-colors cursor-pointer flex items-center gap-1.5"
               >
                 {approving ? (
-                  <>
-                    <Loader2 size={14} className="animate-spin" /> Création...
-                  </>
+                  <span className="inline-block h-3.5 w-28 bg-white/30 rounded animate-pulse" />
                 ) : (
                   <>
                     <CheckCircle size={14} /> Confirmer l'approbation
@@ -632,8 +679,13 @@ export default function GestionCandidatures() {
                 disabled={rejecting}
                 className="px-4 py-2 bg-rose-600 hover:bg-rose-700 text-white text-xs font-bold rounded-xl transition-colors cursor-pointer flex items-center gap-1.5"
               >
-                {rejecting ? <Loader2 size={14} className="animate-spin" /> : <XCircle size={14} />}
-                Confirmer le rejet
+                {rejecting ? (
+                  <span className="inline-block h-3.5 w-28 bg-white/30 rounded animate-pulse" />
+                ) : (
+                  <>
+                    <XCircle size={14} /> Confirmer le rejet
+                  </>
+                )}
               </button>
             </div>
           </div>

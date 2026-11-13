@@ -158,18 +158,18 @@ export default function AdminStatistiques() {
             className="p-1.5 text-white/80 hover:text-white rounded-lg hover:bg-white/10 transition-colors cursor-pointer"
             title="Actualiser les statistiques"
           >
-            <RefreshCw size={15} className={loading ? "animate-spin text-white" : ""} />
+            <RefreshCw size={15} className={loading ? "text-white animate-pulse" : ""} />
           </button>
         </div>
       </div>
 
       {/* ── Stat Cards (Même composant StatCard que l'accueil) ── */}
       <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3 sm:gap-4 w-full min-w-0">
-        <StatCard label="Total des visites" value={summary.total_visits} percent={14.2} bgColor="bg-amber-50" />
-        <StatCard label="Visiteurs uniques" value={summary.unique_visitors} percent={8.5} bgColor="bg-green-50" />
-        <StatCard label="Pages vues" value={summary.page_views} percent={12.0} bgColor="bg-sky-50" />
-        <StatCard label="Actions utilisateurs" value={summary.user_actions} percent={6.3} bgColor="bg-purple-50" />
-        <StatCard label="Taux de rebond" value={summary.bounce_rate} percent={0} bgColor="bg-rose-50" />
+        <StatCard label="Total des visites" value={summary.total_visits} percent={14.2} bgColor="bg-amber-50" loading={loading} />
+        <StatCard label="Visiteurs uniques" value={summary.unique_visitors} percent={8.5} bgColor="bg-green-50" loading={loading} />
+        <StatCard label="Pages vues" value={summary.page_views} percent={12.0} bgColor="bg-sky-50" loading={loading} />
+        <StatCard label="Actions utilisateurs" value={summary.user_actions} percent={6.3} bgColor="bg-purple-50" loading={loading} />
+        <StatCard label="Taux de rebond" value={summary.bounce_rate} percent={0} bgColor="bg-rose-50" loading={loading} />
       </div>
 
       {/* ── Graphiques & Répartition (Même grille Recharts que OverView) ── */}
@@ -187,7 +187,19 @@ export default function AdminStatistiques() {
           </div>
 
           <div className="h-64 w-full">
-            {timelineChartData.length === 0 ? (
+            {loading ? (
+              <div className="h-full flex items-end justify-between gap-4 px-4 pb-6 pt-4 animate-pulse">
+                {[50, 80, 45, 95, 65, 85, 55].map((h, i) => (
+                  <div key={i} className="flex-1 flex flex-col items-center gap-2 h-full justify-end">
+                    <div
+                      className="w-full max-w-[42px] bg-amber-200/70 rounded-t-md"
+                      style={{ height: `${h}%` }}
+                    />
+                    <div className="h-2.5 w-10 bg-gray-100 rounded" />
+                  </div>
+                ))}
+              </div>
+            ) : timelineChartData.length === 0 ? (
               <div className="h-full flex items-center justify-center text-xs text-gray-400">
                 Aucune visite enregistrée sur cette période
               </div>
@@ -233,7 +245,22 @@ export default function AdminStatistiques() {
             <p className="text-xs text-gray-400 mb-4">Origine géographique réelle des requêtes</p>
 
             <div className="space-y-4 overflow-y-auto max-h-56 pr-1">
-              {(data?.countries ?? []).length === 0 ? (
+              {loading ? (
+                <div className="space-y-4 animate-pulse">
+                  {[1, 2, 3].map((i) => (
+                    <div key={i}>
+                      <div className="flex items-center justify-between mb-1.5">
+                        <div className="flex items-center gap-1.5">
+                          <div className="w-6 h-4 bg-gray-200 rounded" />
+                          <div className="h-3.5 w-24 bg-gray-200 rounded" />
+                        </div>
+                        <div className="h-3.5 w-14 bg-gray-200 rounded" />
+                      </div>
+                      <div className="w-full h-2 rounded-full bg-gray-100" />
+                    </div>
+                  ))}
+                </div>
+              ) : (data?.countries ?? []).length === 0 ? (
                 <div className="py-8 text-center text-xs text-gray-400">
                   Aucun pays détecté pour le moment
                 </div>
@@ -282,7 +309,19 @@ export default function AdminStatistiques() {
             <p className="text-xs text-gray-400 mb-4">Plateformes réelles des visiteurs</p>
 
             <div className="space-y-3.5">
-              {(data?.operating_systems ?? []).length === 0 ? (
+              {loading ? (
+                <div className="space-y-3.5 animate-pulse">
+                  {[1, 2, 3].map((i) => (
+                    <div key={i}>
+                      <div className="flex items-center justify-between mb-1">
+                        <div className="h-3 w-24 bg-gray-200 rounded" />
+                        <div className="h-3 w-12 bg-gray-200 rounded" />
+                      </div>
+                      <div className="w-full h-1.5 rounded-full bg-gray-100" />
+                    </div>
+                  ))}
+                </div>
+              ) : (data?.operating_systems ?? []).length === 0 ? (
                 <div className="py-6 text-center text-xs text-gray-400">En attente de visites</div>
               ) : (
                 data?.operating_systems.map((os, i) => (
@@ -313,7 +352,19 @@ export default function AdminStatistiques() {
             <p className="text-xs text-gray-400 mb-4">Logiciels de navigation détectés</p>
 
             <div className="space-y-3.5">
-              {(data?.browsers ?? []).length === 0 ? (
+              {loading ? (
+                <div className="space-y-3.5 animate-pulse">
+                  {[1, 2, 3].map((i) => (
+                    <div key={i}>
+                      <div className="flex items-center justify-between mb-1">
+                        <div className="h-3 w-24 bg-gray-200 rounded" />
+                        <div className="h-3 w-12 bg-gray-200 rounded" />
+                      </div>
+                      <div className="w-full h-1.5 rounded-full bg-gray-100" />
+                    </div>
+                  ))}
+                </div>
+              ) : (data?.browsers ?? []).length === 0 ? (
                 <div className="py-6 text-center text-xs text-gray-400">En attente de visites</div>
               ) : (
                 data?.browsers.map((b, i) => (
@@ -344,7 +395,19 @@ export default function AdminStatistiques() {
             <p className="text-xs text-gray-400 mb-4">Ordinateur vs Smartphone vs Tablette</p>
 
             <div className="space-y-3.5">
-              {(data?.devices ?? []).length === 0 ? (
+              {loading ? (
+                <div className="space-y-3.5 animate-pulse">
+                  {[1, 2, 3].map((i) => (
+                    <div key={i}>
+                      <div className="flex items-center justify-between mb-1">
+                        <div className="h-3 w-28 bg-gray-200 rounded" />
+                        <div className="h-3 w-12 bg-gray-200 rounded" />
+                      </div>
+                      <div className="w-full h-1.5 rounded-full bg-gray-100" />
+                    </div>
+                  ))}
+                </div>
+              ) : (data?.devices ?? []).length === 0 ? (
                 <div className="py-6 text-center text-xs text-gray-400">En attente de visites</div>
               ) : (
                 data?.devices.map((d, i) => (
@@ -382,7 +445,25 @@ export default function AdminStatistiques() {
         </div>
 
         <div className="divide-y divide-gray-50">
-          {(data?.recent_activities ?? []).length === 0 ? (
+          {loading ? (
+            <div className="divide-y divide-gray-50 animate-pulse">
+              {[1, 2, 3, 4, 5].map((i) => (
+                <div key={i} className="py-2.5 flex items-center justify-between gap-3 px-2">
+                  <div className="flex items-center gap-3 min-w-0 flex-1">
+                    <div className="w-8 h-8 rounded-full bg-amber-100 shrink-0" />
+                    <div className="space-y-1.5 flex-1">
+                      <div className="h-3.5 w-44 bg-gray-200 rounded" />
+                      <div className="h-2.5 w-56 bg-gray-100 rounded" />
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-3 shrink-0">
+                    <div className="h-5 w-16 bg-gray-100 rounded-md" />
+                    <div className="h-3 w-16 bg-gray-100 rounded" />
+                  </div>
+                </div>
+              ))}
+            </div>
+          ) : (data?.recent_activities ?? []).length === 0 ? (
             <div className="py-8 text-center text-xs text-gray-400">
               Aucune activité récente enregistrée pour le moment. Naviguez sur l'application pour générer des traces réelles.
             </div>

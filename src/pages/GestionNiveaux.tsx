@@ -190,8 +190,41 @@ export default function GestionNiveaux() {
 
       {/* Contenu */}
       {loading ? (
-        <div className="py-20 text-center text-sm text-gray-400">
-          Chargement des niveaux...
+        <div className="overflow-x-auto border border-gray-100 rounded-2xl bg-white shadow-sm animate-pulse">
+          <table className="w-full text-sm">
+            <thead>
+              <tr className="bg-gray-50/75 text-left text-xs text-gray-500 uppercase tracking-wider border-b border-gray-100">
+                <th className="px-5 py-3.5">Libellé</th>
+                <th className="px-5 py-3.5">Cycle</th>
+                <th className="px-5 py-3.5 text-center">Ordre</th>
+                <th className="px-5 py-3.5 text-right">Actions</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-gray-100">
+              {[1, 2, 3, 4, 5].map((i) => (
+                <tr key={i}>
+                  <td className="px-5 py-3.5">
+                    <div className="flex items-center gap-2">
+                      <span className="w-2 h-2 rounded-full bg-amber-300" />
+                      <div className="h-4 w-32 bg-gray-200 rounded" />
+                    </div>
+                  </td>
+                  <td className="px-5 py-3.5">
+                    <div className="h-5 w-20 bg-purple-50 rounded-full" />
+                  </td>
+                  <td className="px-5 py-3.5 text-center">
+                    <div className="h-5 w-10 bg-gray-100 rounded-md mx-auto" />
+                  </td>
+                  <td className="px-5 py-3.5 text-right">
+                    <div className="flex items-center justify-end gap-1.5">
+                      <div className="w-7 h-7 rounded-lg bg-gray-100" />
+                      <div className="w-7 h-7 rounded-lg bg-gray-100" />
+                    </div>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
         </div>
       ) : error ? (
         <div className="py-16 text-center text-sm text-red-500 bg-red-50 rounded-xl border border-red-100">

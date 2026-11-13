@@ -16,7 +16,7 @@ const MATIERES = [
   "Philosophie",
 ];
 
-const NIVEAU = ["Terminale SE", "Terminale SM", "Terminale SS",  "BEPC", "CEE"];
+const NIVEAU = ["Terminale SE", "Terminale SM", "Terminale SS", "BEPC", "CEE"];
 
 interface FiltreProps {
   loading: boolean;
@@ -50,7 +50,14 @@ export default function Filtre({
       </div>
 
       {loading ? (
-        <p className="text-xs text-gray-400 py-4 text-center">Chargement des filtres...</p>
+        <div className="space-y-3 animate-pulse">
+          {[1, 2].map((i) => (
+            <div key={i}>
+              <div className="h-3 w-16 bg-gray-200 rounded mb-1.5" />
+              <div className="h-8 w-full bg-gray-100 border border-gray-200 rounded-lg" />
+            </div>
+          ))}
+        </div>
       ) : (
         <>
           {/* Matière */}

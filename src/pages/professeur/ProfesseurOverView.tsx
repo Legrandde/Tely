@@ -73,14 +73,14 @@ export default function ProfesseurOverView() {
         {/* Boutons d'action rapide */}
         <div className="relative z-10 flex flex-wrap items-center gap-2.5">
           <button
-            onClick={() => navigate("exercices")}
+            onClick={() => navigate("/Dashboard-professeur/exercices")}
             className="flex items-center gap-1.5 px-4 py-2.5 bg-white text-amber-600 font-semibold text-xs sm:text-sm rounded-xl hover:bg-amber-50 transition-colors shadow-sm cursor-pointer whitespace-nowrap"
           >
             <Plus size={15} />
             Nouvel exercice
           </button>
           <button
-            onClick={() => navigate("ressources")}
+            onClick={() => navigate("/Dashboard-professeur/ressources")}
             className="flex items-center gap-1.5 px-4 py-2.5 bg-amber-700/70 hover:bg-amber-700 text-white font-medium text-xs sm:text-sm rounded-xl transition-colors cursor-pointer border border-amber-400/30 whitespace-nowrap"
           >
             <FileText size={15} />
@@ -96,24 +96,28 @@ export default function ProfesseurOverView() {
           value={counts.mes_exercices}
           percent={5.0}
           bgColor="bg-amber-50"
+          loading={loading}
         />
         <StatCard
           label="Mes ressources (PDFs)"
           value={counts.mes_ressources}
           percent={12.0}
           bgColor="bg-emerald-50"
+          loading={loading}
         />
         <StatCard
           label="Sujets d'examen officiels"
           value={counts.sujets}
           percent={8.5}
           bgColor="bg-purple-50"
+          loading={loading}
         />
         <StatCard
           label="Corrigés enregistrés"
           value={counts.corrections}
           percent={2.4}
           bgColor="bg-sky-50"
+          loading={loading}
         />
       </div>
 
@@ -142,7 +146,17 @@ export default function ProfesseurOverView() {
 
             <div className="divide-y divide-gray-50">
               {loading ? (
-                <div className="py-8 text-center text-xs text-gray-400">Chargement...</div>
+                <div className="divide-y divide-gray-50 animate-pulse">
+                  {[1, 2, 3, 4].map((i) => (
+                    <div key={i} className="py-2.5 flex items-center justify-between gap-3">
+                      <div className="space-y-1.5 flex-1">
+                        <div className="h-3.5 w-3/5 bg-gray-200 rounded" />
+                        <div className="h-2.5 w-2/5 bg-gray-100 rounded" />
+                      </div>
+                      <div className="h-5 w-16 bg-gray-100 rounded-full shrink-0" />
+                    </div>
+                  ))}
+                </div>
               ) : (stats?.derniers_exercices ?? []).length === 0 ? (
                 <div className="py-8 text-center text-xs text-gray-400">
                   Vous n'avez pas encore soumis d'exercices.
@@ -175,7 +189,7 @@ export default function ProfesseurOverView() {
 
           <div className="mt-4 pt-3 border-t border-gray-100 flex justify-end">
             <button
-              onClick={() => navigate("exercices")}
+              onClick={() => navigate("/Dashboard-professeur/exercices")}
               className="text-xs font-medium text-amber-600 hover:text-amber-700 flex items-center gap-1"
             >
               + Ajouter un exercice
@@ -197,7 +211,7 @@ export default function ProfesseurOverView() {
                 </div>
               </div>
               <button
-                onClick={() => navigate("ressources")}
+                onClick={() => navigate("/Dashboard-professeur/ressources")}
                 className="text-xs font-semibold text-amber-600 hover:text-amber-700 cursor-pointer"
               >
                 Gérer tout
@@ -206,7 +220,17 @@ export default function ProfesseurOverView() {
 
             <div className="divide-y divide-gray-50">
               {loading ? (
-                <div className="py-8 text-center text-xs text-gray-400">Chargement...</div>
+                <div className="divide-y divide-gray-50 animate-pulse">
+                  {[1, 2, 3, 4].map((i) => (
+                    <div key={i} className="py-2.5 flex items-center justify-between gap-3">
+                      <div className="space-y-1.5 flex-1">
+                        <div className="h-3.5 w-3/5 bg-gray-200 rounded" />
+                        <div className="h-2.5 w-2/5 bg-gray-100 rounded" />
+                      </div>
+                      <div className="w-6 h-6 bg-gray-100 rounded-lg shrink-0" />
+                    </div>
+                  ))}
+                </div>
               ) : (stats?.dernieres_ressources ?? []).length === 0 ? (
                 <div className="py-8 text-center text-xs text-gray-400">
                   Aucun document PDF publié pour le moment.
@@ -239,7 +263,7 @@ export default function ProfesseurOverView() {
 
           <div className="mt-4 pt-3 border-t border-gray-100 flex justify-end">
             <button
-              onClick={() => navigate("ressources")}
+              onClick={() => navigate("/Dashboard-professeur/ressources")}
               className="text-xs font-medium text-amber-600 hover:text-amber-700 flex items-center gap-1"
             >
               + Déposer un nouveau document
@@ -269,7 +293,25 @@ export default function ProfesseurOverView() {
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
-          {(stats?.derniers_sujets ?? []).map((s) => (
+          {loading ? (
+            [1, 2, 3].map((i) => (
+              <div
+                key={i}
+                className="p-3 rounded-xl border border-gray-100 bg-gray-50/50 flex flex-col justify-between animate-pulse"
+              >
+                <div>
+                  <div className="h-4 w-20 rounded-full bg-purple-100" />
+                  <div className="h-3.5 w-4/5 bg-gray-200 rounded mt-2.5" />
+                  <div className="h-3 w-1/2 bg-gray-100 rounded mt-1.5" />
+                </div>
+                <div className="mt-3 flex items-center justify-between">
+                  <div className="h-3 w-20 bg-amber-100 rounded" />
+                  <div className="h-3 w-12 bg-amber-100 rounded" />
+                </div>
+              </div>
+            ))
+          ) : (
+            (stats?.derniers_sujets ?? []).map((s) => (
             <div
               key={s.id}
               className="p-3 rounded-xl border border-gray-100 bg-gray-50/50 hover:bg-amber-50/30 transition-colors flex flex-col justify-between"
@@ -294,7 +336,8 @@ export default function ProfesseurOverView() {
                 </button>
               </div>
             </div>
-          ))}
+          ))
+          )}
         </div>
       </div>
     </div>

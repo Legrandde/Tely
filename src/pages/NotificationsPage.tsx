@@ -249,7 +249,7 @@ export default function NotificationsPage() {
             className="inline-flex items-center gap-1.5 px-3.5 py-2 text-xs font-medium text-slate-700 bg-white border border-slate-200 rounded-xl hover:bg-slate-50 transition-colors shadow-2xs cursor-pointer"
             title="Rafraîchir"
           >
-            <RotateCw size={14} className={refreshing ? "animate-spin text-amber-500" : ""} />
+            <RotateCw size={14} className={refreshing ? "text-amber-500 animate-pulse" : ""} />
             <span>Actualiser</span>
           </button>
 
@@ -350,9 +350,30 @@ export default function NotificationsPage() {
 
       {/* ── Liste des Notifications ── */}
       {loading ? (
-        <div className="bg-white rounded-2xl border border-slate-200/90 p-12 text-center shadow-2xs space-y-3">
-          <RotateCw size={28} className="animate-spin text-amber-500 mx-auto" />
-          <p className="text-sm font-medium text-slate-600">Chargement des notifications...</p>
+        <div className="bg-white rounded-2xl border border-slate-200/90 shadow-2xs overflow-hidden divide-y divide-slate-100 animate-pulse">
+          {[1, 2, 3, 4, 5].map((i) => (
+            <div key={i} className="p-4 sm:p-5 flex items-start gap-4">
+              <div className="w-10 h-10 rounded-xl bg-slate-100 border border-slate-200/60 shrink-0" />
+              <div className="flex-1 min-w-0">
+                <div className="flex flex-wrap items-center justify-between gap-2 mb-2">
+                  <div className="flex items-center gap-2">
+                    <div className="h-4 w-44 bg-slate-200 rounded" />
+                    <div className="w-2 h-2 rounded-full bg-amber-200" />
+                    <div className="h-4 w-16 bg-slate-100 rounded-md" />
+                  </div>
+                  <div className="h-3 w-20 bg-slate-100 rounded" />
+                </div>
+                <div className="space-y-1.5">
+                  <div className="h-3.5 w-full bg-slate-100 rounded" />
+                  <div className="h-3.5 w-3/4 bg-slate-100 rounded" />
+                </div>
+                <div className="flex items-center justify-between mt-3 pt-2 border-t border-slate-100/80">
+                  <div className="h-3 w-24 bg-amber-100/80 rounded" />
+                  <div className="h-6 w-28 bg-slate-100 rounded-lg" />
+                </div>
+              </div>
+            </div>
+          ))}
         </div>
       ) : filteredNotifications.length === 0 ? (
         <div className="bg-white rounded-2xl border border-slate-200/90 p-12 text-center shadow-2xs">

@@ -55,8 +55,30 @@ export function GoogleCallback() {
   }, [params, navigate]);
 
   return (
-    <div className="flex items-center justify-center h-screen text-gray-400 text-sm">
-      Connexion en cours...
+    <div className="min-h-screen bg-gray-50 px-8 pt-4 animate-pulse">
+      {/* Header skeleton */}
+      <div className="h-16 bg-white rounded-2xl border border-gray-100 px-6 flex items-center justify-between mb-8">
+        <div className="h-6 w-24 bg-gray-200 rounded" />
+        <div className="hidden md:flex items-center gap-6">
+          <div className="h-4 w-16 bg-gray-100 rounded" />
+          <div className="h-4 w-20 bg-gray-100 rounded" />
+          <div className="h-4 w-16 bg-gray-100 rounded" />
+        </div>
+        <div className="w-9 h-9 rounded-full bg-gray-200" />
+      </div>
+      {/* Grid skeleton */}
+      <div className="max-w-7xl mx-auto grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+        {[1, 2, 3, 4, 5, 6, 7, 8].map((i) => (
+          <div key={i} className="bg-white rounded-lg border border-gray-100 overflow-hidden">
+            <div className="h-36 bg-gray-200" />
+            <div className="p-3 space-y-2">
+              <div className="h-3 w-20 bg-gray-100 rounded" />
+              <div className="h-4 w-3/4 bg-gray-200 rounded" />
+              <div className="h-8 w-full bg-gray-50 rounded mt-2" />
+            </div>
+          </div>
+        ))}
+      </div>
     </div>
   );
 }

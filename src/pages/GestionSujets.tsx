@@ -244,8 +244,53 @@ export default function GestionSujets() {
 
       {/* Contenu */}
       {loading ? (
-        <div className="py-20 text-center text-sm text-gray-400">
-          Chargement des sujets d'examen...
+        <div className="overflow-x-auto border border-gray-100 rounded-2xl bg-white shadow-sm animate-pulse">
+          <table className="w-full text-sm">
+            <thead>
+              <tr className="bg-gray-50/75 text-left text-xs text-gray-500 uppercase tracking-wider border-b border-gray-100">
+                <th className="px-5 py-3.5">Titre du sujet</th>
+                <th className="px-5 py-3.5">Matière</th>
+                <th className="px-5 py-3.5">Niveau</th>
+                <th className="px-5 py-3.5">Type & Session</th>
+                <th className="px-5 py-3.5 text-center">Année</th>
+                <th className="px-5 py-3.5 text-center">Exercices</th>
+                <th className="px-5 py-3.5 text-right">Actions</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-gray-100">
+              {[1, 2, 3, 4, 5, 6].map((i) => (
+                <tr key={i}>
+                  <td className="px-5 py-3.5 max-w-xs space-y-1.5">
+                    <div className="h-4 w-48 bg-gray-200 rounded" />
+                    <div className="h-3 w-56 bg-gray-100 rounded" />
+                  </td>
+                  <td className="px-5 py-3.5">
+                    <div className="h-3.5 w-24 bg-gray-200 rounded" />
+                  </td>
+                  <td className="px-5 py-3.5">
+                    <div className="h-3.5 w-20 bg-gray-200 rounded" />
+                  </td>
+                  <td className="px-5 py-3.5 space-y-1">
+                    <div className="h-5 w-20 bg-purple-50 rounded-full" />
+                    <div className="h-3 w-24 bg-gray-100 rounded" />
+                  </td>
+                  <td className="px-5 py-3.5 text-center">
+                    <div className="h-6 w-14 bg-gray-100 rounded-md mx-auto" />
+                  </td>
+                  <td className="px-5 py-3.5 text-center">
+                    <div className="h-5 w-8 bg-amber-50 rounded-full mx-auto" />
+                  </td>
+                  <td className="px-5 py-3.5 text-right">
+                    <div className="flex items-center justify-end gap-1.5">
+                      <div className="w-7 h-7 rounded-lg bg-gray-100" />
+                      <div className="w-7 h-7 rounded-lg bg-gray-100" />
+                      <div className="w-7 h-7 rounded-lg bg-gray-100" />
+                    </div>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
         </div>
       ) : error ? (
         <div className="py-16 text-center text-sm text-red-500 bg-red-50 rounded-xl border border-red-100">
@@ -391,7 +436,21 @@ export default function GestionSujets() {
             </div>
 
             {loadingDetail ? (
-              <div className="py-8 text-center text-xs text-gray-400">Chargement des détails...</div>
+              <div className="space-y-4 animate-pulse">
+                <div className="bg-gray-50 rounded-xl p-4 border border-gray-100 space-y-2.5">
+                  <div className="h-3 w-36 bg-gray-200 rounded mb-3" />
+                  <div className="h-3.5 w-full bg-gray-200/70 rounded" />
+                  <div className="h-3.5 w-11/12 bg-gray-200/70 rounded" />
+                  <div className="h-3.5 w-4/5 bg-gray-200/70 rounded" />
+                  <div className="h-3.5 w-2/3 bg-gray-200/70 rounded" />
+                </div>
+                <div className="space-y-2">
+                  <div className="h-3 w-40 bg-gray-200 rounded" />
+                  {[1, 2].map((i) => (
+                    <div key={i} className="h-11 w-full rounded-lg border border-gray-100 bg-gray-50" />
+                  ))}
+                </div>
+              </div>
             ) : (
               <>
                 <div className="bg-gray-50 rounded-xl p-4 border border-gray-100">
