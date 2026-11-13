@@ -197,7 +197,10 @@ export default function ProfesseurRessources() {
 
       if (formFile) {
         formData.append("fichier", formFile);
-      } else if (formUrl.trim()) {
+      } else if (
+        formUrl.trim() &&
+        formUrl.trim() !== (editingRessource?.fichier_url ?? editingRessource?.fichier_path ?? "")
+      ) {
         formData.append("fichier_path", formUrl.trim());
       }
 

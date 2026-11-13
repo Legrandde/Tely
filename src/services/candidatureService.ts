@@ -71,7 +71,7 @@ export async function approuverCandidature(
 ): Promise<{
   message: string;
   user: Record<string, unknown>;
-  generated_password: string;
+  generated_password: string | null;
   candidature: CandidatureItem;
 }> {
   const { data } = await api.post(`/api/admin/candidatures-professeurs/${id}/approuver`, {
@@ -88,6 +88,32 @@ export async function rejeterCandidature(
     motif_rejet,
   });
   return data;
+}
+
+/**
+ * Ouvre le CV d'un candidat : stocké en privé, il est récupéré avec le token admin
+ * puis affiché via une URL blob locale (jamais de lien public).
+ */
+export async function ouvrirCvCandidature(id: number | string): Promise<void> {
+  // Ouverture synchrone de l'onglet pour ne pas être bloqué par le bloqueur de pop-up
+  const onglet = window.open("", "_blank");
+  try {
+    const { data } = await api.get<Blob>(`/api/admin/candidatures-professeurs/${id}/cv`, {
+      responseType: "blob",
+      timeout: 60000,
+    });
+    const url = URL.createObjectURL(data);
+    if (onglet) {
+      onglet.opener = null;
+      onglet.location.href = url;
+    } else {
+      window.location.assign(url);
+    }
+    setTimeout(() => URL.revokeObjectURL(url), 60_000);
+  } catch (err) {
+    onglet?.close();
+    throw err;
+  }
 }
 
 export async function deleteCandidature(id: number | string): Promise<{ message: string }> {

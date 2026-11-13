@@ -16,13 +16,13 @@ import {
   approuverCandidature,
   rejeterCandidature,
   deleteCandidature,
+  ouvrirCvCandidature,
   type CandidatureItem,
   type CandidatureCounts,
 } from "../../services/candidatureService";
 import { useToast } from "../../context/ToastContext";
 import Modal from "../../components/ui/Modal";
 import ConfirmModal from "../../components/ui/ConfirmModal";
-import { resolveImageUrl } from "../../utils/imageUrl";
 
 export default function GestionCandidatures() {
   const { addToast } = useToast();
@@ -113,19 +113,32 @@ export default function GestionCandidatures() {
     });
   }, [candidatures, activeTab, search]);
 
+  const handleOpenCv = async (id: number) => {
+    try {
+      await ouvrirCvCandidature(id);
+    } catch {
+      addToast("error", "Impossible d'ouvrir le CV de ce candidat.");
+    }
+  };
+
   const handleApprove = async () => {
     if (!approveTarget) return;
     setApproving(true);
     try {
       const res = await approuverCandidature(approveTarget.id, customPassword || undefined);
-      addToast("success", `Le compte enseignant pour ${approveTarget.nom_complet} a été créé !`);
 
-      setCredentialsModal({
-        open: true,
-        email: approveTarget.email,
-        password: res.generated_password,
-        nom: approveTarget.nom_complet,
-      });
+      if (res.generated_password) {
+        addToast("success", `Le compte enseignant pour ${approveTarget.nom_complet} a été créé !`);
+        setCredentialsModal({
+          open: true,
+          email: approveTarget.email,
+          password: res.generated_password,
+          nom: approveTarget.nom_complet,
+        });
+      } else {
+        // Compte déjà existant : promu enseignant, mot de passe inchangé (aucun identifiant à transmettre)
+        addToast("success", res.message);
+      }
 
       setApproveTarget(null);
       setCustomPassword("");
@@ -360,14 +373,13 @@ export default function GestionCandidatures() {
                   {/* CV */}
                   <td className="py-3.5">
                     {c.cv_path ? (
-                      <a
-                        href={resolveImageUrl(c.cv_url || c.cv_path) || "#"}
-                        target="_blank"
-                        rel="noreferrer"
+                      <button
+                        type="button"
+                        onClick={() => handleOpenCv(c.id)}
                         className="inline-flex items-center gap-1 text-[11px] font-semibold text-indigo-600 hover:text-indigo-800 bg-indigo-50 px-2 py-1 rounded-lg border border-indigo-100 transition-colors"
                       >
                         <FileText size={13} /> Voir CV <ExternalLink size={10} />
-                      </a>
+                      </button>
                     ) : (
                       <span className="text-[11px] text-gray-400 italic">Aucun</span>
                     )}
@@ -496,14 +508,13 @@ export default function GestionCandidatures() {
                 <span className="text-xs font-semibold text-gray-700 flex items-center gap-1.5">
                   <FileText size={16} className="text-indigo-600" /> Curriculum Vitae joint
                 </span>
-                <a
-                  href={resolveImageUrl(detailItem.cv_url || detailItem.cv_path) || "#"}
-                  target="_blank"
-                  rel="noreferrer"
+                <button
+                  type="button"
+                  onClick={() => handleOpenCv(detailItem.id)}
                   className="px-3 py-1.5 bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold rounded-lg transition-colors inline-flex items-center gap-1"
                 >
                   Télécharger / Ouvrir <ExternalLink size={12} />
-                </a>
+                </button>
               </div>
             )}
 

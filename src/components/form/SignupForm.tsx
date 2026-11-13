@@ -57,7 +57,7 @@ export function SignupForm() {
     if (values.nom.trim().length < 2) e.nom = "Nom trop court";
     if (values.prenom.trim().length < 2) e.prenom = "Prénom trop court";
     if (!values.email.includes("@")) e.email = "Email invalide";
-    if (values.password.length < 6) e.password = "6 caractères minimum";
+    if (values.password.length < 8) e.password = "8 caractères minimum";
     if (values.confirmPassword !== values.password)
       e.confirmPassword = "Les mots de passe ne correspondent pas";
     return e;

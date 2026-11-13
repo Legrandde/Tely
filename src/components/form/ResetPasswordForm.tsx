@@ -20,7 +20,7 @@ export function ResetPasswordForm() {
 
   function validate() {
     const e: typeof errors = {};
-    if (password.length < 6) e.password = "6 caractères minimum";
+    if (password.length < 8) e.password = "8 caractères minimum";
     if (confirmPassword !== password) e.confirmPassword = "Les mots de passe ne correspondent pas";
     return e;
   }
