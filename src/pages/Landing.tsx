@@ -6,7 +6,6 @@ import { GoArrowRight } from "react-icons/go";
 import PartainerSponsor from "../components/PartenaireSponsort";
 import Header from "../components/ui/Header";
 import { useAuth } from "../context/authContext";
-import TemoinSection from "../components/TemoinSection";
 import NouvelleLettre from "../components/NouvelleLettre";
 import FooterSection from "../components/FooterSection";
 import GoogleOneTap from "../components/auth/GoogleOneTap";
@@ -127,9 +126,6 @@ export default function Landing() {
 
       {/* Section Partenaires */}
       <PartainerSponsor />
-
-      {/* Section Témoignages */}
-      <TemoinSection />
 
       {/* ── Section Rejoindre en tant qu'enseignant ── */}
       <ProfesseurJoinSection />
