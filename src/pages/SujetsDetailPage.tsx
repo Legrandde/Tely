@@ -24,6 +24,8 @@ import { getSujet } from "../services/sujetService";
 
 import type { Sujet } from "../types/Sujet";
 import { useAuth } from "../context/authContext";
+import { trackEvent } from "../services/analyticsTracker";
+import { PrintableDocument, imprimerDocument } from "../components/print/PrintableDocument";
 
 // ── Types ────────────────────────────────────────────────────────────────
 
@@ -75,7 +77,7 @@ function Row({ icon: Icon, label, value }: RowProps) {
   return (
     <div className="flex items-center justify-between">
       <span className="flex items-center gap-2 text-gray-500">
-        <Icon size={15} className="text-orange-500" />
+        <Icon size={15} className="text-amber-500" />
         {label}
       </span>
       <span className="font-medium">{value}</span>
@@ -171,7 +173,7 @@ export default function SujetDetailPage() {
           </p>
           <button
             onClick={() => navigate("/sujets")}
-            className="text-sm font-medium text-orange-600 hover:text-orange-700 mt-3"
+            className="text-sm font-medium text-amber-600 hover:text-amber-700 mt-3"
           >
             Retour aux sujets
           </button>
@@ -204,6 +206,12 @@ export default function SujetDetailPage() {
 
   return (
     <div className="min-h-screen bg-gray-50 text-gray-900">
+      {/* Version imprimable : titre, niveau et énoncé uniquement */}
+      <PrintableDocument
+        titre={sujet.titre}
+        meta={[sujet.matiere?.nom, sujet.niveau?.libelle, sujet.annee ? String(sujet.annee) : null]}
+        enonce={texteSujet}
+      />
       <div className="px-8 pt-4">
         <Header />
       </div>
@@ -211,7 +219,7 @@ export default function SujetDetailPage() {
       <div className="max-w-6xl mx-auto px-4 py-10 grid grid-cols-1 lg:grid-cols-[1fr_360px] gap-10">
         {/* Colonne gauche */}
         <div>
-          <span className="text-xs font-semibold text-orange-600 bg-orange-100 px-2.5 py-1 rounded-full uppercase tracking-wide">
+          <span className="text-xs font-semibold text-amber-600 uppercase tracking-wide">
             {sujet.matiere?.nom} • {sujet.niveau?.libelle}
           </span>
 
@@ -254,7 +262,7 @@ export default function SujetDetailPage() {
                 {tab}
                 {!isAuthenticated && tab !== "Énoncé" && <Lock size={12} className="text-amber-500" />}
                 {activeTab === tab && (
-                  <span className="absolute left-0 -bottom-px w-full h-0.5 bg-orange-500 rounded-full" />
+                  <span className="absolute left-0 -bottom-px w-full h-0.5 bg-amber-500 rounded-full" />
                 )}
               </button>
             ))}
@@ -315,7 +323,7 @@ export default function SujetDetailPage() {
                               {ex.correction.contenu}
                             </p>
                             {ex.correction.explication && (
-                              <div className="bg-amber-50 border border-amber-100 rounded-lg p-3 mt-2">
+                              <div className="border-t border-gray-200 pt-3 mt-2">
                                 <p className="text-xs font-semibold text-gray-800 mb-1">
                                   Explication pédagogique
                                 </p>
@@ -335,7 +343,7 @@ export default function SujetDetailPage() {
                   </div>
                 ) : (
                   <div className="flex flex-col items-center text-center py-10 text-gray-500">
-                    <BookOpen size={28} className="mb-3 text-orange-500" />
+                    <BookOpen size={28} className="mb-3 text-amber-500" />
                     <p className="font-medium text-gray-700">
                       Aucun corrigé disponible pour l'instant pour ce sujet.
                     </p>
@@ -350,7 +358,7 @@ export default function SujetDetailPage() {
                 <ul className="space-y-3">
                   <li className="flex items-center justify-between border border-gray-200 rounded-lg px-4 py-3">
                     <span className="flex items-center gap-2 text-sm text-gray-700">
-                      <FileText size={16} className="text-orange-500" />
+                      <FileText size={16} className="text-amber-500" />
                       Énoncé officiel imprimable / PDF
                     </span>
                     <button
@@ -360,14 +368,16 @@ export default function SujetDetailPage() {
                           () => {
                             const pdfLink = sujet.pdf_url || sujet.fichier_pdf;
                             if (pdfLink) {
+                              void trackEvent("download_pdf", undefined, { sujet_id: sujet.id });
                               window.open(pdfLink, "_blank");
                             } else {
-                              window.print();
+                              void trackEvent("download_pdf", undefined, { sujet_id: sujet.id });
+                              imprimerDocument(sujet.titre);
                             }
                           }
                         )
                       }
-                      className="flex items-center gap-1.5 text-sm font-medium text-orange-600 hover:text-orange-700"
+                      className="flex items-center gap-1.5 text-sm font-medium text-amber-600 hover:text-amber-700"
                     >
                       {isAuthenticated ? <Download size={14} /> : <Lock size={14} />}
                       {isAuthenticated
@@ -389,15 +399,6 @@ export default function SujetDetailPage() {
             <div className="flex items-center gap-3">
               <span className="text-lg font-bold">
                 {TYPE_LABELS[sujet.type] ?? sujet.type}
-              </span>
-              <span
-                className={`ml-auto text-xs font-medium px-2 py-1 rounded ${
-                  sujet.est_actif
-                    ? "text-emerald-600 bg-emerald-100"
-                    : "text-gray-500 bg-gray-100"
-                }`}
-              >
-                {sujet.est_actif ? "Actif" : "Inactif"}
               </span>
             </div>
 
@@ -431,7 +432,7 @@ export default function SujetDetailPage() {
                   () => setActiveTab("Corrigé")
                 )
               }
-              className="w-full bg-orange-100 hover:bg-orange-200 text-orange-600 font-medium py-2.5 rounded-lg mt-6 transition-colors flex items-center justify-center gap-2"
+              className="w-full bg-amber-100 hover:bg-amber-200 text-amber-600 font-medium py-2.5 rounded-lg mt-6 transition-colors flex items-center justify-center gap-2"
             >
               {!isAuthenticated && <Lock size={14} />}
               Voir les corrigés
@@ -446,12 +447,12 @@ export default function SujetDetailPage() {
                   key={label}
                   className="flex items-center gap-2 text-sm text-gray-600"
                 >
-                  <Icon size={15} className="text-orange-500 flex-shrink-0" />
+                  <Icon size={15} className="text-amber-500 flex-shrink-0" />
                   {label}
                 </li>
               ))}
               <li className="flex items-center gap-2 text-sm text-gray-600">
-                <FileText size={15} className="text-orange-500 flex-shrink-0" />
+                <FileText size={15} className="text-amber-500 flex-shrink-0" />
                 {exercicesTries.length} exercice{exercicesTries.length > 1 ? "s" : ""}
               </li>
             </ul>

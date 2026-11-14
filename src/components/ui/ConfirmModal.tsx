@@ -1,4 +1,4 @@
-import { AlertTriangle } from "lucide-react";
+import { X } from "lucide-react";
 
 interface ConfirmModalProps {
   open: boolean;
@@ -18,45 +18,50 @@ export default function ConfirmModal({
   title,
   description,
   loading,
-  confirmLabel = "Supprimer",
-  loadingLabel = "Suppression...",
+  confirmLabel = "Confirmer",
+  loadingLabel = "Traitement...",
   cancelLabel = "Annuler",
-  variant = "danger",
   onConfirm,
   onCancel,
 }: ConfirmModalProps) {
   if (!open) return null;
 
-  const isWarning = variant === "warning";
-
   return (
-    <div className="fixed inset-0 z-[60] flex items-center justify-center bg-black/40 p-4">
-      <div className="bg-white rounded-xl shadow-xl w-full max-w-sm p-5">
-        <div className="flex items-start gap-3">
-          <div
-            className={`w-9 h-9 rounded-full flex items-center justify-center flex-shrink-0 ${
-              isWarning ? "bg-amber-50" : "bg-red-50"
-            }`}
-          >
-            <AlertTriangle
-              size={18}
-              className={isWarning ? "text-amber-500" : "text-red-500"}
-            />
-          </div>
+    <div
+      onClick={onCancel}
+      className="fixed inset-0 z-[60] flex items-center justify-center bg-black/40 p-4"
+    >
+      <div
+        onClick={(e) => e.stopPropagation()}
+        className="tely-card tely-animate w-full max-w-sm p-6"
+      >
+        <div className="flex items-start justify-between gap-3">
           <div>
-            <h3 className="font-semibold text-sm text-gray-900">{title}</h3>
+            <h3 className="tely-title text-xl">{title}</h3>
             {description && (
-              <p className="text-xs text-gray-500 mt-1 leading-relaxed">{description}</p>
+              <p className="tely-subtitle mt-1.5 leading-relaxed">
+                {description}
+              </p>
             )}
           </div>
-        </div>
 
-        <div className="flex gap-3 mt-5">
           <button
             type="button"
             onClick={onCancel}
             disabled={loading}
-            className="flex-1 text-sm font-medium border border-gray-200 rounded-lg px-4 py-2 hover:bg-gray-50 disabled:opacity-60 cursor-pointer"
+            className="tely-icon-btn shrink-0"
+            aria-label="Fermer"
+          >
+            <X size={16} />
+          </button>
+        </div>
+
+        <div className="flex items-center gap-3 mt-5">
+          <button
+            type="button"
+            onClick={onCancel}
+            disabled={loading}
+            className="tely-btn-outline flex-1"
           >
             {cancelLabel}
           </button>
@@ -64,11 +69,7 @@ export default function ConfirmModal({
             type="button"
             onClick={onConfirm}
             disabled={loading}
-            className={`flex-1 text-sm font-medium text-white rounded-lg px-4 py-2 transition-colors disabled:opacity-60 cursor-pointer ${
-              isWarning
-                ? "bg-amber-500 hover:bg-amber-600"
-                : "bg-red-500 hover:bg-red-600"
-            }`}
+            className="tely-btn flex-1"
           >
             {loading ? loadingLabel : confirmLabel}
           </button>

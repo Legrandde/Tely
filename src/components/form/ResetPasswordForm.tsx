@@ -56,15 +56,15 @@ export function ResetPasswordForm() {
 
   return (
     <form onSubmit={handleSubmit} className="flex flex-col">
-      <h1 className="text-[28px] font-bold text-gray-900 leading-tight mb-1" style={{ fontFamily: "'Playfair Display', serif" }}>
+      <h1 className="text-[28px] font-bold text-gray-900 leading-tight mb-1">
         Nouveau mot de passe
       </h1>
       <p className="text-sm text-gray-400 mb-7">Choisis un nouveau mot de passe</p>
 
       {errors.global && (
-        <div className="text-xs text-red-500 bg-red-50 border border-red-100 rounded-lg px-3 py-2 mb-3.5">
+        <p className="text-xs text-red-500 mb-3.5">
           {errors.global}
-        </div>
+        </p>
       )}
 
       <div className="flex flex-col gap-3.5 mb-5">

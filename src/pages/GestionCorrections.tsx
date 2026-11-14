@@ -129,15 +129,15 @@ export default function GestionCorrections() {
       {/* Entête */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
-          <h1 className="text-xl font-bold text-gray-900">Gestion des corrections</h1>
-          <p className="text-sm text-gray-500">
+          <h1 className="tely-h1">Gestion des corrections</h1>
+          <p className="tely-subtitle mt-1">
             Fournissez les corrigés officiels et les explications pédagogiques pour chaque exercice
           </p>
         </div>
 
         <button
           onClick={openCreate}
-          className="flex items-center gap-2 text-sm font-medium bg-amber-500 text-white rounded-xl px-4 py-2.5 hover:bg-amber-600 shadow-sm transition-colors cursor-pointer self-start sm:self-auto"
+          className="tely-btn self-start sm:self-auto"
         >
           <Plus size={16} />
           Ajouter une correction
@@ -145,28 +145,28 @@ export default function GestionCorrections() {
       </div>
 
       {/* Barre d'outils / Recherche */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-white p-3 rounded-xl border border-gray-100 shadow-sm">
-        <div className="flex items-center gap-2 bg-gray-50 rounded-lg px-3 py-2 flex-1 w-full sm:max-w-md">
-          <Search size={16} className="text-gray-400 shrink-0" />
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 tely-card p-3">
+        <div className="relative flex-1 w-full sm:min-w-[260px] sm:max-w-md">
+          <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-900 pointer-events-none" />
           <input
             type="text"
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             placeholder="Rechercher par exercice ou contenu de la solution..."
-            className="bg-transparent text-sm text-gray-800 outline-none w-full placeholder-gray-400"
+            className="tely-input pl-10"
           />
         </div>
-        <div className="text-xs text-gray-500 whitespace-nowrap self-end sm:self-auto">
+        <div className="tely-label whitespace-nowrap self-end sm:self-auto">
           Total : <span className="font-semibold text-gray-800">{filteredCorrections.length}</span> correction(s)
         </div>
       </div>
 
       {/* Contenu */}
       {loading ? (
-        <div className="overflow-x-auto border border-gray-100 rounded-2xl bg-white shadow-sm animate-pulse">
+        <div className="overflow-x-auto tely-card animate-pulse">
           <table className="w-full text-sm">
             <thead>
-              <tr className="bg-gray-50/75 text-left text-xs text-gray-500 uppercase tracking-wider border-b border-gray-100">
+              <tr className="text-left tely-overline border-b border-gray-100">
                 <th className="px-5 py-3.5">Exercice</th>
                 <th className="px-5 py-3.5">Solution</th>
                 <th className="px-5 py-3.5">Explication pédagogique</th>
@@ -199,13 +199,13 @@ export default function GestionCorrections() {
           </table>
         </div>
       ) : error ? (
-        <div className="py-16 text-center text-sm text-red-500 bg-red-50 rounded-xl border border-red-100">
+        <div className="py-16 text-center tely-card tely-error">
           {error}
         </div>
       ) : filteredCorrections.length === 0 ? (
-        <div className="flex flex-col items-center justify-center py-16 text-center bg-white rounded-2xl border border-gray-100">
-          <div className="w-12 h-12 rounded-full bg-amber-50 flex items-center justify-center mb-3">
-            <CheckCircle2 size={22} className="text-amber-500" />
+        <div className="flex flex-col items-center justify-center py-16 text-center tely-card">
+          <div className="w-12 h-12 rounded-full bg-gray-50 flex items-center justify-center mb-3">
+            <CheckCircle2 size={22} className="text-gray-900" />
           </div>
           <p className="text-sm text-gray-500 font-medium">Aucune correction trouvée</p>
           <p className="text-xs text-gray-400 mt-1 max-w-sm">
@@ -214,17 +214,17 @@ export default function GestionCorrections() {
           {!search && (
             <button
               onClick={openCreate}
-              className="text-sm font-medium text-amber-600 hover:text-amber-700 mt-3"
+              className="tely-link text-sm mt-3"
             >
               Créer une première correction
             </button>
           )}
         </div>
       ) : (
-        <div className="overflow-x-auto border border-gray-100 rounded-2xl bg-white shadow-sm">
+        <div className="overflow-x-auto tely-card">
           <table className="w-full text-sm">
             <thead>
-              <tr className="bg-gray-50/75 text-left text-xs text-gray-500 uppercase tracking-wider border-b border-gray-100">
+              <tr className="text-left tely-overline border-b border-gray-100">
                 <th className="px-5 py-3.5">Exercice</th>
                 <th className="px-5 py-3.5">Solution</th>
                 <th className="px-5 py-3.5">Explication pédagogique</th>
@@ -233,7 +233,7 @@ export default function GestionCorrections() {
             </thead>
             <tbody className="divide-y divide-gray-100">
               {filteredCorrections.map((corr) => (
-                <tr key={corr.id} className="hover:bg-amber-50/30 transition-colors">
+                <tr key={corr.id} className="hover:bg-gray-50 transition-colors">
                   <td className="px-5 py-3.5 font-medium text-gray-900 max-w-xs">
                     <div className="truncate font-semibold">
                       {corr.exercice?.titre ?? `Exercice #${corr.exercice_id}`}
@@ -255,21 +255,21 @@ export default function GestionCorrections() {
                       <button
                         onClick={() => setPreviewTarget(corr)}
                         title="Voir la correction"
-                        className="p-1.5 rounded-lg text-gray-400 hover:text-blue-600 hover:bg-blue-50 transition-colors"
+                        className="tely-icon-btn text-gray-900"
                       >
                         <Eye size={15} />
                       </button>
                       <button
                         onClick={() => openEdit(corr)}
                         title="Modifier"
-                        className="p-1.5 rounded-lg text-gray-400 hover:text-amber-600 hover:bg-amber-50 transition-colors"
+                        className="tely-icon-btn text-gray-900"
                       >
                         <Pencil size={15} />
                       </button>
                       <button
                         onClick={() => setDeleteTarget(corr)}
                         title="Supprimer"
-                        className="p-1.5 rounded-lg text-gray-400 hover:text-red-500 hover:bg-red-50 transition-colors"
+                        className="tely-icon-btn text-gray-900 hover:bg-red-50"
                       >
                         <Trash2 size={15} />
                       </button>
@@ -298,16 +298,16 @@ export default function GestionCorrections() {
         {previewTarget && (
           <div className="space-y-4 max-h-[80vh] overflow-y-auto pr-1">
             <div className="border-b border-gray-100 pb-3">
-              <span className="text-xs font-semibold px-2.5 py-0.5 rounded-full bg-emerald-50 text-emerald-700">
+              <span className="tely-overline">
                 Corrigé officiel
               </span>
-              <h2 className="text-lg font-bold text-gray-900 mt-2">
+              <h2 className="tely-title text-xl mt-1">
                 {previewTarget.exercice?.titre ?? `Exercice #${previewTarget.exercice_id}`}
               </h2>
             </div>
 
-            <div className="bg-gray-50 rounded-xl p-4 border border-gray-100">
-              <h3 className="text-xs font-semibold uppercase tracking-wider text-gray-500 mb-2">
+            <div className="bg-gray-50 rounded-[10px] p-4">
+              <h3 className="tely-overline mb-2">
                 Solution détaillée
               </h3>
               <div className="text-sm text-gray-800 whitespace-pre-line leading-relaxed">
@@ -316,8 +316,8 @@ export default function GestionCorrections() {
             </div>
 
             {previewTarget.explication && (
-              <div className="bg-amber-50/50 rounded-xl p-4 border border-amber-100/60">
-                <h3 className="text-xs font-semibold uppercase tracking-wider text-amber-700 mb-2">
+              <div className="rounded-[10px] p-4 border border-gray-200">
+                <h3 className="tely-overline mb-2">
                   Conseils méthodologiques
                 </h3>
                 <div className="text-sm text-gray-700 whitespace-pre-line leading-relaxed">
@@ -330,7 +330,7 @@ export default function GestionCorrections() {
               <button
                 type="button"
                 onClick={() => setPreviewTarget(null)}
-                className="px-4 py-2 text-sm font-medium bg-gray-100 text-gray-700 hover:bg-gray-200 rounded-lg transition-colors"
+                className="tely-btn-outline"
               >
                 Fermer
               </button>

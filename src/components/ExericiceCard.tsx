@@ -8,9 +8,9 @@ interface ExerciceCardProps {
 }
 
 const DIFFICULTE_STYLES: Record<string, string> = {
-  facile: "bg-emerald-50 text-emerald-600",
-  moyen: "bg-amber-50 text-amber-600",
-  difficile: "bg-red-50 text-red-600",
+  facile: "text-emerald-600",
+  moyen: "text-amber-600",
+  difficile: "text-red-600",
 };
 
 const TYPE_LABELS: Record<string, string> = {
@@ -21,11 +21,11 @@ const TYPE_LABELS: Record<string, string> = {
 };
 
 const GRADIENTS = [
-  "from-amber-400 to-orange-500",
-  "from-indigo-600 to-blue-800",
-  "from-sky-500 to-cyan-600",
-  "from-emerald-500 to-green-700",
-  "from-violet-600 to-fuchsia-600",
+  "from-amber-400 to-amber-600",
+  "from-gray-800 to-gray-950",
+  "from-amber-500 to-amber-700",
+  "from-gray-700 to-gray-900",
+  "from-amber-600 to-amber-800",
 ];
 
 // Génère un gradient stable à partir de l'id (pas de champ "gradient" côté API)
@@ -82,13 +82,13 @@ export default function ExerciceCard({ exercice }: ExerciceCardProps) {
 
         <div className="flex items-center justify-between mt-2 pt-2 border-t border-gray-100">
           <span
-            className={`text-xs font-semibold px-2 py-0.5 rounded-full ${DIFFICULTE_STYLES[difficulte] ?? "bg-gray-50 text-gray-600"}`}
+            className={`text-xs font-semibold capitalize ${DIFFICULTE_STYLES[difficulte] ?? "text-gray-600"}`}
           >
             {difficulte}
           </span>
           <button
             type="button"
-            className="text-xs font-medium text-orange-600 hover:text-orange-700 flex items-center gap-1"
+            className="text-xs font-medium text-amber-600 hover:text-amber-700 flex items-center gap-1"
           >
             {!isAuthenticated && <Lock size={12} className="text-amber-600" />}
             Voir détails

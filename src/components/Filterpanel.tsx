@@ -62,7 +62,7 @@ export default function FilterPanel({
               onChange={(e) =>
                 onChange({ ...filtres, matiere_id: e.target.value || undefined })
               }
-              className="w-full text-sm border border-gray-200 rounded-lg px-2 py-1.5 focus:outline-none focus:ring-2 focus:ring-orange-200"
+              className="w-full text-sm border border-gray-200 rounded-lg px-2 py-1.5 focus:outline-none focus:ring-2 focus:ring-amber-200"
             >
               <option value="">Toutes</option>
               {matieres.map((m) => (
@@ -83,7 +83,7 @@ export default function FilterPanel({
               onChange={(e) =>
                 onChange({ ...filtres, niveau_id: e.target.value || undefined })
               }
-              className="w-full text-sm border border-gray-200 rounded-lg px-2 py-1.5 focus:outline-none focus:ring-2 focus:ring-orange-200"
+              className="w-full text-sm border border-gray-200 rounded-lg px-2 py-1.5 focus:outline-none focus:ring-2 focus:ring-amber-200"
             >
               <option value="">Tous</option>
               {niveaux.map((n) => (
@@ -104,7 +104,7 @@ export default function FilterPanel({
               onChange={(e) =>
                 onChange({ ...filtres, type: (e.target.value || undefined) as ExerciceType })
               }
-              className="w-full text-sm border border-gray-200 rounded-lg px-2 py-1.5 focus:outline-none focus:ring-2 focus:ring-orange-200"
+              className="w-full text-sm border border-gray-200 rounded-lg px-2 py-1.5 focus:outline-none focus:ring-2 focus:ring-amber-200"
             >
               <option value="">Tous</option>
               {TYPES.map((t) => (
@@ -125,7 +125,7 @@ export default function FilterPanel({
               onChange={(e) =>
                 onChange({ ...filtres, difficulte: (e.target.value || undefined) as Difficulte })
               }
-              className="w-full text-sm border border-gray-200 rounded-lg px-2 py-1.5 focus:outline-none focus:ring-2 focus:ring-orange-200"
+              className="w-full text-sm border border-gray-200 rounded-lg px-2 py-1.5 focus:outline-none focus:ring-2 focus:ring-amber-200"
             >
               <option value="">Toutes</option>
               {DIFFICULTES.map((d) => (
@@ -140,7 +140,7 @@ export default function FilterPanel({
 
       <button
         onClick={reset}
-        className="w-full mt-3 text-xs font-medium text-orange-600 hover:text-orange-700 text-center"
+        className="w-full mt-3 text-xs font-medium text-amber-600 hover:text-amber-700 text-center"
       >
         Réinitialiser les filtres
       </button>

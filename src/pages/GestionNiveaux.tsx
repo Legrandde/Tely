@@ -139,7 +139,7 @@ export default function GestionNiveaux() {
       {/* Entête */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
-          <h1 className="text-xl font-bold text-gray-900">Gestion des niveaux</h1>
+          <h1 className="tely-h1">Gestion des niveaux</h1>
           <p className="text-sm text-gray-500">
             Configurez les cycles scolaires et niveaux d'études pour la classification des épreuves
           </p>
@@ -147,7 +147,7 @@ export default function GestionNiveaux() {
 
         <button
           onClick={openCreate}
-          className="flex items-center gap-2 text-sm font-medium bg-amber-500 text-white rounded-xl px-4 py-2.5 hover:bg-amber-600 shadow-sm transition-colors cursor-pointer self-start sm:self-auto"
+          className="tely-btn self-start sm:self-auto"
         >
           <Plus size={16} />
           Ajouter un niveau
@@ -155,24 +155,24 @@ export default function GestionNiveaux() {
       </div>
 
       {/* Barre d'outils / Recherche & Filtre */}
-      <div className="flex flex-col sm:flex-row items-center gap-3 bg-white p-3 rounded-xl border border-gray-100 shadow-sm">
-        <div className="flex items-center gap-2 bg-gray-50 rounded-lg px-3 py-2 flex-1 w-full sm:max-w-md">
-          <Search size={16} className="text-gray-400" />
+      <div className="flex flex-col sm:flex-row items-center gap-3 tely-card p-3">
+        <div className="flex items-center gap-2 bg-gray-50 border border-gray-200 rounded-[10px] px-3 flex-1 w-full sm:max-w-md transition-all duration-200 focus-within:border-gray-900 focus-within:shadow-[0_0_0_3px_rgba(17,17,17,0.06)]">
+          <Search size={16} className="text-gray-900 shrink-0" />
           <input
             type="text"
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             placeholder="Rechercher par libellé..."
-            className="bg-transparent text-sm text-gray-800 outline-none w-full placeholder-gray-400"
+            className="flex-1 w-full bg-transparent border-none outline-none text-sm text-gray-900 py-3.5 placeholder:text-gray-400"
           />
         </div>
 
         <div className="flex items-center gap-2 w-full sm:w-auto">
-          <Filter size={15} className="text-gray-400" />
+          <Filter size={15} className="text-gray-900 shrink-0" />
           <select
             value={selectedCycle}
             onChange={(e) => setSelectedCycle(e.target.value)}
-            className="text-sm border border-gray-200 rounded-lg px-3 py-1.5 bg-gray-50 text-gray-700 outline-none focus:ring-2 focus:ring-amber-200"
+            className="tely-input w-auto"
           >
             <option value="all">Tous les cycles</option>
             {cycles.map((c) => (
@@ -190,10 +190,10 @@ export default function GestionNiveaux() {
 
       {/* Contenu */}
       {loading ? (
-        <div className="overflow-x-auto border border-gray-100 rounded-2xl bg-white shadow-sm animate-pulse">
+        <div className="overflow-x-auto tely-card animate-pulse">
           <table className="w-full text-sm">
             <thead>
-              <tr className="bg-gray-50/75 text-left text-xs text-gray-500 uppercase tracking-wider border-b border-gray-100">
+              <tr className="tely-overline text-left border-b border-gray-100">
                 <th className="px-5 py-3.5">Libellé</th>
                 <th className="px-5 py-3.5">Cycle</th>
                 <th className="px-5 py-3.5 text-center">Ordre</th>
@@ -205,12 +205,12 @@ export default function GestionNiveaux() {
                 <tr key={i}>
                   <td className="px-5 py-3.5">
                     <div className="flex items-center gap-2">
-                      <span className="w-2 h-2 rounded-full bg-amber-300" />
+                      <span className="w-2 h-2 rounded-full bg-gray-300" />
                       <div className="h-4 w-32 bg-gray-200 rounded" />
                     </div>
                   </td>
                   <td className="px-5 py-3.5">
-                    <div className="h-5 w-20 bg-purple-50 rounded-full" />
+                    <div className="h-5 w-20 bg-gray-100 rounded-full" />
                   </td>
                   <td className="px-5 py-3.5 text-center">
                     <div className="h-5 w-10 bg-gray-100 rounded-md mx-auto" />
@@ -227,13 +227,13 @@ export default function GestionNiveaux() {
           </table>
         </div>
       ) : error ? (
-        <div className="py-16 text-center text-sm text-red-500 bg-red-50 rounded-xl border border-red-100">
+        <div className="py-16 text-center text-sm text-red-500 tely-card">
           {error}
         </div>
       ) : filteredNiveaux.length === 0 ? (
-        <div className="flex flex-col items-center justify-center py-16 text-center bg-white rounded-2xl border border-gray-100">
-          <div className="w-12 h-12 rounded-full bg-amber-50 flex items-center justify-center mb-3">
-            <Layers size={22} className="text-amber-500" />
+        <div className="flex flex-col items-center justify-center py-16 text-center tely-card">
+          <div className="w-12 h-12 rounded-full bg-gray-50 flex items-center justify-center mb-3">
+            <Layers size={22} className="text-gray-900" />
           </div>
           <p className="text-sm text-gray-500 font-medium">Aucun niveau trouvé</p>
           <p className="text-xs text-gray-400 mt-1 max-w-sm">
@@ -244,17 +244,17 @@ export default function GestionNiveaux() {
           {!search && selectedCycle === "all" && (
             <button
               onClick={openCreate}
-              className="text-sm font-medium text-amber-600 hover:text-amber-700 mt-3"
+              className="tely-link text-sm mt-3"
             >
               Ajouter un premier niveau
             </button>
           )}
         </div>
       ) : (
-        <div className="overflow-x-auto border border-gray-100 rounded-2xl bg-white shadow-sm">
+        <div className="overflow-x-auto tely-card">
           <table className="w-full text-sm">
             <thead>
-              <tr className="bg-gray-50/75 text-left text-xs text-gray-500 uppercase tracking-wider border-b border-gray-100">
+              <tr className="tely-overline text-left border-b border-gray-100">
                 <th className="px-5 py-3.5">Libellé</th>
                 <th className="px-5 py-3.5">Cycle</th>
                 <th className="px-5 py-3.5 text-center">Ordre</th>
@@ -263,26 +263,20 @@ export default function GestionNiveaux() {
             </thead>
             <tbody className="divide-y divide-gray-100">
               {filteredNiveaux.map((niveau) => (
-                <tr key={niveau.id} className="hover:bg-amber-50/30 transition-colors">
+                <tr key={niveau.id} className="hover:bg-gray-50 transition-colors">
                   <td className="px-5 py-3.5 font-medium text-gray-900 flex items-center gap-2">
-                    <span className="w-2 h-2 rounded-full bg-amber-500"></span>
+                    <span className="w-2 h-2 rounded-full bg-gray-900"></span>
                     {niveau.libelle}
                   </td>
                   <td className="px-5 py-3.5">
                     <span
-                      className={`px-2.5 py-1 text-xs font-medium rounded-full ${
-                        niveau.cycle === "Lycée"
-                          ? "bg-purple-50 text-purple-700"
-                          : niveau.cycle === "Collège"
-                          ? "bg-blue-50 text-blue-700"
-                          : "bg-emerald-50 text-emerald-700"
-                      }`}
+                      className="tely-chip"
                     >
                       {niveau.cycle}
                     </span>
                   </td>
                   <td className="px-5 py-3.5 text-center">
-                    <span className="px-2.5 py-0.5 text-xs font-mono font-semibold text-gray-600 bg-gray-100 rounded-md">
+                    <span className="text-xs font-mono font-semibold text-gray-600">
                       #{niveau.ordre}
                     </span>
                   </td>
@@ -291,14 +285,14 @@ export default function GestionNiveaux() {
                       <button
                         onClick={() => openEdit(niveau)}
                         title="Modifier"
-                        className="p-1.5 rounded-lg text-gray-400 hover:text-amber-600 hover:bg-amber-50 transition-colors"
+                        className="tely-icon-btn text-gray-900"
                       >
                         <Pencil size={15} />
                       </button>
                       <button
                         onClick={() => setDeleteTarget(niveau)}
                         title="Supprimer"
-                        className="p-1.5 rounded-lg text-gray-400 hover:text-red-500 hover:bg-red-50 transition-colors"
+                        className="tely-icon-btn text-gray-900 hover:text-red-500 hover:bg-red-50"
                       >
                         <Trash2 size={15} />
                       </button>

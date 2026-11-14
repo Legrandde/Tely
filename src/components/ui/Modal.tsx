@@ -12,10 +12,10 @@ export default function Modal({ open, onClose, children }: ModalProps) {
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4">
-      <div className="bg-white rounded-xl shadow-xl w-full max-w-md max-h-[90vh] overflow-y-auto p-5 relative">
+      <div className="tely-card tely-animate w-full max-w-md max-h-[90vh] overflow-y-auto p-6 relative">
         <button
           onClick={onClose}
-          className="absolute top-3 right-3 text-gray-400 hover:text-gray-600"
+          className="absolute top-3 right-3 tely-icon-btn"
         >
           <X size={18} />
         </button>

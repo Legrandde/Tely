@@ -52,14 +52,14 @@ export default function NotificationDropdown() {
       }
       className={`p-1.5 sm:p-2 rounded-xl transition-all cursor-pointer relative ${
         isActive
-          ? "bg-amber-100 text-amber-700"
-          : "text-slate-400 hover:text-amber-600 hover:bg-amber-50"
+          ? "bg-white text-gray-900"
+          : "text-gray-900 hover:bg-white"
       }`}
       aria-label="Accéder au centre de notifications"
     >
       <Bell size={18} />
       {unreadCount > 0 && (
-        <span className="absolute top-1 right-1 bg-amber-500 text-white text-[10px] font-bold rounded-full w-4 h-4 flex items-center justify-center animate-pulse shadow-xs">
+        <span className="absolute top-1 right-1 bg-gray-900 text-white text-[10px] font-bold rounded-full w-4 h-4 flex items-center justify-center">
           {unreadCount > 9 ? "9+" : unreadCount}
         </span>
       )}

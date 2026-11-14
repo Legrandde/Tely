@@ -101,7 +101,7 @@ export default function ProfesseurJoinSection() {
             resetForm();
             setModalOpen(true);
           }}
-          className="mt-2 flex items-center justify-center gap-3 rounded-lg bg-black hover:bg-neutral-800 px-6 py-3 font-semibold text-white shadow-md transition-colors cursor-pointer"
+          className="mt-2 flex items-center justify-center gap-3 rounded-lg bg-black hover:bg-gray-800 px-6 py-3 font-semibold text-white shadow-md transition-colors cursor-pointer"
         >
           Postuler comme enseignant <GoArrowRight />
         </button>
@@ -132,7 +132,7 @@ export default function ProfesseurJoinSection() {
                 <button
                   type="button"
                   onClick={() => setModalOpen(false)}
-                  className="px-6 py-2.5 bg-black hover:bg-neutral-800 text-white text-xs font-semibold rounded-lg transition-colors cursor-pointer"
+                  className="px-6 py-2.5 bg-black hover:bg-gray-800 text-white text-xs font-semibold rounded-lg transition-colors cursor-pointer"
                 >
                   Fermer
                 </button>

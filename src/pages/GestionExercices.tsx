@@ -11,9 +11,9 @@ import { useToast } from "../context/ToastContext";
 import { resolveImageUrl } from "../utils/imageUrl";
 
 const DIFFICULTE_STYLES: Record<string, string> = {
-  facile: "bg-emerald-50 text-emerald-700 border-emerald-100",
-  moyen: "bg-amber-50 text-amber-700 border-amber-100",
-  difficile: "bg-red-50 text-red-700 border-red-100",
+  facile: "text-emerald-700",
+  moyen: "text-amber-700",
+  difficile: "text-red-700",
 };
 
 const TYPE_LABELS: Record<string, string> = {
@@ -181,15 +181,15 @@ export default function GestionExercices() {
       {/* Entête */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
-          <h1 className="text-xl font-bold text-gray-900">Gestion des exercices</h1>
-          <p className="text-sm text-gray-500">
+          <h1 className="tely-h1">Gestion des exercices</h1>
+          <p className="tely-subtitle mt-1">
             Créez, éditez et organisez l'ensemble de la banque d'exercices et travaux dirigés
           </p>
         </div>
 
         <button
           onClick={openCreate}
-          className="flex items-center gap-2 text-sm font-medium bg-amber-500 text-white rounded-xl px-4 py-2.5 hover:bg-amber-600 shadow-sm transition-colors cursor-pointer self-start sm:self-auto"
+          className="tely-btn self-start sm:self-auto"
         >
           <Plus size={16} />
           Ajouter un exercice
@@ -197,26 +197,26 @@ export default function GestionExercices() {
       </div>
 
       {/* Barre d'outils / Recherche & Filtres */}
-      <div className="flex flex-col lg:flex-row items-center gap-3 bg-white p-3.5 rounded-xl border border-gray-100 shadow-sm">
-        <div className="flex items-center gap-2 bg-gray-50 rounded-lg px-3 py-2 flex-1 w-full lg:max-w-md">
-          <Search size={16} className="text-gray-400" />
+      <div className="flex flex-col lg:flex-row items-center gap-3 tely-card p-3.5">
+        <div className="relative flex-1 w-full lg:min-w-[260px] lg:max-w-md">
+          <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-900 pointer-events-none" />
           <input
             type="text"
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             placeholder="Rechercher par titre ou énoncé..."
-            className="bg-transparent text-sm text-gray-800 outline-none w-full placeholder-gray-400"
+            className="tely-input pl-10"
           />
         </div>
 
         <div className="flex flex-wrap items-center gap-2 w-full lg:w-auto">
-          <div className="flex items-center gap-1.5 text-xs text-gray-500">
-            <Filter size={14} /> Matière :
+          <div className="flex items-center gap-1.5 tely-label">
+            <Filter size={14} className="text-gray-900" /> Matière :
           </div>
           <select
             value={filterMatiere}
             onChange={(e) => setFilterMatiere(e.target.value)}
-            className="text-xs border border-gray-200 rounded-lg px-2.5 py-2 bg-gray-50 text-gray-700 outline-none focus:ring-2 focus:ring-amber-200"
+            className="tely-input w-auto max-w-[190px] truncate"
           >
             <option value="all">Toutes matières</option>
             {matieres.map((m) => (
@@ -226,13 +226,13 @@ export default function GestionExercices() {
             ))}
           </select>
 
-          <div className="flex items-center gap-1.5 text-xs text-gray-500 ml-1">
+          <div className="flex items-center gap-1.5 tely-label ml-1">
             Niveau :
           </div>
           <select
             value={filterNiveau}
             onChange={(e) => setFilterNiveau(e.target.value)}
-            className="text-xs border border-gray-200 rounded-lg px-2.5 py-2 bg-gray-50 text-gray-700 outline-none focus:ring-2 focus:ring-amber-200"
+            className="tely-input w-auto max-w-[190px] truncate"
           >
             <option value="all">Tous niveaux</option>
             {niveaux.map((n) => (
@@ -242,13 +242,13 @@ export default function GestionExercices() {
             ))}
           </select>
 
-          <div className="flex items-center gap-1.5 text-xs text-gray-500 ml-1">
+          <div className="flex items-center gap-1.5 tely-label ml-1">
             Difficulté :
           </div>
           <select
             value={filterDifficulte}
             onChange={(e) => setFilterDifficulte(e.target.value)}
-            className="text-xs border border-gray-200 rounded-lg px-2.5 py-2 bg-gray-50 text-gray-700 outline-none focus:ring-2 focus:ring-amber-200"
+            className="tely-input w-auto max-w-[190px] truncate"
           >
             <option value="all">Toutes</option>
             <option value="facile">Facile</option>
@@ -257,17 +257,17 @@ export default function GestionExercices() {
           </select>
         </div>
 
-        <div className="lg:ml-auto text-xs text-gray-500 whitespace-nowrap">
+        <div className="lg:ml-auto tely-label whitespace-nowrap">
           Total : <span className="font-semibold text-gray-800">{filteredExercices.length}</span> exercice(s)
         </div>
       </div>
 
       {/* Contenu */}
       {loading ? (
-        <div className="overflow-x-auto border border-gray-100 rounded-2xl bg-white shadow-sm animate-pulse">
+        <div className="overflow-x-auto tely-card animate-pulse">
           <table className="w-full text-sm">
             <thead>
-              <tr className="bg-gray-50/75 text-left text-xs text-gray-500 uppercase tracking-wider border-b border-gray-100">
+              <tr className="text-left tely-overline border-b border-gray-100">
                 <th className="px-5 py-3.5">Titre</th>
                 <th className="px-5 py-3.5">Matière</th>
                 <th className="px-5 py-3.5">Niveau</th>
@@ -294,10 +294,10 @@ export default function GestionExercices() {
                     <div className="h-5 w-16 bg-gray-100 rounded" />
                   </td>
                   <td className="px-5 py-3.5">
-                    <div className="h-5 w-16 bg-amber-50 rounded-full" />
+                    <div className="h-5 w-16 bg-gray-100 rounded-full" />
                   </td>
                   <td className="px-5 py-3.5 text-center">
-                    <div className="h-5 w-14 bg-emerald-50 rounded-full mx-auto" />
+                    <div className="h-5 w-14 bg-gray-100 rounded-full mx-auto" />
                   </td>
                   <td className="px-5 py-3.5 text-right">
                     <div className="flex items-center justify-end gap-1.5">
@@ -312,13 +312,13 @@ export default function GestionExercices() {
           </table>
         </div>
       ) : error ? (
-        <div className="py-16 text-center text-sm text-red-500 bg-red-50 rounded-xl border border-red-100">
+        <div className="py-16 text-center tely-card tely-error">
           {error}
         </div>
       ) : filteredExercices.length === 0 ? (
-        <div className="flex flex-col items-center justify-center py-16 text-center bg-white rounded-2xl border border-gray-100">
-          <div className="w-12 h-12 rounded-full bg-amber-50 flex items-center justify-center mb-3">
-            <BookOpen size={22} className="text-amber-500" />
+        <div className="flex flex-col items-center justify-center py-16 text-center tely-card">
+          <div className="w-12 h-12 rounded-full bg-gray-50 flex items-center justify-center mb-3">
+            <BookOpen size={22} className="text-gray-900" />
           </div>
           <p className="text-sm text-gray-500 font-medium">Aucun exercice pour le moment</p>
           <p className="text-xs text-gray-400 mt-1 max-w-sm">
@@ -329,17 +329,17 @@ export default function GestionExercices() {
           {!search && filterMatiere === "all" && filterNiveau === "all" && (
             <button
               onClick={openCreate}
-              className="text-sm font-medium text-amber-600 hover:text-amber-700 mt-3"
+              className="tely-link text-sm mt-3"
             >
               Créer le premier exercice
             </button>
           )}
         </div>
       ) : (
-        <div className="overflow-x-auto border border-gray-100 rounded-2xl bg-white shadow-sm">
+        <div className="overflow-x-auto tely-card">
           <table className="w-full text-sm">
             <thead>
-              <tr className="bg-gray-50/75 text-left text-xs text-gray-500 uppercase tracking-wider border-b border-gray-100">
+              <tr className="text-left tely-overline border-b border-gray-100">
                 <th className="px-5 py-3.5">Titre</th>
                 <th className="px-5 py-3.5">Matière</th>
                 <th className="px-5 py-3.5">Niveau</th>
@@ -353,7 +353,7 @@ export default function GestionExercices() {
               {filteredExercices.map((exercice) => (
                 <tr
                   key={exercice.id}
-                  className="hover:bg-amber-50/30 transition-colors"
+                  className="hover:bg-gray-50 transition-colors"
                 >
                   <td className="px-5 py-3.5 font-medium text-gray-900 max-w-xs">
                     <div className="truncate font-semibold">{exercice.titre}</div>
@@ -368,14 +368,14 @@ export default function GestionExercices() {
                     {exercice.niveau?.libelle ?? "—"}
                   </td>
                   <td className="px-5 py-3.5 text-gray-600">
-                    <span className="text-xs px-2.5 py-1 rounded bg-gray-100 text-gray-700">
+                    <span className="tely-chip">
                       {TYPE_LABELS[exercice.type] ?? exercice.type}
                     </span>
                   </td>
                   <td className="px-5 py-3.5">
                     <span
-                      className={`text-xs font-semibold px-2.5 py-0.5 rounded-full border capitalize ${
-                        DIFFICULTE_STYLES[exercice.difficulte] ?? "bg-gray-50 text-gray-600 border-gray-100"
+                      className={`tely-chip capitalize ${
+                        DIFFICULTE_STYLES[exercice.difficulte] ?? "text-gray-600"
                       }`}
                     >
                       {exercice.difficulte}
@@ -383,10 +383,10 @@ export default function GestionExercices() {
                   </td>
                   <td className="px-5 py-3.5 text-center">
                     <span
-                      className={`text-xs font-semibold px-2.5 py-0.5 rounded-full ${
+                      className={`tely-chip ${
                         exercice.est_actif
-                          ? "bg-emerald-50 text-emerald-700"
-                          : "bg-gray-100 text-gray-500"
+                          ? "text-emerald-700"
+                          : "text-gray-500"
                       }`}
                     >
                       {exercice.est_actif ? "Actif" : "Inactif"}
@@ -397,21 +397,21 @@ export default function GestionExercices() {
                       <button
                         onClick={() => setViewExercice(exercice)}
                         title="Consulter l'énoncé"
-                        className="p-1.5 rounded-lg text-gray-400 hover:text-blue-600 hover:bg-blue-50 transition-colors"
+                        className="tely-icon-btn text-gray-900"
                       >
                         <Eye size={15} />
                       </button>
                       <button
                         onClick={() => openEdit(exercice)}
                         title="Modifier"
-                        className="p-1.5 rounded-lg text-gray-400 hover:text-amber-600 hover:bg-amber-50 transition-colors"
+                        className="tely-icon-btn text-gray-900"
                       >
                         <Pencil size={15} />
                       </button>
                       <button
                         onClick={() => setDeleteTarget(exercice)}
                         title="Supprimer"
-                        className="p-1.5 rounded-lg text-gray-400 hover:text-red-500 hover:bg-red-50 transition-colors"
+                        className="tely-icon-btn text-gray-900 hover:bg-red-50"
                       >
                         <Trash2 size={15} />
                       </button>
@@ -441,14 +441,15 @@ export default function GestionExercices() {
           <div className="space-y-4 max-h-[80vh] overflow-y-auto pr-1">
             <div className="border-b border-gray-100 pb-3">
               <div className="flex items-center gap-2 mb-1.5">
-                <span className="text-xs font-semibold px-2 py-0.5 rounded-full bg-amber-50 text-amber-700">
+                <span className="tely-overline">
                   {TYPE_LABELS[viewExercice.type] ?? viewExercice.type}
                 </span>
-                <span className={`text-xs font-semibold px-2 py-0.5 rounded-full capitalize ${DIFFICULTE_STYLES[viewExercice.difficulte]}`}>
+                <span className="text-xs text-gray-400">•</span>
+                <span className={`tely-chip capitalize ${DIFFICULTE_STYLES[viewExercice.difficulte]}`}>
                   {viewExercice.difficulte}
                 </span>
               </div>
-              <h2 className="text-lg font-bold text-gray-900">{viewExercice.titre}</h2>
+              <h2 className="tely-title text-xl">{viewExercice.titre}</h2>
               <div className="flex gap-4 mt-2 text-xs text-gray-500">
                 <span>Matière : <strong className="text-gray-800">{viewExercice.matiere?.nom ?? "Non définie"}</strong></span>
                 <span>Niveau : <strong className="text-gray-800">{viewExercice.niveau?.libelle ?? "Non défini"}</strong></span>
@@ -456,7 +457,7 @@ export default function GestionExercices() {
             </div>
 
             {(viewExercice.image || viewExercice.image_url) && (
-              <div className="rounded-xl overflow-hidden max-h-56 border border-gray-200 bg-gray-100">
+              <div className="rounded-lg overflow-hidden max-h-56 bg-gray-100">
                 <img
                   src={resolveImageUrl(viewExercice.image_url || viewExercice.image) || ""}
                   alt={viewExercice.titre}
@@ -465,8 +466,8 @@ export default function GestionExercices() {
               </div>
             )}
 
-            <div className="bg-gray-50 rounded-xl p-4 border border-gray-100">
-              <h3 className="text-xs font-semibold uppercase tracking-wider text-gray-500 mb-2">
+            <div className="bg-gray-50 rounded-[10px] p-4">
+              <h3 className="tely-overline mb-2">
                 Énoncé de l'exercice
               </h3>
               <div className="text-sm text-gray-800 whitespace-pre-line leading-relaxed">
@@ -478,7 +479,7 @@ export default function GestionExercices() {
               <button
                 type="button"
                 onClick={() => setViewExercice(null)}
-                className="px-4 py-2 text-sm font-medium bg-gray-100 text-gray-700 hover:bg-gray-200 rounded-lg transition-colors"
+                className="tely-btn-outline"
               >
                 Fermer
               </button>

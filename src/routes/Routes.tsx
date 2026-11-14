@@ -7,7 +7,8 @@ import ProfesseurOverView from "../pages/professeur/ProfesseurOverView";
 import ProfesseurRessources from "../pages/professeur/ProfesseurRessources";
 import AdminStatistiques from "../pages/admin/AdminStatistiques";
 import GestionCandidatures from "../pages/admin/GestionCandidatures";
-import ProfilePage from "../pages/ProfilePage";
+import GestionUtilisateurs from "../pages/admin/GestionUtilisateurs";
+import EspaceComptePage from "../pages/EspaceComptePage";
 
 import CourseDetailPage from "../pages/CourseDetailPage";
 
@@ -24,12 +25,10 @@ import GestionEleves from "../pages/GestionEleves";
 import GestionSujets from "../pages/GestionSujets";
 import FormSujetPage from "../pages/FormSujetPage";
 import FormExercicePage from "../pages/FormExercicePage";
-import NotificationsPage from "../pages/NotificationsPage";
 import GestionCorrections from "../pages/GestionCorrections";
 import GestionMatieres from "../pages/GestionMatieres";
 import GestionNiveaux from "../pages/GestionNiveaux";
 import GestionCategories from "../pages/GestionCategories";
-import ParametresPage from "../pages/ParametresPage";
 import NotFoundPage from "../pages/NotFound";
 import { RequireGuest } from "./RequireGuest";
 import { RequireAuth } from "./RequireAuth";
@@ -114,16 +113,20 @@ export const Route = createBrowserRouter([
         element: <GestionCandidatures />,
       },
       {
+        path: "utilisateurs",
+        element: <GestionUtilisateurs />,
+      },
+      {
         path: "profile",
-        element: <ProfilePage />,
+        element: <EspaceComptePage />,
       },
       {
         path: "parametres",
-        element: <ParametresPage />,
+        element: <EspaceComptePage />,
       },
       {
         path: "notifications",
-        element: <NotificationsPage />,
+        element: <EspaceComptePage />,
       },
       {
         path: "exercices",
@@ -194,15 +197,15 @@ export const Route = createBrowserRouter([
       },
       {
         path: "profile",
-        element: <ProfilePage />,
+        element: <EspaceComptePage />,
       },
       {
         path: "parametres",
-        element: <ParametresPage />,
+        element: <EspaceComptePage />,
       },
       {
         path: "notifications",
-        element: <NotificationsPage />,
+        element: <EspaceComptePage />,
       },
       {
         path: "exercices",
@@ -246,7 +249,15 @@ export const Route = createBrowserRouter([
     path: "profile",
     element: (
       <RequireAuth>
-        <ProfilePage />
+        <EspaceComptePage />
+      </RequireAuth>
+    ),
+  },
+  {
+    path: "parametres",
+    element: (
+      <RequireAuth>
+        <EspaceComptePage />
       </RequireAuth>
     ),
   },
@@ -254,7 +265,7 @@ export const Route = createBrowserRouter([
     path: "notifications",
     element: (
       <RequireAuth>
-        <NotificationsPage />
+        <EspaceComptePage />
       </RequireAuth>
     ),
   },

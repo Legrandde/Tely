@@ -17,13 +17,13 @@ import {
 } from "recharts";
 
 const ACTION_COLORS: Record<string, { bg: string; text: string; label: string }> = {
-  page_view: { bg: "bg-gray-100", text: "text-gray-700", label: "Page vue" },
-  view_exercice: { bg: "bg-amber-50", text: "text-amber-700", label: "Exercice consulté" },
-  view_sujet: { bg: "bg-purple-50", text: "text-purple-700", label: "Sujet examen" },
-  download_pdf: { bg: "bg-emerald-50", text: "text-emerald-700", label: "Téléchargement PDF" },
-  view_correction: { bg: "bg-teal-50", text: "text-teal-700", label: "Corrigé consulté" },
-  login: { bg: "bg-blue-50", text: "text-blue-700", label: "Connexion" },
-  register: { bg: "bg-rose-50", text: "text-rose-700", label: "Inscription" },
+  page_view: { bg: "bg-gray-100", text: "text-gray-600", label: "Page vue" },
+  view_exercice: { bg: "bg-gray-100", text: "text-gray-900", label: "Exercice consulté" },
+  view_sujet: { bg: "bg-gray-100", text: "text-gray-900", label: "Sujet examen" },
+  download_pdf: { bg: "bg-gray-100", text: "text-emerald-700", label: "Téléchargement PDF" },
+  view_correction: { bg: "bg-gray-100", text: "text-gray-900", label: "Corrigé consulté" },
+  login: { bg: "bg-gray-100", text: "text-gray-900", label: "Connexion" },
+  register: { bg: "bg-gray-100", text: "text-emerald-700", label: "Inscription" },
 };
 
 export default function AdminStatistiques() {
@@ -91,12 +91,12 @@ export default function AdminStatistiques() {
 
   const getActionBadge = (action: string) => {
     const config = ACTION_COLORS[action] ?? {
-      bg: "bg-orange-50",
-      text: "text-orange-700",
+      bg: "bg-gray-100",
+      text: "text-gray-600",
       label: action,
     };
     return (
-      <span className={`text-[10px] px-2 py-0.5 rounded-full font-semibold capitalize ${config.bg} ${config.text}`}>
+      <span className={`tely-chip capitalize ${config.bg} ${config.text}`}>
         {config.label}
       </span>
     );
@@ -105,7 +105,7 @@ export default function AdminStatistiques() {
   return (
     <div className="flex flex-col gap-7 pb-8 max-w-7xl mx-auto w-full min-w-0 overflow-x-hidden">
       {/* ── Entête avec image de fond & dégradé identique à OverView ── */}
-      <div className="relative overflow-hidden rounded-2xl bg-gradient-to-r from-amber-600 via-amber-500 to-orange-500 text-white shadow-sm min-h-[160px] flex flex-col sm:flex-row items-start sm:items-center justify-between p-6 sm:p-8 gap-4">
+      <div className="relative overflow-hidden rounded-2xl border-2 border-amber-200 bg-gradient-to-r from-amber-600 via-amber-500 to-amber-500 text-white shadow-xl min-h-[160px] flex flex-col sm:flex-row items-start sm:items-center justify-between p-6 sm:p-8 gap-4">
         {/* Image de fond avec fondu et opacité */}
         <div
           className="absolute inset-0 bg-cover bg-right sm:bg-center opacity-30 mix-blend-luminosity pointer-events-none"
@@ -165,23 +165,23 @@ export default function AdminStatistiques() {
 
       {/* ── Stat Cards (Même composant StatCard que l'accueil) ── */}
       <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3 sm:gap-4 w-full min-w-0">
-        <StatCard label="Total des visites" value={summary.total_visits} percent={14.2} bgColor="bg-amber-50" loading={loading} />
-        <StatCard label="Visiteurs uniques" value={summary.unique_visitors} percent={8.5} bgColor="bg-green-50" loading={loading} />
-        <StatCard label="Pages vues" value={summary.page_views} percent={12.0} bgColor="bg-sky-50" loading={loading} />
-        <StatCard label="Actions utilisateurs" value={summary.user_actions} percent={6.3} bgColor="bg-purple-50" loading={loading} />
-        <StatCard label="Taux de rebond" value={summary.bounce_rate} percent={0} bgColor="bg-rose-50" loading={loading} />
+        <StatCard label="Total des visites" value={summary.total_visits} percent={summary.trends?.total_visits} bgColor="bg-amber-50" loading={loading} />
+        <StatCard label="Visiteurs uniques" value={summary.unique_visitors} percent={summary.trends?.unique_visitors} bgColor="bg-emerald-50" loading={loading} />
+        <StatCard label="Pages vues" value={summary.page_views} percent={summary.trends?.page_views} bgColor="bg-gray-50" loading={loading} />
+        <StatCard label="Actions utilisateurs" value={summary.user_actions} percent={summary.trends?.user_actions} bgColor="bg-gray-50" loading={loading} />
+        <StatCard label="Taux de rebond" value={summary.bounce_rate} percent={summary.trends?.bounce_rate} percentUnit="pts" lowerIsBetter bgColor="bg-red-50" loading={loading} />
       </div>
 
       {/* ── Graphiques & Répartition (Même grille Recharts que OverView) ── */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 w-full min-w-0">
         {/* Évolution chronologique des visites */}
-        <div className="lg:col-span-2 bg-white rounded-2xl p-5 shadow-sm border border-gray-100 flex flex-col min-w-0 overflow-hidden">
+        <div className="lg:col-span-2 tely-card p-5 flex flex-col min-w-0 overflow-hidden">
           <div className="flex items-center justify-between mb-4">
             <div>
-              <h3 className="text-sm font-bold text-gray-900">Évolution du trafic réel</h3>
-              <p className="text-xs text-gray-400">Volume quotidien des visites réelles enregistrées</p>
+              <h3 className="tely-title text-lg">Évolution du trafic réel</h3>
+              <p className="tely-subtitle">Volume quotidien des visites réelles enregistrées</p>
             </div>
-            <span className="text-xs text-gray-400 font-mono">
+            <span className="tely-overline">
               Total {summary.total_visits} visites
             </span>
           </div>
@@ -192,7 +192,7 @@ export default function AdminStatistiques() {
                 {[50, 80, 45, 95, 65, 85, 55].map((h, i) => (
                   <div key={i} className="flex-1 flex flex-col items-center gap-2 h-full justify-end">
                     <div
-                      className="w-full max-w-[42px] bg-amber-200/70 rounded-t-md"
+                      className="w-full max-w-[42px] bg-gray-200 rounded-t-md"
                       style={{ height: `${h}%` }}
                     />
                     <div className="h-2.5 w-10 bg-gray-100 rounded" />
@@ -221,7 +221,7 @@ export default function AdminStatistiques() {
                     {timelineChartData.map((_, index) => (
                       <Cell
                         key={`cell-${index}`}
-                        fill={index % 2 === 0 ? "#f59e0b" : "#fbbf24"}
+                        fill={index % 2 === 0 ? "#111827" : "#D1D5DB"}
                       />
                     ))}
                   </Bar>
@@ -232,17 +232,17 @@ export default function AdminStatistiques() {
         </div>
 
         {/* Provenance Géographique (Même design de barres que le bloc difficulté de OverView) */}
-        <div className="bg-white rounded-2xl p-5 shadow-sm border border-gray-100 flex flex-col justify-between">
+        <div className="tely-card p-5 flex flex-col justify-between">
           <div>
             <div className="flex items-center justify-between mb-1">
-              <h3 className="text-sm font-bold text-gray-900 flex items-center gap-2">
-                <Globe size={16} className="text-amber-500" /> Pays de provenance
+              <h3 className="tely-title text-lg flex items-center gap-2">
+                <Globe size={16} className="text-gray-900" /> Pays de provenance
               </h3>
-              <span className="text-xs font-semibold text-amber-600 bg-amber-50 px-2 py-0.5 rounded-full">
+              <span className="tely-overline">
                 {data?.countries.length ?? 0} pays
               </span>
             </div>
-            <p className="text-xs text-gray-400 mb-4">Origine géographique réelle des requêtes</p>
+            <p className="tely-subtitle mb-4">Origine géographique réelle des requêtes</p>
 
             <div className="space-y-4 overflow-y-auto max-h-56 pr-1">
               {loading ? (
@@ -270,7 +270,7 @@ export default function AdminStatistiques() {
                     <div key={idx}>
                       <div className="flex items-center justify-between text-xs mb-1.5">
                         <span className="font-medium text-gray-700 flex items-center gap-1.5">
-                          <span className="px-1.5 py-0.5 text-[10px] font-bold font-mono bg-slate-100 text-slate-700 rounded border border-slate-200">
+                          <span className="tely-chip font-mono font-bold">
                             {c.country_code || "GN"}
                           </span>
                           {c.country}
@@ -281,7 +281,7 @@ export default function AdminStatistiques() {
                       </div>
                       <div className="w-full h-2 rounded-full bg-gray-100 overflow-hidden">
                         <div
-                          className="h-full rounded-full bg-amber-500 transition-all duration-500"
+                          className="h-full rounded-full bg-gray-900 transition-all duration-500"
                           style={{ width: `${Math.min(100, c.percentage)}%` }}
                         />
                       </div>
@@ -292,7 +292,7 @@ export default function AdminStatistiques() {
             </div>
           </div>
 
-          <div className="mt-4 pt-3 border-t border-gray-100 bg-amber-50/50 rounded-xl p-2.5 text-[11px] text-amber-800">
+          <div className="mt-4 bg-gray-50 rounded-[10px] p-2.5 text-[11px] text-gray-500">
             Détection automatique par adresses IP et fuseaux horaires des requêtes.
           </div>
         </div>
@@ -301,12 +301,12 @@ export default function AdminStatistiques() {
       {/* ── Deuxième Ligne : OS, Navigateurs, Types d'appareils ── */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         {/* Systèmes d'exploitation (OS) */}
-        <div className="bg-white rounded-2xl p-5 shadow-sm border border-gray-100 flex flex-col justify-between">
+        <div className="tely-card p-5 flex flex-col justify-between">
           <div>
-            <h3 className="text-sm font-bold text-gray-900 mb-1 flex items-center gap-2">
-              <Monitor size={16} className="text-amber-500" /> Systèmes d'exploitation
+            <h3 className="tely-title text-lg mb-1 flex items-center gap-2">
+              <Monitor size={16} className="text-gray-900" /> Systèmes d'exploitation
             </h3>
-            <p className="text-xs text-gray-400 mb-4">Plateformes réelles des visiteurs</p>
+            <p className="tely-subtitle mb-4">Plateformes réelles des visiteurs</p>
 
             <div className="space-y-3.5">
               {loading ? (
@@ -332,7 +332,7 @@ export default function AdminStatistiques() {
                     </div>
                     <div className="w-full h-1.5 rounded-full bg-gray-100 overflow-hidden">
                       <div
-                        className="h-full rounded-full bg-amber-500 transition-all duration-500"
+                        className="h-full rounded-full bg-gray-900 transition-all duration-500"
                         style={{ width: `${Math.min(100, os.percentage)}%` }}
                       />
                     </div>
@@ -344,12 +344,12 @@ export default function AdminStatistiques() {
         </div>
 
         {/* Navigateurs */}
-        <div className="bg-white rounded-2xl p-5 shadow-sm border border-gray-100 flex flex-col justify-between">
+        <div className="tely-card p-5 flex flex-col justify-between">
           <div>
-            <h3 className="text-sm font-bold text-gray-900 mb-1 flex items-center gap-2">
-              <Compass size={16} className="text-amber-500" /> Navigateurs Web
+            <h3 className="tely-title text-lg mb-1 flex items-center gap-2">
+              <Compass size={16} className="text-gray-900" /> Navigateurs Web
             </h3>
-            <p className="text-xs text-gray-400 mb-4">Logiciels de navigation détectés</p>
+            <p className="tely-subtitle mb-4">Logiciels de navigation détectés</p>
 
             <div className="space-y-3.5">
               {loading ? (
@@ -375,7 +375,7 @@ export default function AdminStatistiques() {
                     </div>
                     <div className="w-full h-1.5 rounded-full bg-gray-100 overflow-hidden">
                       <div
-                        className="h-full rounded-full bg-blue-500 transition-all duration-500"
+                        className="h-full rounded-full bg-gray-900 transition-all duration-500"
                         style={{ width: `${Math.min(100, b.percentage)}%` }}
                       />
                     </div>
@@ -387,12 +387,12 @@ export default function AdminStatistiques() {
         </div>
 
         {/* Types d'appareils */}
-        <div className="bg-white rounded-2xl p-5 shadow-sm border border-gray-100 flex flex-col justify-between">
+        <div className="tely-card p-5 flex flex-col justify-between">
           <div>
-            <h3 className="text-sm font-bold text-gray-900 mb-1 flex items-center gap-2">
-              <Smartphone size={16} className="text-amber-500" /> Types d'appareils
+            <h3 className="tely-title text-lg mb-1 flex items-center gap-2">
+              <Smartphone size={16} className="text-gray-900" /> Types d'appareils
             </h3>
-            <p className="text-xs text-gray-400 mb-4">Ordinateur vs Smartphone vs Tablette</p>
+            <p className="tely-subtitle mb-4">Ordinateur vs Smartphone vs Tablette</p>
 
             <div className="space-y-3.5">
               {loading ? (
@@ -420,7 +420,7 @@ export default function AdminStatistiques() {
                     </div>
                     <div className="w-full h-1.5 rounded-full bg-gray-100 overflow-hidden">
                       <div
-                        className="h-full rounded-full bg-emerald-500 transition-all duration-500"
+                        className="h-full rounded-full bg-gray-900 transition-all duration-500"
                         style={{ width: `${Math.min(100, d.percentage)}%` }}
                       />
                     </div>
@@ -433,13 +433,13 @@ export default function AdminStatistiques() {
       </div>
 
       {/* ── Troisième Ligne : Flux d'activités réelles en direct (Même liste que OverView) ── */}
-      <div className="bg-white rounded-2xl p-5 shadow-sm border border-gray-100">
+      <div className="tely-card p-5">
         <div className="flex items-center justify-between mb-4">
           <div>
-            <h3 className="text-sm font-bold text-gray-900">Journal d'activités réelles en temps réel</h3>
-            <p className="text-xs text-gray-400">Dernières requêtes et actions tracées en direct</p>
+            <h3 className="tely-title text-lg">Journal d'activités réelles en temps réel</h3>
+            <p className="tely-subtitle">Dernières requêtes et actions tracées en direct</p>
           </div>
-          <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-emerald-50 text-emerald-700">
+          <span className="tely-chip text-emerald-700">
             <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse inline-block" /> Live Tracker
           </span>
         </div>
@@ -450,7 +450,7 @@ export default function AdminStatistiques() {
               {[1, 2, 3, 4, 5].map((i) => (
                 <div key={i} className="py-2.5 flex items-center justify-between gap-3 px-2">
                   <div className="flex items-center gap-3 min-w-0 flex-1">
-                    <div className="w-8 h-8 rounded-full bg-amber-100 shrink-0" />
+                    <div className="w-8 h-8 rounded-full bg-gray-100 shrink-0" />
                     <div className="space-y-1.5 flex-1">
                       <div className="h-3.5 w-44 bg-gray-200 rounded" />
                       <div className="h-2.5 w-56 bg-gray-100 rounded" />
@@ -469,9 +469,9 @@ export default function AdminStatistiques() {
             </div>
           ) : (
             data?.recent_activities.map((act) => (
-              <div key={act.id} className="py-2.5 flex items-center justify-between gap-3 hover:bg-amber-50/20 px-2 rounded-lg transition-colors">
+              <div key={act.id} className="py-2.5 flex items-center justify-between gap-3 hover:bg-gray-50 px-2 rounded-[10px] transition-colors">
                 <div className="flex items-center gap-3 min-w-0">
-                  <div className="w-8 h-8 rounded-full bg-amber-100 text-amber-700 flex items-center justify-center font-bold text-xs shrink-0">
+                  <div className="w-8 h-8 rounded-full bg-gray-900 text-white flex items-center justify-center font-bold text-xs shrink-0">
                     {act.user ? act.user.prenom?.charAt(0) || act.user.nom?.charAt(0) : "V"}
                   </div>
                   <div className="min-w-0">

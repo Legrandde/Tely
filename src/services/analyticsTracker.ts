@@ -7,6 +7,14 @@ export interface AnalyticsSummary {
   user_actions: number;
   bounce_rate: string;
   avg_duration: string;
+  /** Évolution vs période précédente (null = pas de point de comparaison) */
+  trends?: {
+    total_visits: number | null;
+    unique_visitors: number | null;
+    page_views: number | null;
+    user_actions: number | null;
+    bounce_rate: number | null;
+  };
 }
 
 export interface AnalyticsTimelineItem {
@@ -80,17 +88,37 @@ export interface AdminAnalyticsData {
   recent_activities: AnalyticsRecentActivity[];
 }
 
+// Session = activité continue ; elle expire après 30 min d'inactivité.
+// Stockée dans localStorage pour ne pas créer une nouvelle session à chaque onglet.
+const SESSION_KEY = "tely_analytics_session";
+const SESSION_TTL_MS = 30 * 60 * 1000;
+
 function getSessionId(): string {
   try {
-    let sid = sessionStorage.getItem("tely_analytics_sid");
-    if (!sid) {
-      sid = "sid_" + Math.random().toString(36).substring(2, 12) + Date.now().toString(36);
-      sessionStorage.setItem("tely_analytics_sid", sid);
-    }
-    return sid;
+    const now = Date.now();
+    const raw = localStorage.getItem(SESSION_KEY);
+    const stored = raw ? (JSON.parse(raw) as { id: string; last: number }) : null;
+    const id =
+      stored && now - stored.last < SESSION_TTL_MS
+        ? stored.id
+        : "sid_" + Math.random().toString(36).substring(2, 12) + now.toString(36);
+    localStorage.setItem(SESSION_KEY, JSON.stringify({ id, last: now }));
+    return id;
   } catch {
     return "sid_default";
   }
+}
+
+// Anti-doublon : React StrictMode (dev) et les re-rendus déclenchent parfois
+// deux fois le même événement à quelques millisecondes d'intervalle.
+const recentEvents = new Map<string, number>();
+const DEDUPE_WINDOW_MS = 2000;
+
+function isDuplicate(key: string): boolean {
+  const now = Date.now();
+  const last = recentEvents.get(key);
+  recentEvents.set(key, now);
+  return last !== undefined && now - last < DEDUPE_WINDOW_MS;
 }
 
 function detectOS(): string {
@@ -127,10 +155,13 @@ export async function trackEvent(
   path?: string,
   metadata?: Record<string, unknown>
 ): Promise<void> {
+  const resolvedPath = path || window.location.pathname;
+  if (isDuplicate(`${action}|${resolvedPath}|${JSON.stringify(metadata ?? {})}`)) return;
+
   try {
     const payload = {
       action,
-      path: path || window.location.pathname,
+      path: resolvedPath,
       session_id: getSessionId(),
       os: detectOS(),
       browser: detectBrowser(),

@@ -55,7 +55,7 @@ export default function ChartSection() {
     <div className="flex mt-7 gap-4 w-full">
 
       {/* ── Graphique principal ── */}
-      <div className="flex-1 bg-white rounded-2xl p-5 shadow-sm border border-gray-100">
+      <div className="flex-1 tely-card p-5">
 
         {/* Tabs + légende */}
         <div className="flex items-center justify-between mb-6">
@@ -63,10 +63,10 @@ export default function ChartSection() {
             {tabs.map((tab, i) => (
               <button
                 key={tab}
-                className={`text-sm font-medium transition-colors ${
+                className={`text-sm font-medium px-3 py-1.5 transition-colors ${
                   i === 0
-                    ? "text-gray-800 font-semibold"
-                    : "text-gray-400 hover:text-gray-600"
+                    ? "bg-gray-900 text-white rounded-[10px] font-semibold"
+                    : "text-gray-500 hover:text-gray-900"
                 }`}
               >
                 {tab}
@@ -79,7 +79,7 @@ export default function ChartSection() {
                 This year
               </span>
               <span className="flex items-center gap-1">
-                <span className="w-2 h-2 rounded-full bg-indigo-300 inline-block" />
+                <span className="w-2 h-2 rounded-full bg-gray-300 inline-block" />
                 Last year
               </span>
             </div>
@@ -95,8 +95,8 @@ export default function ChartSection() {
                 <stop offset="95%" stopColor="#1a1a1a" stopOpacity={0}    />
               </linearGradient>
               <linearGradient id="lastYearGrad" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="5%"  stopColor="#818cf8" stopOpacity={0.1} />
-                <stop offset="95%" stopColor="#818cf8" stopOpacity={0}   />
+                <stop offset="5%"  stopColor="#D1D5DB" stopOpacity={0.1} />
+                <stop offset="95%" stopColor="#D1D5DB" stopOpacity={0}   />
               </linearGradient>
             </defs>
 
@@ -127,7 +127,7 @@ export default function ChartSection() {
             <Area
               type="monotone"
               dataKey="lastYear"
-              stroke="#818cf8"
+              stroke="#D1D5DB"
               strokeWidth={1.5}
               strokeDasharray="4 4"
               fill="url(#lastYearGrad)"
@@ -138,7 +138,7 @@ export default function ChartSection() {
             <Area
               type="monotone"
               dataKey="thisYear"
-              stroke="#1a1a1a"
+              stroke="#111827"
               strokeWidth={2}
               fill="url(#thisYearGrad)"
               dot={false}
@@ -148,8 +148,8 @@ export default function ChartSection() {
       </div>
 
       {/* ── Traffic by Website ── */}
-      <div className="w-56 bg-white rounded-2xl p-5 shadow-sm border border-gray-100 flex-shrink-0">
-        <h3 className="text-sm font-semibold text-gray-800 mb-3">Traffic by Website</h3>
+      <div className="w-56 tely-card p-5 flex-shrink-0">
+        <h3 className="tely-title text-lg mb-3">Traffic by Website</h3>
         <div className="flex flex-col">
           {trafficSources.map((source) => (
             <TrafficItem key={source.name} name={source.name} solid={source.solid} />

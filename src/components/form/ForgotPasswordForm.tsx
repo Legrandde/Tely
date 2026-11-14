@@ -32,7 +32,7 @@ export function ForgotPasswordForm() {
   if (sent) {
     return (
       <div className="flex flex-col">
-        <h1 className="text-[28px] font-bold text-gray-900 leading-tight mb-1" style={{ fontFamily: "'Playfair Display', serif" }}>
+        <h1 className="text-[28px] font-bold text-gray-900 leading-tight mb-1">
           Vérifie ta boîte mail
         </h1>
         <p className="text-sm text-gray-400 mb-7">
@@ -47,7 +47,7 @@ export function ForgotPasswordForm() {
 
   return (
     <form onSubmit={handleSubmit} className="flex flex-col">
-      <h1 className="text-[28px] font-bold text-gray-900 leading-tight mb-1" style={{ fontFamily: "'Playfair Display', serif" }}>
+      <h1 className="text-[28px] font-bold text-gray-900 leading-tight mb-1">
         Mot de passe oublié
       </h1>
       <p className="text-sm text-gray-400 mb-7">

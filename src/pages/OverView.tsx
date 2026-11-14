@@ -3,6 +3,19 @@ import StatCard from "../components/ui/StatCard";
 import { getAdminStats } from "../services/resourceService";
 import type { AdminStats } from "../types/admin";
 import { useNavigate } from "react-router-dom";
+import { useAuth } from "../context/authContext";
+import { ATraiter, ActionsRapides, DashboardHeader } from "../components/dashboard/DashboardHome";
+import {
+  BookOpen,
+  CheckCircle2,
+  ClipboardList,
+  EyeOff,
+  Plus,
+  TrendingUp,
+  UserCheck,
+  UserPlus,
+  Users,
+} from "lucide-react";
 import {
   BarChart,
   Bar,
@@ -23,6 +36,7 @@ export default function OverView() {
   const [stats, setStats] = useState<AdminStats | null>(null);
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
+  const { user } = useAuth();
 
   useEffect(() => {
     let isMounted = true;
@@ -56,6 +70,8 @@ export default function OverView() {
     users: 0,
   };
 
+  const aTraiter = stats?.a_traiter;
+
   const matiereChartData = (stats?.exercices_par_matiere ?? []).map((m) => ({
     name: m.nom,
     code: m.code,
@@ -64,51 +80,90 @@ export default function OverView() {
 
   return (
     <div className="flex flex-col gap-7 pb-8 w-full max-w-full overflow-x-hidden min-w-0">
-      {/* ── Entête Bienvenue avec image de fond ── */}
-      <div className="relative overflow-hidden rounded-2xl bg-gradient-to-r from-amber-600 via-amber-500 to-orange-500 text-white shadow-sm min-h-[160px] flex items-center justify-between p-6 sm:p-8">
-        {/* Image de fond avec fondu et opacité */}
-        <div
-          className="absolute inset-0 bg-cover bg-right sm:bg-center opacity-30 mix-blend-luminosity pointer-events-none"
-          style={{ backgroundImage: "url('/banner1.png')" }}
-        />
-        {/* Dégradé par-dessus pour assurer la lisibilité parfaite du texte */}
-        <div className="absolute inset-0 bg-gradient-to-r from-amber-700/90 via-amber-600/80 to-transparent pointer-events-none" />
+      {/* ── Accueil orienté actions ── */}
+      <DashboardHeader
+        prenom={user?.prenom}
+        sousTitre="Voici l'état de la plateforme et ce qui demande votre attention."
+        action={
+          <button type="button" onClick={() => navigate("/Dashbord-admin/exercices/nouveau")} className="tely-btn">
+            <Plus size={16} /> Nouvel exercice
+          </button>
+        }
+      />
 
-        {/* Contenu textuel */}
-        <div className="relative z-10 max-w-xl">
-          <div className="mb-1.5">
-            <span className="text-xs font-semibold uppercase tracking-wider text-amber-100">
-              Panneau d'administration Tely
-            </span>
-          </div>
-          <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight">
-            Vue d'ensemble de la plateforme
-          </h1>
-          <p className="text-sm text-amber-100/90 mt-1.5 leading-relaxed">
-            Suivi en temps réel des contenus pédagogiques, des épreuves d'examen et des utilisateurs.
-          </p>
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 w-full min-w-0">
+        <div className="lg:col-span-2 min-w-0">
+          <ATraiter
+            loading={loading}
+            taches={[
+              {
+                count: aTraiter?.candidatures_en_attente ?? 0,
+                label: "candidature(s) enseignant en attente",
+                description: "Des enseignants attendent votre validation pour publier.",
+                to: "/Dashbord-admin/candidatures",
+                priorite: "urgent",
+                icon: <UserCheck size={18} />,
+              },
+              {
+                count: aTraiter?.exercices_sans_corrige ?? 0,
+                label: "exercice(s) sans corrigé",
+                description: "Les élèves ne peuvent pas vérifier leurs réponses sur ces exercices.",
+                to: "/Dashbord-admin/corrections",
+                icon: <CheckCircle2 size={18} />,
+              },
+              {
+                count: aTraiter?.sujets_sans_exercice ?? 0,
+                label: "sujet(s) d'examen sans exercice",
+                description: "Associez des exercices pour rendre ces sujets exploitables.",
+                to: "/Dashbord-admin/sujets",
+                icon: <ClipboardList size={18} />,
+              },
+              {
+                count: aTraiter?.exercices_inactifs ?? 0,
+                label: "exercice(s) désactivé(s)",
+                description: "Invisibles pour les élèves : à publier ou à supprimer.",
+                to: "/Dashbord-admin/exercices",
+                icon: <EyeOff size={18} />,
+              },
+              {
+                count: aTraiter?.nouveaux_inscrits_7j ?? 0,
+                label: "nouvel(le)s inscrit(e)s cette semaine",
+                description: "Vérifiez les comptes et attribuez les bons rôles.",
+                to: "/Dashbord-admin/utilisateurs",
+                icon: <Users size={18} />,
+              },
+            ]}
+          />
         </div>
+        <ActionsRapides
+          actions={[
+            { label: "Créer un compte", to: "/Dashbord-admin/utilisateurs", icon: <UserPlus size={18} /> },
+            { label: "Nouvel exercice", to: "/Dashbord-admin/exercices/nouveau", icon: <BookOpen size={18} /> },
+            { label: "Nouveau sujet", to: "/Dashbord-admin/sujets/nouveau", icon: <ClipboardList size={18} /> },
+            { label: "Statistiques", to: "/Dashbord-admin/statistiques", icon: <TrendingUp size={18} /> },
+          ]}
+        />
       </div>
 
       {/* ── Stat Cards ── */}
       <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3 sm:gap-4 w-full min-w-0">
-        <StatCard label="Élèves inscrits" value={counts.eleves} percent={12.5} bgColor="bg-amber-50" loading={loading} />
-        <StatCard label="Professeurs" value={counts.professeurs} percent={4.2} bgColor="bg-green-50" loading={loading} />
-        <StatCard label="Exercices actifs" value={counts.exercices} percent={8.1} bgColor="bg-rose-50" loading={loading} />
-        <StatCard label="Sujets d'examen" value={counts.sujets} percent={15.0} bgColor="bg-sky-50" loading={loading} />
-        <StatCard label="Matières actives" value={counts.matieres} percent={0} bgColor="bg-purple-50" loading={loading} />
+        <StatCard label="Élèves inscrits" value={counts.eleves} bgColor="bg-amber-50" loading={loading} />
+        <StatCard label="Professeurs" value={counts.professeurs} bgColor="bg-emerald-50" loading={loading} />
+        <StatCard label="Exercices actifs" value={counts.exercices} bgColor="bg-red-50" loading={loading} />
+        <StatCard label="Sujets d'examen" value={counts.sujets} bgColor="bg-gray-50" loading={loading} />
+        <StatCard label="Matières actives" value={counts.matieres} bgColor="bg-gray-50" loading={loading} />
       </div>
 
       {/* ── Graphiques & Répartition ── */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 w-full min-w-0">
         {/* Exercices par Matière */}
-        <div className="lg:col-span-2 bg-white rounded-2xl p-5 shadow-sm border border-gray-100 flex flex-col min-w-0 overflow-hidden">
+        <div className="lg:col-span-2 tely-card p-5 flex flex-col min-w-0 overflow-hidden">
           <div className="flex items-center justify-between mb-4">
             <div>
-              <h3 className="text-sm font-bold text-gray-900">Exercices par matière</h3>
-              <p className="text-xs text-gray-400">Distribution du volume de TD par discipline</p>
+              <h3 className="tely-title text-lg">Exercices par matière</h3>
+              <p className="tely-subtitle">Distribution du volume de TD par discipline</p>
             </div>
-            <span className="text-xs text-gray-400 font-mono">
+            <span className="tely-overline">
               Total {counts.exercices}
             </span>
           </div>
@@ -119,7 +174,7 @@ export default function OverView() {
                 {[45, 75, 55, 90, 60, 80, 40].map((h, i) => (
                   <div key={i} className="flex-1 flex flex-col items-center gap-2 h-full justify-end">
                     <div
-                      className="w-full max-w-[42px] bg-amber-200/70 rounded-t-md"
+                      className="w-full max-w-[42px] bg-gray-200 rounded-t-md"
                       style={{ height: `${h}%` }}
                     />
                     <div className="h-2.5 w-10 bg-gray-100 rounded" />
@@ -153,7 +208,7 @@ export default function OverView() {
                     {matiereChartData.map((_, index) => (
                       <Cell
                         key={`cell-${index}`}
-                        fill={index % 2 === 0 ? "#f59e0b" : "#fbbf24"}
+                        fill={index % 2 === 0 ? "#111827" : "#D1D5DB"}
                       />
                     ))}
                   </Bar>
@@ -164,10 +219,10 @@ export default function OverView() {
         </div>
 
         {/* Répartition par difficulté */}
-        <div className="bg-white rounded-2xl p-5 shadow-sm border border-gray-100 flex flex-col justify-between">
+        <div className="tely-card p-5 flex flex-col justify-between">
           <div>
-            <h3 className="text-sm font-bold text-gray-900 mb-1">Niveau de difficulté</h3>
-            <p className="text-xs text-gray-400 mb-4">Proportion des exercices selon l'exigence</p>
+            <h3 className="tely-title text-lg mb-1">Niveau de difficulté</h3>
+            <p className="tely-subtitle mb-4">Proportion des exercices selon l'exigence</p>
 
             <div className="space-y-4">
               {["facile", "moyen", "difficile"].map((diff) => {
@@ -199,8 +254,8 @@ export default function OverView() {
             </div>
           </div>
 
-          <div className="mt-6 pt-4 border-t border-gray-100 bg-amber-50/50 rounded-xl p-3">
-            <span className="text-xs font-semibold text-amber-800 block">Taux de correction</span>
+          <div className="mt-6 bg-gray-50 rounded-[10px] p-3">
+            <span className="tely-label block">Taux de correction</span>
             <p className="text-xs text-gray-600 mt-0.5">
               {counts.corrections} exercice(s) disposent d'un corrigé détaillé officiel.
             </p>
@@ -211,15 +266,15 @@ export default function OverView() {
       {/* ── Derniers Exercices et Derniers Sujets ── */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Derniers Exercices */}
-        <div className="bg-white rounded-2xl p-5 shadow-sm border border-gray-100">
+        <div className="tely-card p-5">
           <div className="flex items-center justify-between mb-4">
             <div>
-              <h3 className="text-sm font-bold text-gray-900">Derniers exercices ajoutés</h3>
-              <p className="text-xs text-gray-400">Contenus récemment publiés</p>
+              <h3 className="tely-title text-lg">Derniers exercices ajoutés</h3>
+              <p className="tely-subtitle">Contenus récemment publiés</p>
             </div>
             <button
               onClick={() => navigate("/Dashbord-admin/exercices")}
-              className="text-xs font-semibold text-amber-600 hover:text-amber-700 cursor-pointer"
+              className="tely-link text-xs"
             >
               Voir tout
             </button>
@@ -252,9 +307,8 @@ export default function OverView() {
                     </span>
                   </div>
                   <span
-                    className="text-[10px] px-2 py-0.5 rounded-full font-semibold capitalize shrink-0"
+                    className="text-[10px] font-semibold capitalize shrink-0"
                     style={{
-                      backgroundColor: `${DIFFICULTE_COLORS[ex.difficulte] ?? "#6b7280"}15`,
                       color: DIFFICULTE_COLORS[ex.difficulte] ?? "#6b7280",
                     }}
                   >
@@ -267,15 +321,15 @@ export default function OverView() {
         </div>
 
         {/* Derniers Sujets d'Examen */}
-        <div className="bg-white rounded-2xl p-5 shadow-sm border border-gray-100">
+        <div className="tely-card p-5">
           <div className="flex items-center justify-between mb-4">
             <div>
-              <h3 className="text-sm font-bold text-gray-900">Derniers sujets d'examen</h3>
-              <p className="text-xs text-gray-400">Épreuves officielles enregistrées</p>
+              <h3 className="tely-title text-lg">Derniers sujets d'examen</h3>
+              <p className="tely-subtitle">Épreuves officielles enregistrées</p>
             </div>
             <button
               onClick={() => navigate("/Dashbord-admin/sujets")}
-              className="text-xs font-semibold text-amber-600 hover:text-amber-700 cursor-pointer"
+              className="tely-link text-xs"
             >
               Voir tout
             </button>
@@ -290,7 +344,7 @@ export default function OverView() {
                       <div className="h-3.5 w-3/5 bg-gray-200 rounded" />
                       <div className="h-2.5 w-2/5 bg-gray-100 rounded" />
                     </div>
-                    <div className="h-5 w-14 bg-purple-50 rounded-full shrink-0" />
+                    <div className="h-5 w-14 bg-gray-100 rounded-full shrink-0" />
                   </div>
                 ))}
               </div>
@@ -307,7 +361,7 @@ export default function OverView() {
                       {sujet.matiere?.nom ?? "—"} • Session {sujet.session} {sujet.annee}
                     </span>
                   </div>
-                  <span className="text-[10px] px-2 py-0.5 rounded-full font-semibold uppercase bg-purple-50 text-purple-700 shrink-0">
+                  <span className="tely-chip uppercase shrink-0">
                     {sujet.type}
                   </span>
                 </div>

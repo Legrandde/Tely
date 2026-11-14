@@ -138,7 +138,7 @@ export default function GestionProfesseurs() {
       {/* Entête */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
-          <h1 className="text-xl font-bold text-gray-900">Gestion des professeurs</h1>
+          <h1 className="tely-h1">Gestion des professeurs</h1>
           <p className="text-sm text-gray-500">
             Gérez le corps enseignant, leurs spécialités académiques et contenus rédigés
           </p>
@@ -146,7 +146,7 @@ export default function GestionProfesseurs() {
 
         <button
           onClick={openCreate}
-          className="flex items-center gap-2 text-sm font-medium bg-amber-500 text-white rounded-xl px-4 py-2.5 hover:bg-amber-600 shadow-sm transition-colors cursor-pointer self-start sm:self-auto"
+          className="tely-btn self-start sm:self-auto"
         >
           <Plus size={16} />
           Ajouter un professeur
@@ -154,15 +154,15 @@ export default function GestionProfesseurs() {
       </div>
 
       {/* Barre d'outils / Recherche */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-white p-3 rounded-xl border border-gray-100 shadow-sm">
-        <div className="flex items-center gap-2 bg-gray-50 rounded-lg px-3 py-2 flex-1 w-full sm:max-w-md">
-          <Search size={16} className="text-gray-400 shrink-0" />
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 tely-card p-3">
+        <div className="flex items-center gap-2 bg-gray-50 border border-gray-200 rounded-[10px] px-3 flex-1 w-full sm:max-w-md transition-all duration-200 focus-within:border-gray-900 focus-within:shadow-[0_0_0_3px_rgba(17,17,17,0.06)]">
+          <Search size={16} className="text-gray-900 shrink-0" />
           <input
             type="text"
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             placeholder="Rechercher par nom, email ou spécialité..."
-            className="bg-transparent text-sm text-gray-800 outline-none w-full placeholder-gray-400"
+            className="flex-1 w-full bg-transparent border-none outline-none text-sm text-gray-900 py-3.5 placeholder:text-gray-400"
           />
         </div>
         <div className="text-xs text-gray-500 whitespace-nowrap self-end sm:self-auto">
@@ -172,10 +172,10 @@ export default function GestionProfesseurs() {
 
       {/* Contenu */}
       {loading ? (
-        <div className="overflow-x-auto border border-gray-100 rounded-2xl bg-white shadow-sm animate-pulse">
+        <div className="overflow-x-auto tely-card animate-pulse">
           <table className="w-full text-sm">
             <thead>
-              <tr className="bg-gray-50/75 text-left text-xs text-gray-500 uppercase tracking-wider border-b border-gray-100">
+              <tr className="tely-overline text-left border-b border-gray-100">
                 <th className="px-5 py-3.5">Professeur</th>
                 <th className="px-5 py-3.5">Email professionnel</th>
                 <th className="px-5 py-3.5">Spécialité</th>
@@ -188,7 +188,7 @@ export default function GestionProfesseurs() {
                 <tr key={i}>
                   <td className="px-5 py-3.5">
                     <div className="flex items-center gap-3">
-                      <div className="w-9 h-9 rounded-full bg-amber-100 shrink-0" />
+                      <div className="w-9 h-9 rounded-full bg-gray-100 shrink-0" />
                       <div className="h-4 w-36 bg-gray-200 rounded" />
                     </div>
                   </td>
@@ -196,7 +196,7 @@ export default function GestionProfesseurs() {
                     <div className="h-3.5 w-44 bg-gray-100 rounded" />
                   </td>
                   <td className="px-5 py-3.5">
-                    <div className="h-5 w-28 bg-amber-50 rounded-full" />
+                    <div className="h-5 w-28 bg-gray-100 rounded-full" />
                   </td>
                   <td className="px-5 py-3.5 text-center">
                     <div className="h-5 w-10 bg-gray-100 rounded-full mx-auto" />
@@ -214,13 +214,13 @@ export default function GestionProfesseurs() {
           </table>
         </div>
       ) : error ? (
-        <div className="py-16 text-center text-sm text-red-500 bg-red-50 rounded-xl border border-red-100">
+        <div className="py-16 text-center text-sm text-red-500 tely-card">
           {error}
         </div>
       ) : filteredProfesseurs.length === 0 ? (
-        <div className="flex flex-col items-center justify-center py-16 text-center bg-white rounded-2xl border border-gray-100">
-          <div className="w-12 h-12 rounded-full bg-amber-50 flex items-center justify-center mb-3">
-            <GraduationCap size={22} className="text-amber-500" />
+        <div className="flex flex-col items-center justify-center py-16 text-center tely-card">
+          <div className="w-12 h-12 rounded-full bg-gray-50 flex items-center justify-center mb-3">
+            <GraduationCap size={22} className="text-gray-900" />
           </div>
           <p className="text-sm text-gray-500 font-medium">Aucun professeur trouvé</p>
           <p className="text-xs text-gray-400 mt-1 max-w-sm">
@@ -231,17 +231,17 @@ export default function GestionProfesseurs() {
           {!search && (
             <button
               onClick={openCreate}
-              className="text-sm font-medium text-amber-600 hover:text-amber-700 mt-3"
+              className="tely-link text-sm mt-3"
             >
               Ajouter le premier professeur
             </button>
           )}
         </div>
       ) : (
-        <div className="overflow-x-auto border border-gray-100 rounded-2xl bg-white shadow-sm">
+        <div className="overflow-x-auto tely-card">
           <table className="w-full text-sm">
             <thead>
-              <tr className="bg-gray-50/75 text-left text-xs text-gray-500 uppercase tracking-wider border-b border-gray-100">
+              <tr className="tely-overline text-left border-b border-gray-100">
                 <th className="px-5 py-3.5">Professeur</th>
                 <th className="px-5 py-3.5">Email professionnel</th>
                 <th className="px-5 py-3.5">Spécialité</th>
@@ -260,10 +260,10 @@ export default function GestionProfesseurs() {
                   .toUpperCase();
 
                 return (
-                  <tr key={professeur.id} className="hover:bg-amber-50/30 transition-colors">
+                  <tr key={professeur.id} className="hover:bg-gray-50 transition-colors">
                     <td className="px-5 py-3.5">
                       <div className="flex items-center gap-3">
-                        <div className="w-9 h-9 rounded-full bg-amber-100 text-amber-800 font-bold text-xs flex items-center justify-center shrink-0">
+                        <div className="w-9 h-9 rounded-full bg-gray-900 text-white font-bold text-xs flex items-center justify-center shrink-0">
                           {professeur.user?.avatar ? (
                             <img
                               src={professeur.user.avatar}
@@ -281,12 +281,12 @@ export default function GestionProfesseurs() {
                       {professeur.user?.email ?? "—"}
                     </td>
                     <td className="px-5 py-3.5">
-                      <span className="text-xs px-2.5 py-1 rounded-md bg-amber-50 text-amber-800 font-medium">
+                      <span className="tely-chip">
                         {professeur.specialite || "Généraliste"}
                       </span>
                     </td>
                     <td className="px-5 py-3.5 text-center">
-                      <span className="px-2.5 py-0.5 text-xs font-semibold rounded-full bg-gray-100 text-gray-700">
+                      <span className="text-xs font-semibold text-gray-700">
                         {professeur.exercices_count ?? 0}
                       </span>
                     </td>
@@ -295,21 +295,21 @@ export default function GestionProfesseurs() {
                         <button
                           onClick={() => setViewProfesseur(professeur)}
                           title="Voir le profil"
-                          className="p-1.5 rounded-lg text-gray-400 hover:text-blue-600 hover:bg-blue-50 transition-colors"
+                          className="tely-icon-btn text-gray-900"
                         >
                           <Eye size={15} />
                         </button>
                         <button
                           onClick={() => openEdit(professeur)}
                           title="Modifier"
-                          className="p-1.5 rounded-lg text-gray-400 hover:text-amber-600 hover:bg-amber-50 transition-colors"
+                          className="tely-icon-btn text-gray-900"
                         >
                           <Pencil size={15} />
                         </button>
                         <button
                           onClick={() => setDeleteTarget(professeur)}
                           title="Supprimer"
-                          className="p-1.5 rounded-lg text-gray-400 hover:text-red-500 hover:bg-red-50 transition-colors"
+                          className="tely-icon-btn text-gray-900 hover:text-red-500 hover:bg-red-50"
                         >
                           <Trash2 size={15} />
                         </button>
@@ -346,7 +346,7 @@ export default function GestionProfesseurs() {
         {viewProfesseur && (
           <div className="space-y-4">
             <div className="flex items-center gap-4 pb-4 border-b border-gray-100">
-              <div className="w-14 h-14 rounded-full bg-amber-100 text-amber-800 font-bold text-lg flex items-center justify-center shrink-0">
+              <div className="w-14 h-14 rounded-full bg-gray-900 text-white font-bold text-lg flex items-center justify-center shrink-0">
                 {viewProfesseur.user?.avatar ? (
                   <img
                     src={viewProfesseur.user.avatar}
@@ -358,7 +358,7 @@ export default function GestionProfesseurs() {
                 )}
               </div>
               <div>
-                <h2 className="text-lg font-bold text-gray-900">
+                <h2 className="tely-title text-xl">
                   {viewProfesseur.user?.prenom} {viewProfesseur.user?.nom}
                 </h2>
                 <p className="text-xs text-gray-500">{viewProfesseur.user?.email}</p>
@@ -366,16 +366,16 @@ export default function GestionProfesseurs() {
             </div>
 
             <div className="grid grid-cols-2 gap-3 text-sm">
-              <div className="bg-gray-50 p-3 rounded-xl border border-gray-100">
-                <span className="text-xs text-gray-400 block mb-0.5">Spécialité</span>
+              <div className="bg-gray-50 p-3 rounded-[10px] border border-gray-200">
+                <span className="tely-label block mb-0.5">Spécialité</span>
                 <span className="font-semibold text-gray-800">
                   {viewProfesseur.specialite || "Généraliste"}
                 </span>
               </div>
-              <div className="bg-gray-50 p-3 rounded-xl border border-gray-100">
-                <span className="text-xs text-gray-400 block mb-0.5">Exercices créés</span>
+              <div className="bg-gray-50 p-3 rounded-[10px] border border-gray-200">
+                <span className="tely-label block mb-0.5">Exercices créés</span>
                 <span className="font-semibold text-gray-800 flex items-center gap-1.5">
-                  <BookOpen size={14} className="text-amber-500" />
+                  <BookOpen size={14} className="text-gray-900" />
                   {viewProfesseur.exercices_count ?? 0} exercice(s)
                 </span>
               </div>

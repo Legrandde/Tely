@@ -192,51 +192,51 @@ export default function GestionCandidatures() {
   return (
     <div className="p-4 sm:p-6 lg:p-8 space-y-6 max-w-7xl mx-auto">
       {/* ── En-tête de la page ── */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-white p-6 rounded-2xl border border-gray-100 shadow-sm">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 tely-card p-6">
         <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-xl bg-amber-50 text-amber-600 flex items-center justify-center font-bold">
+          <div className="w-10 h-10 rounded-[10px] bg-gray-50 text-gray-900 flex items-center justify-center font-bold">
             <GraduationCap size={22} />
           </div>
           <div>
-            <h1 className="text-xl font-bold text-gray-900">Candidatures Enseignants</h1>
-            <p className="text-xs text-gray-500">
+            <h1 className="tely-h1">Candidatures Enseignants</h1>
+            <p className="tely-subtitle mt-1">
               Validez les professeurs postulants et générez leurs accès de connexion au tableau de bord.
             </p>
           </div>
         </div>
 
         {counts.en_attente > 0 && (
-          <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-xl bg-amber-50 border border-amber-200 text-amber-800 text-xs font-semibold self-start sm:self-auto">
-            <Clock size={15} className="text-amber-600 animate-pulse" />
+          <div className="tely-chip text-amber-700 px-3 py-1.5 text-xs self-start sm:self-auto">
+            <Clock size={15} className="text-gray-900 animate-pulse" />
             {counts.en_attente} candidature(s) en attente d'approbation
           </div>
         )}
       </div>
 
       {/* ── Barre de filtre d'onglets & Recherche ── */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-white p-3 rounded-xl border border-gray-100 shadow-sm">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 tely-card p-3">
         {/* Tabs */}
         <div className="flex items-center gap-1.5 overflow-x-auto text-xs no-scrollbar">
           {(
             [
-              { key: "en_attente", label: "En attente", count: counts.en_attente, color: "bg-amber-100 text-amber-800" },
-              { key: "toutes", label: "Toutes", count: counts.total, color: "bg-gray-100 text-gray-700" },
-              { key: "approuve", label: "Approuvées", count: counts.approuve, color: "bg-emerald-100 text-emerald-800" },
-              { key: "rejete", label: "Rejetées", count: counts.rejete, color: "bg-rose-100 text-rose-800" },
+              { key: "en_attente", label: "En attente", count: counts.en_attente, color: "bg-gray-100 text-gray-600" },
+              { key: "toutes", label: "Toutes", count: counts.total, color: "bg-gray-100 text-gray-600" },
+              { key: "approuve", label: "Approuvées", count: counts.approuve, color: "bg-gray-100 text-gray-600" },
+              { key: "rejete", label: "Rejetées", count: counts.rejete, color: "bg-gray-100 text-gray-600" },
             ] as const
           ).map((t) => (
             <button
               key={t.key}
               type="button"
               onClick={() => setActiveTab(t.key)}
-              className={`px-3.5 py-2 rounded-lg font-semibold transition-all cursor-pointer flex items-center gap-2 shrink-0 ${
+              className={`px-3.5 py-2 rounded-[10px] font-semibold transition-all cursor-pointer flex items-center gap-2 shrink-0 ${
                 activeTab === t.key
-                  ? "bg-amber-500 text-white shadow-xs"
-                  : "text-gray-600 hover:text-gray-900 hover:bg-gray-50"
+                  ? "bg-gray-900 text-white"
+                  : "text-gray-500 hover:text-gray-900"
               }`}
             >
               <span>{t.label}</span>
-              <span className={`text-[10px] px-1.5 py-0.2 rounded-full font-bold ${activeTab === t.key ? "bg-white/20 text-white" : t.color}`}>
+              <span className={`text-[10px] px-1.5 py-0.2 rounded-full font-bold ${activeTab === t.key ? "bg-white/15 text-white" : t.color}`}>
                 {t.count}
               </span>
             </button>
@@ -244,24 +244,24 @@ export default function GestionCandidatures() {
         </div>
 
         {/* Recherche */}
-        <div className="flex items-center gap-2 bg-gray-50 rounded-lg px-3 py-2 sm:w-72 border border-gray-100">
-          <Search size={15} className="text-gray-400 shrink-0" />
+        <div className="flex items-center gap-2 bg-gray-50 border border-gray-200 rounded-[10px] px-3 sm:w-72 transition-all duration-200 focus-within:border-gray-900 focus-within:shadow-[0_0_0_3px_rgba(17,17,17,0.06)]">
+          <Search size={15} className="text-gray-900 shrink-0" />
           <input
             type="text"
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             placeholder="Rechercher par nom, email, matière..."
-            className="bg-transparent text-xs text-gray-700 outline-none w-full placeholder-gray-400"
+            className="flex-1 w-full bg-transparent border-none outline-none text-sm text-gray-900 py-3.5 placeholder:text-gray-400"
           />
         </div>
       </div>
 
       {/* ── Table des Candidatures ── */}
       {loading ? (
-        <div className="overflow-x-auto border border-gray-100 rounded-2xl bg-white shadow-xs animate-pulse">
+        <div className="overflow-x-auto tely-card animate-pulse">
           <table className="w-full text-left text-xs">
             <thead>
-              <tr className="bg-gray-50/75 border-b border-gray-100 text-gray-500 uppercase tracking-wider text-[10px]">
+              <tr className="tely-overline border-b border-gray-100">
                 <th className="py-3.5 pl-4">Candidat</th>
                 <th className="py-3.5">Discipline</th>
                 <th className="py-3.5">Établissement & Diplôme</th>
@@ -276,7 +276,7 @@ export default function GestionCandidatures() {
                 <tr key={i}>
                   <td className="py-3.5 pl-4">
                     <div className="flex items-center gap-2.5">
-                      <div className="w-8 h-8 rounded-full bg-amber-100 shrink-0" />
+                      <div className="w-8 h-8 rounded-full bg-gray-100 shrink-0" />
                       <div className="space-y-1.5">
                         <div className="h-3.5 w-32 bg-gray-200 rounded" />
                         <div className="h-2.5 w-40 bg-gray-100 rounded" />
@@ -284,7 +284,7 @@ export default function GestionCandidatures() {
                     </div>
                   </td>
                   <td className="py-3.5">
-                    <div className="h-5 w-28 bg-amber-50 rounded-md" />
+                    <div className="h-5 w-28 bg-gray-100 rounded-md" />
                   </td>
                   <td className="py-3.5 space-y-1.5">
                     <div className="h-3.5 w-32 bg-gray-200 rounded" />
@@ -294,10 +294,10 @@ export default function GestionCandidatures() {
                     <div className="h-3.5 w-14 bg-gray-200 rounded" />
                   </td>
                   <td className="py-3.5">
-                    <div className="h-6 w-20 bg-indigo-50 rounded-lg" />
+                    <div className="h-6 w-20 bg-gray-100 rounded-lg" />
                   </td>
                   <td className="py-3.5">
-                    <div className="h-5 w-24 bg-amber-50 rounded-full" />
+                    <div className="h-5 w-24 bg-gray-100 rounded-full" />
                   </td>
                   <td className="py-3.5 pr-4 text-right">
                     <div className="flex items-center justify-end gap-1.5">
@@ -312,8 +312,8 @@ export default function GestionCandidatures() {
           </table>
         </div>
       ) : filteredCandidatures.length === 0 ? (
-        <div className="py-16 text-center bg-white rounded-2xl border border-gray-100 space-y-2">
-          <div className="w-12 h-12 rounded-full bg-amber-50 text-amber-500 flex items-center justify-center mx-auto">
+        <div className="py-16 text-center tely-card space-y-2">
+          <div className="w-12 h-12 rounded-full bg-gray-50 text-gray-900 flex items-center justify-center mx-auto">
             <GraduationCap size={24} />
           </div>
           <p className="text-sm font-semibold text-gray-800">Aucune candidature trouvée</p>
@@ -322,10 +322,10 @@ export default function GestionCandidatures() {
           </p>
         </div>
       ) : (
-        <div className="overflow-x-auto border border-gray-100 rounded-2xl bg-white shadow-xs">
+        <div className="overflow-x-auto tely-card">
           <table className="w-full text-left text-xs">
             <thead>
-              <tr className="bg-gray-50/75 border-b border-gray-100 text-gray-500 uppercase tracking-wider text-[10px]">
+              <tr className="tely-overline border-b border-gray-100">
                 <th className="py-3.5 pl-4">Candidat</th>
                 <th className="py-3.5">Discipline</th>
                 <th className="py-3.5">Établissement & Diplôme</th>
@@ -337,11 +337,11 @@ export default function GestionCandidatures() {
             </thead>
             <tbody className="divide-y divide-gray-100">
               {filteredCandidatures.map((c) => (
-                <tr key={c.id} className="hover:bg-amber-50/20 transition-colors">
+                <tr key={c.id} className="hover:bg-gray-50 transition-colors">
                   {/* Candidat */}
                   <td className="py-3.5 pl-4">
                     <div className="flex items-center gap-2.5">
-                      <div className="w-8 h-8 rounded-full bg-amber-100 text-amber-800 flex items-center justify-center font-bold text-xs shrink-0">
+                      <div className="w-8 h-8 rounded-full bg-gray-900 text-white flex items-center justify-center font-bold text-xs shrink-0">
                         {c.prenom.charAt(0)}{c.nom.charAt(0)}
                       </div>
                       <div>
@@ -354,7 +354,7 @@ export default function GestionCandidatures() {
 
                   {/* Discipline */}
                   <td className="py-3.5">
-                    <span className="font-semibold text-amber-800 bg-amber-50 px-2 py-0.5 rounded-md border border-amber-200/60">
+                    <span className="tely-chip">
                       {c.specialite}
                     </span>
                   </td>
@@ -376,7 +376,7 @@ export default function GestionCandidatures() {
                       <button
                         type="button"
                         onClick={() => handleOpenCv(c.id)}
-                        className="inline-flex items-center gap-1 text-[11px] font-semibold text-indigo-600 hover:text-indigo-800 bg-indigo-50 px-2 py-1 rounded-lg border border-indigo-100 transition-colors"
+                        className="inline-flex items-center gap-1 text-[11px] tely-link"
                       >
                         <FileText size={13} /> Voir CV <ExternalLink size={10} />
                       </button>
@@ -388,18 +388,18 @@ export default function GestionCandidatures() {
                   {/* Statut */}
                   <td className="py-3.5">
                     {c.statut === "en_attente" && (
-                      <span className="inline-flex items-center gap-1 text-[11px] font-semibold text-amber-700 bg-amber-50 border border-amber-200 px-2.5 py-0.5 rounded-full">
-                        <Clock size={12} /> En attente
+                      <span className="tely-chip text-amber-700">
+                        <Clock size={12} className="text-gray-900" /> En attente
                       </span>
                     )}
                     {c.statut === "approuve" && (
-                      <span className="inline-flex items-center gap-1 text-[11px] font-semibold text-emerald-700 bg-emerald-50 border border-emerald-200 px-2.5 py-0.5 rounded-full">
-                        <CheckCircle size={12} /> Approuvée
+                      <span className="tely-chip text-emerald-700">
+                        <CheckCircle size={12} className="text-gray-900" /> Approuvée
                       </span>
                     )}
                     {c.statut === "rejete" && (
-                      <span className="inline-flex items-center gap-1 text-[11px] font-semibold text-rose-700 bg-rose-50 border border-rose-200 px-2.5 py-0.5 rounded-full">
-                        <XCircle size={12} /> Rejetée
+                      <span className="tely-chip text-red-600">
+                        <XCircle size={12} className="text-gray-900" /> Rejetée
                       </span>
                     )}
                   </td>
@@ -412,7 +412,7 @@ export default function GestionCandidatures() {
                         type="button"
                         onClick={() => setDetailItem(c)}
                         title="Consulter le dossier"
-                        className="p-1.5 rounded-lg text-gray-400 hover:text-gray-700 hover:bg-gray-100 transition-colors cursor-pointer"
+                        className="tely-icon-btn text-gray-900"
                       >
                         <Eye size={15} />
                       </button>
@@ -423,7 +423,7 @@ export default function GestionCandidatures() {
                           type="button"
                           onClick={() => setApproveTarget(c)}
                           title="Approuver & Créer le compte enseignant"
-                          className="px-2.5 py-1 rounded-lg text-[11px] font-bold bg-emerald-600 hover:bg-emerald-700 text-white shadow-2xs transition-colors cursor-pointer inline-flex items-center gap-1"
+                          className="tely-btn px-2.5 py-1 text-[11px]"
                         >
                           <CheckCircle size={12} /> Approuver
                         </button>
@@ -435,7 +435,7 @@ export default function GestionCandidatures() {
                           type="button"
                           onClick={() => setRejectTarget(c)}
                           title="Rejeter la candidature"
-                          className="p-1.5 rounded-lg text-gray-400 hover:text-rose-600 hover:bg-rose-50 transition-colors cursor-pointer"
+                          className="tely-icon-btn text-gray-900 hover:text-red-500 hover:bg-red-50"
                         >
                           <XCircle size={15} />
                         </button>
@@ -446,7 +446,7 @@ export default function GestionCandidatures() {
                         type="button"
                         onClick={() => setDeleteTarget(c)}
                         title="Supprimer la candidature"
-                        className="p-1.5 rounded-lg text-gray-400 hover:text-red-600 hover:bg-red-50 transition-colors cursor-pointer"
+                        className="tely-icon-btn text-gray-900 hover:text-red-500 hover:bg-red-50"
                       >
                         <Trash2 size={15} />
                       </button>
@@ -464,39 +464,39 @@ export default function GestionCandidatures() {
         {detailItem && (
           <div className="space-y-4">
             <div className="border-b border-gray-100 pb-3">
-              <span className="text-[10px] font-bold uppercase text-amber-600 tracking-wider">
+              <span className="tely-overline">
                 Dossier de candidature
               </span>
-              <h2 className="text-lg font-bold text-gray-900 mt-0.5">
+              <h2 className="tely-title text-xl mt-0.5">
                 {detailItem.prenom} {detailItem.nom}
               </h2>
-              <div className="text-xs text-gray-500">
+              <div className="tely-subtitle">
                 {detailItem.email} {detailItem.telephone && `• ${detailItem.telephone}`}
               </div>
             </div>
 
             <div className="grid grid-cols-2 gap-3 text-xs">
-              <div className="p-3 bg-gray-50 rounded-xl">
-                <span className="text-gray-400 block text-[10px] uppercase font-bold">Spécialité</span>
+              <div className="p-3 bg-gray-50 rounded-[10px]">
+                <span className="tely-overline block">Spécialité</span>
                 <span className="font-semibold text-gray-800">{detailItem.specialite}</span>
               </div>
-              <div className="p-3 bg-gray-50 rounded-xl">
-                <span className="text-gray-400 block text-[10px] uppercase font-bold">Expérience</span>
+              <div className="p-3 bg-gray-50 rounded-[10px]">
+                <span className="tely-overline block">Expérience</span>
                 <span className="font-semibold text-gray-800">{detailItem.experience_annees} an(s)</span>
               </div>
-              <div className="p-3 bg-gray-50 rounded-xl">
-                <span className="text-gray-400 block text-[10px] uppercase font-bold">Établissement</span>
+              <div className="p-3 bg-gray-50 rounded-[10px]">
+                <span className="tely-overline block">Établissement</span>
                 <span className="font-semibold text-gray-800">{detailItem.etablissement || "Non renseigné"}</span>
               </div>
-              <div className="p-3 bg-gray-50 rounded-xl">
-                <span className="text-gray-400 block text-[10px] uppercase font-bold">Diplôme</span>
+              <div className="p-3 bg-gray-50 rounded-[10px]">
+                <span className="tely-overline block">Diplôme</span>
                 <span className="font-semibold text-gray-800">{detailItem.diplome || "Non renseigné"}</span>
               </div>
             </div>
 
             {/* Message de motivation */}
-            <div className="p-3.5 bg-amber-50/50 rounded-xl border border-amber-100">
-              <span className="text-xs font-bold text-amber-900 block mb-1">Message de motivation</span>
+            <div className="p-3.5 bg-gray-50 rounded-[10px] border border-gray-200">
+              <span className="tely-label block mb-1">Message de motivation</span>
               <p className="text-xs text-gray-700 leading-relaxed whitespace-pre-line">
                 {detailItem.message || "Aucun message particulier fourni."}
               </p>
@@ -504,14 +504,14 @@ export default function GestionCandidatures() {
 
             {/* CV link if present */}
             {detailItem.cv_path && (
-              <div className="flex items-center justify-between p-3 bg-gray-50 rounded-xl border border-gray-200">
+              <div className="flex items-center justify-between p-3 bg-gray-50 rounded-[10px] border border-gray-200">
                 <span className="text-xs font-semibold text-gray-700 flex items-center gap-1.5">
-                  <FileText size={16} className="text-indigo-600" /> Curriculum Vitae joint
+                  <FileText size={16} className="text-gray-900" /> Curriculum Vitae joint
                 </span>
                 <button
                   type="button"
                   onClick={() => handleOpenCv(detailItem.id)}
-                  className="px-3 py-1.5 bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold rounded-lg transition-colors inline-flex items-center gap-1"
+                  className="tely-btn px-3 py-1.5 text-xs"
                 >
                   Télécharger / Ouvrir <ExternalLink size={12} />
                 </button>
@@ -522,7 +522,7 @@ export default function GestionCandidatures() {
               <button
                 type="button"
                 onClick={() => setDetailItem(null)}
-                className="px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 text-xs font-semibold rounded-xl cursor-pointer"
+                className="tely-btn-outline"
               >
                 Fermer
               </button>
@@ -536,19 +536,19 @@ export default function GestionCandidatures() {
         {approveTarget && (
           <div className="space-y-4">
             <div className="border-b border-gray-100 pb-3">
-              <div className="w-10 h-10 rounded-xl bg-emerald-100 text-emerald-700 flex items-center justify-center font-bold mb-2">
+              <div className="w-10 h-10 rounded-[10px] bg-gray-50 text-gray-900 flex items-center justify-center font-bold mb-2">
                 <CheckCircle size={22} />
               </div>
-              <h2 className="text-base font-bold text-gray-900">
+              <h2 className="tely-title text-xl">
                 Approuver {approveTarget.nom_complet}
               </h2>
-              <p className="text-xs text-gray-500 mt-0.5">
+              <p className="tely-subtitle mt-0.5">
                 Un compte enseignant sera créé avec l'adresse <strong>{approveTarget.email}</strong>.
               </p>
             </div>
 
             <div>
-              <label className="block text-xs font-semibold text-gray-700 mb-1">
+              <label className="block tely-label mb-1.5">
                 Mot de passe temporaire (facultatif)
               </label>
               <input
@@ -556,18 +556,18 @@ export default function GestionCandidatures() {
                 value={customPassword}
                 onChange={(e) => setCustomPassword(e.target.value)}
                 placeholder="Laissez vide pour générer un mot de passe automatique"
-                className="w-full text-xs px-3.5 py-2.5 rounded-xl border border-gray-200 outline-none focus:border-emerald-500 font-mono"
+                className="tely-input font-mono"
               />
-              <span className="text-[10px] text-gray-400 mt-1 block">
+              <span className="text-[11px] text-gray-400 mt-1 block">
                 Si vide, un mot de passe sécurisé sera automatiquement généré.
               </span>
             </div>
 
-            <div className="p-3 bg-emerald-50 text-emerald-800 rounded-xl text-xs space-y-1">
-              <div className="font-bold flex items-center gap-1">
-                <CheckCircle size={14} className="text-emerald-600" /> Accès accordé
+            <div className="pt-1 text-xs text-gray-500 space-y-1">
+              <div className="font-bold text-emerald-700 flex items-center gap-1">
+                <CheckCircle size={14} className="text-gray-900" /> Accès accordé
               </div>
-              <p className="text-[11px] text-emerald-700">
+              <p className="text-[11px]">
                 L'enseignant aura accès au Tableau de bord Professeur pour publier des exercices, corrigés et ressources.
               </p>
             </div>
@@ -576,7 +576,7 @@ export default function GestionCandidatures() {
               <button
                 type="button"
                 onClick={() => setApproveTarget(null)}
-                className="px-4 py-2 text-xs font-semibold text-gray-600 hover:bg-gray-100 rounded-xl cursor-pointer"
+                className="tely-btn-outline"
               >
                 Annuler
               </button>
@@ -584,7 +584,7 @@ export default function GestionCandidatures() {
                 type="button"
                 onClick={handleApprove}
                 disabled={approving}
-                className="px-5 py-2 bg-emerald-600 hover:bg-emerald-700 disabled:opacity-50 text-white text-xs font-bold rounded-xl shadow-xs transition-colors cursor-pointer flex items-center gap-1.5"
+                className="tely-btn"
               >
                 {approving ? (
                   <span className="inline-block h-3.5 w-28 bg-white/30 rounded animate-pulse" />
@@ -603,25 +603,25 @@ export default function GestionCandidatures() {
       <Modal open={!!credentialsModal?.open} onClose={() => setCredentialsModal(null)}>
         {credentialsModal && (
           <div className="space-y-4 text-center">
-            <div className="w-14 h-14 rounded-full bg-emerald-100 text-emerald-600 flex items-center justify-center mx-auto">
+            <div className="w-14 h-14 rounded-full bg-gray-50 text-gray-900 flex items-center justify-center mx-auto">
               <CheckCircle size={28} />
             </div>
 
             <div>
-              <h2 className="text-lg font-bold text-gray-900">Compte Enseignant Créé !</h2>
-              <p className="text-xs text-gray-500 mt-1">
+              <h2 className="tely-title text-xl">Compte Enseignant Créé !</h2>
+              <p className="tely-subtitle mt-1">
                 Voici les identifiants de connexion générés pour <strong>{credentialsModal.nom}</strong> :
               </p>
             </div>
 
-            <div className="bg-gray-50 border border-gray-200 rounded-2xl p-4 text-left space-y-3 font-mono text-xs">
+            <div className="bg-gray-50 border border-gray-200 rounded-[10px] p-4 text-left space-y-3 font-mono text-xs">
               <div>
-                <span className="text-gray-400 text-[10px] uppercase font-bold block">Email</span>
+                <span className="tely-overline block">Email</span>
                 <span className="font-bold text-gray-900 select-all">{credentialsModal.email}</span>
               </div>
               <div>
-                <span className="text-gray-400 text-[10px] uppercase font-bold block">Mot de passe temporaire</span>
-                <span className="font-bold text-amber-600 text-sm select-all">{credentialsModal.password}</span>
+                <span className="tely-overline block">Mot de passe temporaire</span>
+                <span className="font-bold text-gray-900 text-sm select-all">{credentialsModal.password}</span>
               </div>
             </div>
 
@@ -633,14 +633,14 @@ export default function GestionCandidatures() {
                     `Bonjour ${credentialsModal.nom},\nVotre compte enseignant sur Tely a été activé avec succès !\n\nLien de connexion : https://tely.com/auth/login\nIdentifiant : ${credentialsModal.email}\nMot de passe : ${credentialsModal.password}\n\nÀ très bientôt !`
                   )
                 }
-                className="flex-1 py-2.5 bg-amber-500 hover:bg-amber-600 text-white text-xs font-bold rounded-xl shadow-xs flex items-center justify-center gap-1.5 transition-colors cursor-pointer"
+                className="tely-btn flex-1"
               >
                 <Copy size={14} /> Copier le message d'accès
               </button>
               <button
                 type="button"
                 onClick={() => setCredentialsModal(null)}
-                className="px-4 py-2.5 bg-gray-900 hover:bg-black text-white text-xs font-bold rounded-xl cursor-pointer"
+                className="tely-btn-outline"
               >
                 Fermer
               </button>
@@ -654,16 +654,16 @@ export default function GestionCandidatures() {
         {rejectTarget && (
           <div className="space-y-4">
             <div className="border-b border-gray-100 pb-3">
-              <h2 className="text-base font-bold text-gray-900">
+              <h2 className="tely-title text-xl">
                 Rejeter la candidature de {rejectTarget.nom_complet}
               </h2>
-              <p className="text-xs text-gray-500 mt-0.5">
+              <p className="tely-subtitle mt-0.5">
                 Vous pouvez préciser un motif interne ou informatif pour ce rejet.
               </p>
             </div>
 
             <div>
-              <label className="block text-xs font-semibold text-gray-700 mb-1">
+              <label className="block tely-label mb-1.5">
                 Motif du rejet (optionnel)
               </label>
               <textarea
@@ -671,7 +671,7 @@ export default function GestionCandidatures() {
                 value={motifRejet}
                 onChange={(e) => setMotifRejet(e.target.value)}
                 placeholder="Ex: Profil ne correspondant pas aux besoins actuels ou justificatifs manquants..."
-                className="w-full text-xs px-3 py-2 rounded-xl border border-gray-200 outline-none focus:border-rose-500 resize-none"
+                className="tely-input resize-none"
               />
             </div>
 
@@ -679,7 +679,7 @@ export default function GestionCandidatures() {
               <button
                 type="button"
                 onClick={() => setRejectTarget(null)}
-                className="px-4 py-2 text-xs font-semibold text-gray-600 hover:bg-gray-100 rounded-xl cursor-pointer"
+                className="tely-btn-outline"
               >
                 Annuler
               </button>
@@ -687,7 +687,7 @@ export default function GestionCandidatures() {
                 type="button"
                 onClick={handleReject}
                 disabled={rejecting}
-                className="px-4 py-2 bg-rose-600 hover:bg-rose-700 text-white text-xs font-bold rounded-xl transition-colors cursor-pointer flex items-center gap-1.5"
+                className="tely-btn-danger"
               >
                 {rejecting ? (
                   <span className="inline-block h-3.5 w-28 bg-white/30 rounded animate-pulse" />

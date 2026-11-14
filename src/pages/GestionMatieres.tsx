@@ -129,14 +129,14 @@ export default function GestionMatieres() {
   return (
     <div className="p-4 sm:p-6 lg:p-8 space-y-6 max-w-7xl mx-auto">
       {/* En-tête */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-white p-6 rounded-2xl border border-gray-100 shadow-sm">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 tely-card p-6">
         <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-xl bg-amber-50 text-amber-500 flex items-center justify-center font-bold">
+          <div className="w-10 h-10 rounded-[10px] bg-gray-50 text-gray-900 flex items-center justify-center font-bold">
             <Library size={22} />
           </div>
           <div>
-            <h1 className="text-xl font-bold text-gray-900">Matières & Disciplines</h1>
-            <p className="text-xs text-gray-500">
+            <h1 className="tely-h1">Matières & Disciplines</h1>
+            <p className="tely-subtitle mt-1">
               Gérez les matières du programme scolaire, leurs codes officiels et illustrations.
             </p>
           </div>
@@ -144,7 +144,7 @@ export default function GestionMatieres() {
 
         <button
           onClick={openCreate}
-          className="inline-flex items-center gap-2 px-4 py-2.5 bg-amber-500 hover:bg-amber-600 text-white text-xs font-semibold rounded-xl shadow-sm transition-colors cursor-pointer self-start sm:self-auto"
+          className="tely-btn self-start sm:self-auto"
         >
           <Plus size={16} />
           Nouvelle matière
@@ -152,15 +152,15 @@ export default function GestionMatieres() {
       </div>
 
       {/* Barre d'outils / Recherche */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-white p-3 rounded-xl border border-gray-100 shadow-sm">
-        <div className="flex items-center gap-2 bg-gray-50 rounded-lg px-3 py-2 flex-1 w-full sm:max-w-md">
-          <Search size={16} className="text-gray-400 shrink-0" />
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 tely-card p-3">
+        <div className="flex items-center gap-2 bg-gray-50 border border-gray-200 rounded-[10px] px-3 flex-1 w-full sm:max-w-md transition-all duration-200 focus-within:border-gray-900 focus-within:shadow-[0_0_0_3px_rgba(17,17,17,0.06)]">
+          <Search size={16} className="text-gray-900 shrink-0" />
           <input
             type="text"
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             placeholder="Rechercher par nom ou code (ex: MATH)..."
-            className="bg-transparent text-sm text-gray-800 outline-none w-full placeholder-gray-400"
+            className="flex-1 w-full bg-transparent border-none outline-none text-sm text-gray-900 py-3.5 placeholder:text-gray-400"
           />
         </div>
         <div className="text-xs text-gray-500 whitespace-nowrap self-end sm:self-auto">
@@ -170,10 +170,10 @@ export default function GestionMatieres() {
 
       {/* Contenu */}
       {loading ? (
-        <div className="overflow-x-auto border border-gray-100 rounded-2xl bg-white shadow-sm animate-pulse">
+        <div className="overflow-x-auto tely-card animate-pulse">
           <table className="w-full text-sm">
             <thead>
-              <tr className="bg-gray-50/75 text-left text-xs text-gray-500 uppercase tracking-wider border-b border-gray-100">
+              <tr className="tely-overline text-left border-b border-gray-100">
                 <th className="px-5 py-3.5">Illustration</th>
                 <th className="px-5 py-3.5">Nom de la matière</th>
                 <th className="px-5 py-3.5">Code</th>
@@ -186,11 +186,11 @@ export default function GestionMatieres() {
               {[1, 2, 3, 4, 5].map((i) => (
                 <tr key={i}>
                   <td className="px-5 py-3.5">
-                    <div className="w-11 h-11 rounded-xl bg-gray-100 border border-gray-200 shrink-0" />
+                    <div className="w-11 h-11 rounded-[10px] bg-gray-100 border border-gray-200 shrink-0" />
                   </td>
                   <td className="px-5 py-3.5">
                     <div className="flex items-center gap-2">
-                      <span className="w-2.5 h-2.5 rounded-full bg-amber-300" />
+                      <span className="w-2.5 h-2.5 rounded-full bg-gray-300" />
                       <div className="h-4 w-32 bg-gray-200 rounded" />
                     </div>
                   </td>
@@ -201,7 +201,7 @@ export default function GestionMatieres() {
                     <div className="h-3.5 w-52 bg-gray-100 rounded" />
                   </td>
                   <td className="px-5 py-3.5 text-center">
-                    <div className="h-5 w-10 bg-amber-50 rounded-full mx-auto" />
+                    <div className="h-5 w-10 bg-gray-100 rounded-full mx-auto" />
                   </td>
                   <td className="px-5 py-3.5 text-right">
                     <div className="flex items-center justify-end gap-1.5">
@@ -215,13 +215,13 @@ export default function GestionMatieres() {
           </table>
         </div>
       ) : error ? (
-        <div className="py-16 text-center text-sm text-red-500 bg-red-50 rounded-xl border border-red-100">
+        <div className="py-16 text-center text-sm text-red-500 tely-card">
           {error}
         </div>
       ) : filteredMatieres.length === 0 ? (
-        <div className="flex flex-col items-center justify-center py-16 text-center bg-white rounded-2xl border border-gray-100">
-          <div className="w-12 h-12 rounded-full bg-amber-50 flex items-center justify-center mb-3">
-            <Library size={22} className="text-amber-500" />
+        <div className="flex flex-col items-center justify-center py-16 text-center tely-card">
+          <div className="w-12 h-12 rounded-full bg-gray-50 flex items-center justify-center mb-3">
+            <Library size={22} className="text-gray-900" />
           </div>
           <p className="text-sm text-gray-500 font-medium">Aucune matière trouvée</p>
           <p className="text-xs text-gray-400 mt-1 max-w-sm">
@@ -230,17 +230,17 @@ export default function GestionMatieres() {
           {!search && (
             <button
               onClick={openCreate}
-              className="text-sm font-medium text-amber-600 hover:text-amber-700 mt-3 cursor-pointer"
+              className="tely-link text-sm mt-3"
             >
               Ajouter une première matière
             </button>
           )}
         </div>
       ) : (
-        <div className="overflow-x-auto border border-gray-100 rounded-2xl bg-white shadow-sm">
+        <div className="overflow-x-auto tely-card">
           <table className="w-full text-sm">
             <thead>
-              <tr className="bg-gray-50/75 text-left text-xs text-gray-500 uppercase tracking-wider border-b border-gray-100">
+              <tr className="tely-overline text-left border-b border-gray-100">
                 <th className="px-5 py-3.5">Illustration</th>
                 <th className="px-5 py-3.5">Nom de la matière</th>
                 <th className="px-5 py-3.5">Code</th>
@@ -253,9 +253,9 @@ export default function GestionMatieres() {
               {filteredMatieres.map((matiere) => {
                 const imgUrl = resolveImageUrl(matiere.image_url || matiere.image);
                 return (
-                  <tr key={matiere.id} className="hover:bg-amber-50/30 transition-colors">
+                  <tr key={matiere.id} className="hover:bg-gray-50 transition-colors">
                     <td className="px-5 py-3.5">
-                      <div className="w-11 h-11 rounded-xl overflow-hidden bg-gray-100 border border-gray-200 shrink-0">
+                      <div className="w-11 h-11 rounded-[10px] overflow-hidden bg-gray-100 border border-gray-200 shrink-0">
                         {imgUrl ? (
                           <img
                             src={imgUrl}
@@ -263,18 +263,18 @@ export default function GestionMatieres() {
                             className="w-full h-full object-cover"
                           />
                         ) : (
-                          <div className="w-full h-full flex items-center justify-center text-amber-500 font-bold text-xs bg-amber-50">
+                          <div className="w-full h-full flex items-center justify-center text-gray-900 font-bold text-xs bg-gray-50">
                             {matiere.code?.slice(0, 3) || "MAT"}
                           </div>
                         )}
                       </div>
                     </td>
                     <td className="px-5 py-3.5 font-medium text-gray-900 flex items-center gap-2 pt-5">
-                      <span className="w-2.5 h-2.5 rounded-full bg-amber-400"></span>
+                      <span className="w-2.5 h-2.5 rounded-full bg-gray-900"></span>
                       {matiere.nom}
                     </td>
                     <td className="px-5 py-3.5">
-                      <span className="px-2.5 py-1 text-xs font-semibold rounded-md bg-gray-100 text-gray-700 font-mono">
+                      <span className="text-xs font-semibold text-gray-700 font-mono">
                         {matiere.code}
                       </span>
                     </td>
@@ -282,7 +282,7 @@ export default function GestionMatieres() {
                       {matiere.description || <span className="text-gray-300 italic">Aucune description</span>}
                     </td>
                     <td className="px-5 py-3.5 text-center">
-                      <span className="px-2.5 py-0.5 text-xs font-semibold rounded-full bg-amber-50 text-amber-600">
+                      <span className="text-xs font-semibold text-gray-900">
                         {matiere.exercices_count ?? 0}
                       </span>
                     </td>
@@ -291,14 +291,14 @@ export default function GestionMatieres() {
                         <button
                           onClick={() => openEdit(matiere)}
                           title="Modifier"
-                          className="p-1.5 rounded-lg text-gray-400 hover:text-amber-600 hover:bg-amber-50 transition-colors cursor-pointer"
+                          className="tely-icon-btn text-gray-900"
                         >
                           <Pencil size={15} />
                         </button>
                         <button
                           onClick={() => setDeleteTarget(matiere)}
                           title="Supprimer"
-                          className="p-1.5 rounded-lg text-gray-400 hover:text-red-500 hover:bg-red-50 transition-colors cursor-pointer"
+                          className="tely-icon-btn text-gray-900 hover:text-red-500 hover:bg-red-50"
                         >
                           <Trash2 size={15} />
                         </button>
@@ -315,7 +315,7 @@ export default function GestionMatieres() {
       {/* Modal Création / Édition */}
       <Modal open={modalOpen} onClose={closeModal}>
         <div className="mb-3">
-          <h2 className="text-base font-bold text-gray-900">
+          <h2 className="tely-title text-xl">
             {editingMatiere ? `Modifier la matière "${editingMatiere.nom}"` : "Créer une nouvelle matière"}
           </h2>
         </div>

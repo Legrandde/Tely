@@ -4,7 +4,7 @@ export default function CourseDetailSkeleton() {
       {/* Colonne gauche */}
       <div>
         {/* Badge Matière • Niveau */}
-        <div className="h-6 bg-orange-100/70 rounded-full w-44" />
+        <div className="h-6 bg-amber-100/70 rounded-full w-44" />
 
         {/* Titre */}
         <div className="space-y-2.5 mt-3">
@@ -65,7 +65,7 @@ export default function CourseDetailSkeleton() {
             ))}
           </div>
 
-          <div className="h-10 bg-orange-100/70 rounded-lg mt-6 w-full" />
+          <div className="h-10 bg-amber-100/70 rounded-lg mt-6 w-full" />
 
           <hr className="my-5 border-gray-200" />
 

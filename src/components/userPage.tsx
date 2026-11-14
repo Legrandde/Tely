@@ -158,7 +158,7 @@ export default function UsersPage() {
                 />
                 <Circle
                   size={10}
-                  className="absolute bottom-0 right-0 text-green-500 fill-green-500 bg-white rounded-full"
+                  className="absolute bottom-0 right-0 text-emerald-500 fill-emerald-500 bg-white rounded-full"
                 />
               </div>
 

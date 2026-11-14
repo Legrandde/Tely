@@ -23,7 +23,7 @@ import {
 import type { AppNotification } from "../types/notification";
 import { useToast } from "../context/ToastContext";
 
-export default function NotificationsPage() {
+export default function NotificationsPage({ embedded = false }: { embedded?: boolean }) {
   const [notifications, setNotifications] = useState<AppNotification[]>([]);
   const [unreadCount, setUnreadCount] = useState(0);
   const [loading, setLoading] = useState(true);
@@ -142,16 +142,16 @@ export default function NotificationsPage() {
   const getNotificationIcon = (type: string) => {
     switch (type) {
       case "candidature":
-        return <UserCheck size={18} className="text-blue-600" />;
+        return <UserCheck size={18} className="text-gray-900" />;
       case "exercice":
-        return <BookOpen size={18} className="text-amber-600" />;
+        return <BookOpen size={18} className="text-gray-900" />;
       case "sujet":
-        return <ClipboardList size={18} className="text-purple-600" />;
+        return <ClipboardList size={18} className="text-gray-900" />;
       case "securite":
-        return <ShieldAlert size={18} className="text-rose-600" />;
+        return <ShieldAlert size={18} className="text-gray-900" />;
       case "systeme":
       default:
-        return <Info size={18} className="text-slate-600" />;
+        return <Info size={18} className="text-gray-900" />;
     }
   };
 
@@ -159,32 +159,32 @@ export default function NotificationsPage() {
     switch (type) {
       case "candidature":
         return (
-          <span className="px-2 py-0.5 text-[10px] font-semibold bg-blue-50 text-blue-700 border border-blue-200 rounded-full">
+          <span className="tely-chip uppercase tracking-wide">
             Candidature
           </span>
         );
       case "exercice":
         return (
-          <span className="px-2 py-0.5 text-[10px] font-semibold bg-amber-50 text-amber-700 border border-amber-200 rounded-full">
+          <span className="tely-chip uppercase tracking-wide">
             Exercice
           </span>
         );
       case "sujet":
         return (
-          <span className="px-2 py-0.5 text-[10px] font-semibold bg-purple-50 text-purple-700 border border-purple-200 rounded-full">
+          <span className="tely-chip uppercase tracking-wide">
             Sujet examen
           </span>
         );
       case "securite":
         return (
-          <span className="px-2 py-0.5 text-[10px] font-semibold bg-rose-50 text-rose-700 border border-rose-200 rounded-full">
+          <span className="tely-chip uppercase tracking-wide">
             Sécurité
           </span>
         );
       case "systeme":
       default:
         return (
-          <span className="px-2 py-0.5 text-[10px] font-semibold bg-slate-100 text-slate-700 border border-slate-200 rounded-full">
+          <span className="tely-chip uppercase tracking-wide">
             Système
           </span>
         );
@@ -218,24 +218,26 @@ export default function NotificationsPage() {
       {/* ── Entête de la page ── */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
-          <div className="flex items-center gap-2 text-xs text-slate-400 mb-1">
-            <Link to={dashboardPath} className="hover:underline">
-              Tableau de bord
-            </Link>
-            <span>/</span>
-            <span className="text-slate-600 font-medium">Notifications</span>
-          </div>
+          {!embedded && (
+            <div className="flex items-center gap-2 text-xs text-gray-400 mb-1">
+              <Link to={dashboardPath} className="hover:underline">
+                Tableau de bord
+              </Link>
+              <span>/</span>
+              <span className="text-gray-900 font-medium">Notifications</span>
+            </div>
+          )}
           <div className="flex items-center gap-3">
-            <h1 className="text-xl sm:text-2xl font-bold text-slate-900">
+            <h1 className="tely-h1">
               Centre de notifications
             </h1>
             {unreadCount > 0 && (
-              <span className="px-2.5 py-0.5 text-xs font-bold bg-amber-500 text-white rounded-full">
+              <span className="px-2.5 py-0.5 text-xs font-bold bg-gray-900 text-white rounded-full">
                 {unreadCount} non {unreadCount > 1 ? "lues" : "lue"}
               </span>
             )}
           </div>
-          <p className="text-sm text-slate-500 mt-0.5">
+          <p className="tely-subtitle mt-0.5">
             Suivez l'activité des épreuves, candidatures, alertes système et interactions en direct
           </p>
         </div>
@@ -246,10 +248,10 @@ export default function NotificationsPage() {
             type="button"
             onClick={() => loadData(true)}
             disabled={refreshing}
-            className="inline-flex items-center gap-1.5 px-3.5 py-2 text-xs font-medium text-slate-700 bg-white border border-slate-200 rounded-xl hover:bg-slate-50 transition-colors shadow-2xs cursor-pointer"
+            className="tely-btn-outline"
             title="Rafraîchir"
           >
-            <RotateCw size={14} className={refreshing ? "text-amber-500 animate-pulse" : ""} />
+            <RotateCw size={14} className={refreshing ? "text-gray-900 animate-pulse" : "text-gray-900"} />
             <span>Actualiser</span>
           </button>
 
@@ -257,38 +259,38 @@ export default function NotificationsPage() {
             type="button"
             onClick={handleMarkAllRead}
             disabled={unreadCount === 0}
-            className="inline-flex items-center gap-2 px-4 py-2 text-xs font-semibold text-slate-700 bg-white border border-slate-200 hover:border-slate-300 rounded-xl transition-all shadow-2xs disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer"
+            className="tely-btn"
           >
-            <CheckCheck size={15} className="text-emerald-500" />
+            <CheckCheck size={15} />
             <span>Tout marquer comme lu</span>
           </button>
         </div>
       </div>
 
       {/* ── Barre d'outils / Recherche & Filtres en pilule ── */}
-      <div className="bg-white p-4 rounded-2xl border border-slate-200/90 shadow-2xs space-y-3.5">
+      <div className="tely-card p-4 space-y-3.5">
         <div className="flex flex-col md:flex-row items-center justify-between gap-3">
           {/* Recherche */}
           <div className="relative w-full md:max-w-md">
-            <Search size={16} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400" />
+            <Search size={16} className="absolute left-3.5 top-1/2 -trangray-y-1/2 text-gray-900" />
             <input
               type="text"
               value={search}
               onChange={(e) => setSearch(e.target.value)}
               placeholder="Rechercher dans les notifications..."
-              className="w-full pl-9 pr-4 py-2 text-xs sm:text-sm bg-slate-50 border border-slate-200 rounded-xl focus:outline-hidden focus:border-amber-400 focus:bg-white transition-colors"
+              className="tely-input pl-9 pr-4"
             />
           </div>
 
           {/* Filtres de statut : Tous / Non lus / Lus */}
-          <div className="flex items-center gap-1 bg-slate-100 p-1 rounded-xl self-start md:self-auto">
+          <div className="flex items-center gap-1 bg-gray-50 p-1 rounded-[10px] self-start md:self-auto">
             <button
               type="button"
               onClick={() => setFilterStatus("all")}
-              className={`px-3 py-1.5 text-xs font-medium rounded-lg transition-all cursor-pointer ${
+              className={`px-3 py-1.5 text-xs font-medium rounded-[10px] transition-all cursor-pointer ${
                 filterStatus === "all"
-                  ? "bg-white text-slate-900 shadow-2xs"
-                  : "text-slate-500 hover:text-slate-700"
+                  ? "bg-gray-900 text-white"
+                  : "text-gray-500 hover:text-gray-900"
               }`}
             >
               Toutes ({notifications.length})
@@ -296,10 +298,10 @@ export default function NotificationsPage() {
             <button
               type="button"
               onClick={() => setFilterStatus("unread")}
-              className={`px-3 py-1.5 text-xs font-medium rounded-lg transition-all cursor-pointer ${
+              className={`px-3 py-1.5 text-xs font-medium rounded-[10px] transition-all cursor-pointer ${
                 filterStatus === "unread"
-                  ? "bg-white text-slate-900 shadow-2xs"
-                  : "text-slate-500 hover:text-slate-700"
+                  ? "bg-gray-900 text-white"
+                  : "text-gray-500 hover:text-gray-900"
               }`}
             >
               Non lues ({unreadCount})
@@ -307,10 +309,10 @@ export default function NotificationsPage() {
             <button
               type="button"
               onClick={() => setFilterStatus("read")}
-              className={`px-3 py-1.5 text-xs font-medium rounded-lg transition-all cursor-pointer ${
+              className={`px-3 py-1.5 text-xs font-medium rounded-[10px] transition-all cursor-pointer ${
                 filterStatus === "read"
-                  ? "bg-white text-slate-900 shadow-2xs"
-                  : "text-slate-500 hover:text-slate-700"
+                  ? "bg-gray-900 text-white"
+                  : "text-gray-500 hover:text-gray-900"
               }`}
             >
               Lues ({notifications.length - unreadCount})
@@ -319,9 +321,9 @@ export default function NotificationsPage() {
         </div>
 
         {/* Filtres par catégorie */}
-        <div className="flex flex-wrap items-center gap-1.5 pt-2 border-t border-slate-100 text-xs">
-          <span className="text-slate-400 mr-1 flex items-center gap-1">
-            <Filter size={13} />
+        <div className="flex flex-wrap items-center gap-1.5 pt-2 border-t border-gray-200 text-xs">
+          <span className="text-gray-400 mr-1 flex items-center gap-1">
+            <Filter size={13} className="text-gray-900" />
             Catégories :
           </span>
           {[
@@ -338,8 +340,8 @@ export default function NotificationsPage() {
               onClick={() => setFilterType(cat.key)}
               className={`px-3 py-1 rounded-full text-xs transition-all cursor-pointer ${
                 filterType === cat.key
-                  ? "bg-slate-900 text-white font-medium"
-                  : "bg-slate-100 text-slate-600 hover:bg-slate-200"
+                  ? "bg-gray-900 text-white font-medium"
+                  : "bg-gray-50 text-gray-500 hover:text-gray-900 hover:bg-gray-100"
               }`}
             >
               {cat.label}
@@ -350,63 +352,63 @@ export default function NotificationsPage() {
 
       {/* ── Liste des Notifications ── */}
       {loading ? (
-        <div className="bg-white rounded-2xl border border-slate-200/90 shadow-2xs overflow-hidden divide-y divide-slate-100 animate-pulse">
+        <div className="tely-card overflow-hidden divide-y divide-gray-100 animate-pulse">
           {[1, 2, 3, 4, 5].map((i) => (
             <div key={i} className="p-4 sm:p-5 flex items-start gap-4">
-              <div className="w-10 h-10 rounded-xl bg-slate-100 border border-slate-200/60 shrink-0" />
+              <div className="w-10 h-10 rounded-[10px] bg-gray-100 border border-gray-200/60 shrink-0" />
               <div className="flex-1 min-w-0">
                 <div className="flex flex-wrap items-center justify-between gap-2 mb-2">
                   <div className="flex items-center gap-2">
-                    <div className="h-4 w-44 bg-slate-200 rounded" />
-                    <div className="w-2 h-2 rounded-full bg-amber-200" />
-                    <div className="h-4 w-16 bg-slate-100 rounded-md" />
+                    <div className="h-4 w-44 bg-gray-200 rounded" />
+                    <div className="w-2 h-2 rounded-full bg-gray-200" />
+                    <div className="h-4 w-16 bg-gray-100 rounded-md" />
                   </div>
-                  <div className="h-3 w-20 bg-slate-100 rounded" />
+                  <div className="h-3 w-20 bg-gray-100 rounded" />
                 </div>
                 <div className="space-y-1.5">
-                  <div className="h-3.5 w-full bg-slate-100 rounded" />
-                  <div className="h-3.5 w-3/4 bg-slate-100 rounded" />
+                  <div className="h-3.5 w-full bg-gray-100 rounded" />
+                  <div className="h-3.5 w-3/4 bg-gray-100 rounded" />
                 </div>
-                <div className="flex items-center justify-between mt-3 pt-2 border-t border-slate-100/80">
-                  <div className="h-3 w-24 bg-amber-100/80 rounded" />
-                  <div className="h-6 w-28 bg-slate-100 rounded-lg" />
+                <div className="flex items-center justify-between mt-3 pt-2 border-t border-gray-100/80">
+                  <div className="h-3 w-24 bg-gray-100 rounded" />
+                  <div className="h-6 w-28 bg-gray-100 rounded-lg" />
                 </div>
               </div>
             </div>
           ))}
         </div>
       ) : filteredNotifications.length === 0 ? (
-        <div className="bg-white rounded-2xl border border-slate-200/90 p-12 text-center shadow-2xs">
-          <div className="w-16 h-16 bg-slate-100 rounded-full flex items-center justify-center text-slate-400 mx-auto mb-3">
+        <div className="tely-card p-12 text-center">
+          <div className="w-16 h-16 bg-gray-50 rounded-full flex items-center justify-center text-gray-900 mx-auto mb-3">
             <Inbox size={28} />
           </div>
-          <h3 className="text-base font-bold text-slate-800 mb-1">
+          <h3 className="tely-title text-lg mb-1">
             Aucune notification trouvée
           </h3>
-          <p className="text-xs sm:text-sm text-slate-400 max-w-sm mx-auto">
+          <p className="text-xs sm:text-sm text-gray-400 max-w-sm mx-auto">
             {search || filterStatus !== "all" || filterType !== "all"
               ? "Aucune notification ne correspond à vos critères de filtrage."
               : "Vous êtes à jour ! Aucune nouvelle notification pour le moment."}
           </p>
         </div>
       ) : (
-        <div className="bg-white rounded-2xl border border-slate-200/90 shadow-2xs overflow-hidden divide-y divide-slate-100">
+        <div className="tely-card overflow-hidden divide-y divide-gray-100">
           {filteredNotifications.map((item) => (
             <div
               key={item.id}
               onClick={() => handleItemClick(item)}
               className={`p-4 sm:p-5 flex items-start gap-4 transition-colors cursor-pointer ${
                 !item.is_read
-                  ? "bg-amber-50/40 hover:bg-amber-50/70"
-                  : "hover:bg-slate-50/80"
+                  ? "bg-gray-50 hover:bg-gray-100/70"
+                  : "hover:bg-gray-50"
               }`}
             >
               {/* Icône de type */}
               <div
-                className={`w-10 h-10 rounded-xl flex items-center justify-center shrink-0 border ${
+                className={`w-10 h-10 rounded-[10px] flex items-center justify-center shrink-0 border ${
                   !item.is_read
-                    ? "bg-white border-amber-200 shadow-2xs"
-                    : "bg-slate-50 border-slate-200"
+                    ? "bg-white border-gray-900"
+                    : "bg-gray-50 border-gray-200"
                 }`}
               >
                 {getNotificationIcon(item.type)}
@@ -416,44 +418,44 @@ export default function NotificationsPage() {
               <div className="flex-1 min-w-0">
                 <div className="flex flex-wrap items-center justify-between gap-2 mb-1">
                   <div className="flex items-center gap-2">
-                    <span className="font-semibold text-sm text-slate-900">
+                    <span className="font-semibold text-sm text-gray-900">
                       {item.titre}
                     </span>
                     {!item.is_read && (
-                      <span className="w-2 h-2 rounded-full bg-amber-500" title="Non lue" />
+                      <span className="w-2 h-2 rounded-full bg-gray-900" title="Non lue" />
                     )}
                   </div>
                   <div className="flex items-center gap-2">
                     {getNotificationBadge(item.type)}
-                    <span className="text-[11px] text-slate-400 flex items-center gap-1 font-medium">
-                      <Clock size={12} />
+                    <span className="text-[11px] text-gray-400 flex items-center gap-1 font-medium">
+                      <Clock size={12} className="text-gray-900" />
                       {item.time_ago}
                     </span>
                   </div>
                 </div>
 
-                <p className="text-xs sm:text-sm text-slate-600 leading-relaxed mb-2.5">
+                <p className="text-xs sm:text-sm text-gray-600 leading-relaxed mb-2.5">
                   {item.message}
                 </p>
 
                 {/* Barre d'action inférieure de la carte */}
                 <div className="flex items-center justify-between pt-1 text-xs">
                   {item.lien ? (
-                    <span className="inline-flex items-center gap-1 font-medium text-amber-600 hover:text-amber-700">
+                    <span className="inline-flex items-center gap-1 tely-link">
                       Voir le détail
-                      <ArrowRight size={13} />
+                      <ArrowRight size={13} className="text-gray-900" />
                     </span>
                   ) : (
-                    <span className="text-slate-400 text-[11px]">Information système</span>
+                    <span className="text-gray-400 text-[11px]">Information système</span>
                   )}
 
                   {!item.is_read && (
                     <button
                       type="button"
                       onClick={(e) => handleMarkAsRead(item.id, e)}
-                      className="inline-flex items-center gap-1 text-[11px] text-slate-500 hover:text-slate-800 bg-white border border-slate-200 hover:border-slate-300 rounded-lg px-2.5 py-1 transition-colors shadow-2xs"
+                      className="inline-flex items-center gap-1 text-[11px] text-gray-500 hover:text-gray-900 bg-white border border-gray-200 hover:bg-gray-50 rounded-[10px] px-2.5 py-1 transition-colors"
                     >
-                      <Check size={12} className="text-emerald-500" />
+                      <Check size={12} className="text-gray-900" />
                       Marquer comme lu
                     </button>
                   )}

@@ -66,6 +66,14 @@ export interface RessourceItem {
 }
 
 export interface AdminStats {
+  /** Ce qui demande une action de l'administrateur (calculé en direct) */
+  a_traiter?: {
+    candidatures_en_attente: number;
+    exercices_sans_corrige: number;
+    exercices_inactifs: number;
+    sujets_sans_exercice: number;
+    nouveaux_inscrits_7j: number;
+  };
   counts: {
     eleves: number;
     professeurs: number;
@@ -121,6 +129,12 @@ export interface AdminStats {
 }
 
 export interface ProfesseurStats {
+  /** Ce qui demande une action de l'enseignant */
+  a_traiter?: {
+    exercices_sans_corrige: number;
+    exercices_inactifs: number;
+    exercices_sans_corrige_liste: Array<{ id: number; titre: string }>;
+  };
   professeur?: {
     id: number | string;
     specialite?: string;

@@ -17,7 +17,7 @@ import ConfirmModal from "../components/ui/ConfirmModal";
 
 type TabKey = "general" | "pedagogie" | "notifications" | "securite";
 
-export default function ParametresPage() {
+export default function ParametresPage({ embedded = false }: { embedded?: boolean }) {
   const { user } = useAuth();
   const { addToast } = useToast();
   const isAdmin = user?.role === "administrateur";
@@ -87,18 +87,18 @@ export default function ParametresPage() {
   };
 
   return (
-    <div className="p-4 sm:p-6 lg:p-8 space-y-6 max-w-5xl mx-auto">
+    <div className={embedded ? "space-y-6" : "p-4 sm:p-6 lg:p-8 space-y-6 max-w-5xl mx-auto"}>
       {/* ── En-tête ── */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-white p-6 rounded-2xl border border-gray-100 shadow-sm">
+      <div className="tely-card flex flex-col sm:flex-row sm:items-center justify-between gap-4 p-6">
         <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-xl bg-amber-50 text-amber-600 flex items-center justify-center font-bold">
+          <div className="w-10 h-10 rounded-[10px] bg-gray-50 text-gray-900 flex items-center justify-center font-bold">
             <Settings size={22} />
           </div>
           <div>
-            <h1 className="text-xl font-bold text-gray-900">
+            <h1 className="tely-h1">
               {isAdmin ? "Paramètres de la Plateforme" : "Paramètres & Préférences"}
             </h1>
-            <p className="text-xs text-gray-500">
+            <p className="tely-subtitle">
               {isAdmin
                 ? "Configurez le fonctionnement global du site, les accès pédagogiques et les notifications."
                 : "Gérez vos options de réception des alertes et préférences de compte."}
@@ -110,7 +110,7 @@ export default function ParametresPage() {
           type="button"
           onClick={handleSubmit}
           disabled={saving || loading}
-          className="flex items-center gap-2 px-5 py-2.5 bg-amber-500 hover:bg-amber-600 text-white text-xs font-semibold rounded-xl shadow-sm transition-colors cursor-pointer self-start sm:self-auto"
+          className="tely-btn self-start sm:self-auto"
         >
           {saving ? (
             <span className="inline-block h-3.5 w-28 bg-white/30 rounded animate-pulse" />
@@ -123,7 +123,7 @@ export default function ParametresPage() {
       </div>
 
       {/* ── Onglets de Navigation ── */}
-      <div className="flex items-center gap-1.5 overflow-x-auto bg-white p-2 rounded-xl border border-gray-100 shadow-sm no-scrollbar text-xs">
+      <div className="tely-card flex items-center gap-1.5 overflow-x-auto p-2 no-scrollbar text-xs">
         {(
           [
             { key: "general" as const, label: "Général", icon: <Globe size={15} /> },
@@ -140,10 +140,10 @@ export default function ParametresPage() {
             key={tab.key}
             type="button"
             onClick={() => setActiveTab(tab.key)}
-            className={`flex items-center gap-2 px-4 py-2.5 rounded-lg font-semibold transition-all cursor-pointer whitespace-nowrap ${
+            className={`flex items-center gap-2 px-4 py-2.5 rounded-[10px] font-semibold transition-all cursor-pointer whitespace-nowrap ${
               activeTab === tab.key
-                ? "bg-amber-500 text-white shadow-xs"
-                : "text-gray-600 hover:text-gray-900 hover:bg-gray-50"
+                ? "bg-gray-900 text-white"
+                : "text-gray-500 hover:text-gray-900 hover:bg-gray-50 [&_svg]:text-gray-900"
             }`}
           >
             {tab.icon}
@@ -154,27 +154,27 @@ export default function ParametresPage() {
 
       {/* ── Formulaire des Paramètres ── */}
       {loading ? (
-        <div className="bg-white rounded-2xl border border-gray-100 p-6 shadow-sm space-y-6 animate-pulse">
-          <div className="flex items-center gap-2 border-b border-gray-100 pb-3">
-            <div className="w-4 h-4 rounded bg-amber-200" />
+        <div className="tely-card p-6 space-y-6 animate-pulse">
+          <div className="flex items-center gap-2 border-b border-gray-200 pb-3">
+            <div className="w-4 h-4 rounded bg-gray-200" />
             <div className="h-4 w-44 bg-gray-200 rounded" />
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
             <div>
               <div className="h-3.5 w-48 bg-gray-200 rounded mb-2" />
-              <div className="h-10 w-full bg-gray-100 rounded-xl border border-gray-200" />
+              <div className="h-10 w-full bg-gray-50 rounded-[10px] border border-gray-200" />
             </div>
             <div>
               <div className="h-3.5 w-52 bg-gray-200 rounded mb-2" />
-              <div className="h-10 w-full bg-gray-100 rounded-xl border border-gray-200" />
+              <div className="h-10 w-full bg-gray-50 rounded-[10px] border border-gray-200" />
             </div>
           </div>
           <div>
             <div className="h-3.5 w-56 bg-gray-200 rounded mb-2" />
-            <div className="h-20 w-full bg-gray-100 rounded-xl border border-gray-200" />
+            <div className="h-20 w-full bg-gray-50 rounded-[10px] border border-gray-200" />
           </div>
           <div className="pt-4 border-t border-gray-100">
-            <div className="flex items-center justify-between p-4 rounded-xl bg-gray-50 border border-gray-100">
+            <div className="flex items-center justify-between p-4 rounded-[10px] bg-gray-50 border border-gray-200">
               <div className="space-y-1.5 flex-1 pr-4">
                 <div className="h-3.5 w-36 bg-gray-200 rounded" />
                 <div className="h-3 w-3/4 bg-gray-100 rounded" />
@@ -187,15 +187,15 @@ export default function ParametresPage() {
       <form onSubmit={handleSubmit} className="space-y-6">
         {/* Onglet Général */}
         {activeTab === "general" && (
-          <div className="bg-white rounded-2xl border border-gray-100 p-6 shadow-sm space-y-6">
-            <h2 className="text-sm font-bold text-gray-900 border-b border-gray-100 pb-3 flex items-center gap-2">
-              <Globe size={16} className="text-amber-500" />
+          <div className="tely-card p-6 space-y-6">
+            <h2 className="tely-title text-lg border-b border-gray-200 pb-3 flex items-center gap-2">
+              <Globe size={16} className="text-gray-900" />
               Informations générales
             </h2>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
               <div>
-                <label className="block text-xs font-semibold text-gray-700 mb-1.5">
+                <label className="tely-label block mb-1.5">
                   Nom du service / de l'application
                 </label>
                 <input
@@ -203,12 +203,12 @@ export default function ParametresPage() {
                   value={form.site_nom}
                   onChange={(e) => handleChange("site_nom", e.target.value)}
                   disabled={!isAdmin}
-                  className="w-full text-xs px-3.5 py-2.5 rounded-xl border border-gray-200 bg-gray-50/50 outline-none focus:border-amber-500 transition-colors"
+                  className="tely-input"
                 />
               </div>
 
               <div>
-                <label className="block text-xs font-semibold text-gray-700 mb-1.5">
+                <label className="tely-label block mb-1.5">
                   Adresse e-mail de contact & support
                 </label>
                 <input
@@ -216,13 +216,13 @@ export default function ParametresPage() {
                   value={form.contact_email}
                   onChange={(e) => handleChange("contact_email", e.target.value)}
                   disabled={!isAdmin}
-                  className="w-full text-xs px-3.5 py-2.5 rounded-xl border border-gray-200 bg-gray-50/50 outline-none focus:border-amber-500 transition-colors"
+                  className="tely-input"
                 />
               </div>
             </div>
 
             <div>
-              <label className="block text-xs font-semibold text-gray-700 mb-1.5">
+              <label className="tely-label block mb-1.5">
                 Description de la plateforme (Meta / SEO)
               </label>
               <textarea
@@ -230,16 +230,16 @@ export default function ParametresPage() {
                 value={form.site_description}
                 onChange={(e) => handleChange("site_description", e.target.value)}
                 disabled={!isAdmin}
-                className="w-full text-xs px-3.5 py-2.5 rounded-xl border border-gray-200 bg-gray-50/50 outline-none focus:border-amber-500 transition-colors resize-none"
+                className="tely-input resize-none"
               />
             </div>
 
             {isAdmin && (
               <div className="pt-4 border-t border-gray-100">
-                <div className="flex items-center justify-between p-4 rounded-xl bg-amber-50/50 border border-amber-200/60">
+                <div className="flex items-center justify-between p-4 rounded-[10px] border border-gray-200">
                   <div className="pr-4">
                     <p className="text-xs font-bold text-gray-900 flex items-center gap-1.5">
-                      <AlertTriangle size={15} className="text-amber-600" /> Mode Maintenance
+                      <AlertTriangle size={15} className="text-gray-900" /> Mode Maintenance
                     </p>
                     <p className="text-[11px] text-gray-600 mt-0.5">
                       Rend l'application temporairement inaccessible aux apprenants pour les opérations de mise à jour.
@@ -249,7 +249,7 @@ export default function ParametresPage() {
                     type="button"
                     onClick={() => handleToggle("mode_maintenance")}
                     className={`relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none ${
-                      form.mode_maintenance === "1" ? "bg-amber-500" : "bg-gray-200"
+                      form.mode_maintenance === "1" ? "bg-gray-900" : "bg-gray-200"
                     }`}
                   >
                     <span
@@ -266,14 +266,14 @@ export default function ParametresPage() {
 
         {/* Onglet Pédagogie (Admin) */}
         {activeTab === "pedagogie" && isAdmin && (
-          <div className="bg-white rounded-2xl border border-gray-100 p-6 shadow-sm space-y-6">
-            <h2 className="text-sm font-bold text-gray-900 border-b border-gray-100 pb-3 flex items-center gap-2">
-              <GraduationCap size={16} className="text-amber-500" />
+          <div className="tely-card p-6 space-y-6">
+            <h2 className="tely-title text-lg border-b border-gray-200 pb-3 flex items-center gap-2">
+              <GraduationCap size={16} className="text-gray-900" />
               Règles d'inscription et de production pédagogique
             </h2>
 
             <div className="space-y-4">
-              <div className="flex items-center justify-between p-4 rounded-xl border border-gray-100 bg-gray-50/30">
+              <div className="flex items-center justify-between p-4 rounded-[10px] border border-gray-200">
                 <div>
                   <p className="text-xs font-bold text-gray-900">Inscriptions des élèves ouvertes</p>
                   <p className="text-[11px] text-gray-500 mt-0.5">
@@ -284,7 +284,7 @@ export default function ParametresPage() {
                   type="button"
                   onClick={() => handleToggle("inscriptions_ouvertes")}
                   className={`relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none ${
-                    form.inscriptions_ouvertes === "1" ? "bg-amber-500" : "bg-gray-200"
+                    form.inscriptions_ouvertes === "1" ? "bg-gray-900" : "bg-gray-200"
                   }`}
                 >
                   <span
@@ -295,7 +295,7 @@ export default function ParametresPage() {
                 </button>
               </div>
 
-              <div className="flex items-center justify-between p-4 rounded-xl border border-gray-100 bg-gray-50/30">
+              <div className="flex items-center justify-between p-4 rounded-[10px] border border-gray-200">
                 <div>
                   <p className="text-xs font-bold text-gray-900">Formulaire de recrutement enseignant actif</p>
                   <p className="text-[11px] text-gray-500 mt-0.5">
@@ -306,7 +306,7 @@ export default function ParametresPage() {
                   type="button"
                   onClick={() => handleToggle("candidatures_ouvertes")}
                   className={`relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none ${
-                    form.candidatures_ouvertes === "1" ? "bg-amber-500" : "bg-gray-200"
+                    form.candidatures_ouvertes === "1" ? "bg-gray-900" : "bg-gray-200"
                   }`}
                 >
                   <span
@@ -317,7 +317,7 @@ export default function ParametresPage() {
                 </button>
               </div>
 
-              <div className="flex items-center justify-between p-4 rounded-xl border border-gray-100 bg-gray-50/30">
+              <div className="flex items-center justify-between p-4 rounded-[10px] border border-gray-200">
                 <div>
                   <p className="text-xs font-bold text-gray-900">Exiger un corrigé pour chaque exercice publié</p>
                   <p className="text-[11px] text-gray-500 mt-0.5">
@@ -328,7 +328,7 @@ export default function ParametresPage() {
                   type="button"
                   onClick={() => handleToggle("correction_obligatoire")}
                   className={`relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none ${
-                    form.correction_obligatoire === "1" ? "bg-amber-500" : "bg-gray-200"
+                    form.correction_obligatoire === "1" ? "bg-gray-900" : "bg-gray-200"
                   }`}
                 >
                   <span
@@ -340,7 +340,7 @@ export default function ParametresPage() {
               </div>
 
               <div>
-                <label className="block text-xs font-semibold text-gray-700 mb-1.5">
+                <label className="tely-label block mb-1.5">
                   Taille maximale autorisée pour les documents PDF (en Mo)
                 </label>
                 <input
@@ -349,7 +349,7 @@ export default function ParametresPage() {
                   max="100"
                   value={form.taille_max_fichier_mo}
                   onChange={(e) => handleChange("taille_max_fichier_mo", e.target.value)}
-                  className="w-48 text-xs px-3.5 py-2.5 rounded-xl border border-gray-200 bg-gray-50/50 outline-none focus:border-amber-500 transition-colors"
+                  className="tely-input w-48"
                 />
               </div>
             </div>
@@ -358,14 +358,14 @@ export default function ParametresPage() {
 
         {/* Onglet Notifications */}
         {activeTab === "notifications" && (
-          <div className="bg-white rounded-2xl border border-gray-100 p-6 shadow-sm space-y-6">
-            <h2 className="text-sm font-bold text-gray-900 border-b border-gray-100 pb-3 flex items-center gap-2">
-              <Bell size={16} className="text-amber-500" />
+          <div className="tely-card p-6 space-y-6">
+            <h2 className="tely-title text-lg border-b border-gray-200 pb-3 flex items-center gap-2">
+              <Bell size={16} className="text-gray-900" />
               Canaux d'alertes & notifications
             </h2>
 
             <div className="space-y-4">
-              <div className="flex items-center justify-between p-4 rounded-xl border border-gray-100 bg-gray-50/30">
+              <div className="flex items-center justify-between p-4 rounded-[10px] border border-gray-200">
                 <div>
                   <p className="text-xs font-bold text-gray-900">Notifications d'activités dans l'application</p>
                   <p className="text-[11px] text-gray-500 mt-0.5">
@@ -376,7 +376,7 @@ export default function ParametresPage() {
                   type="button"
                   onClick={() => handleToggle("alertes_navigateur")}
                   className={`relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none ${
-                    form.alertes_navigateur === "1" ? "bg-amber-500" : "bg-gray-200"
+                    form.alertes_navigateur === "1" ? "bg-gray-900" : "bg-gray-200"
                   }`}
                 >
                   <span
@@ -388,7 +388,7 @@ export default function ParametresPage() {
               </div>
 
               {isAdmin && (
-                <div className="flex items-center justify-between p-4 rounded-xl border border-gray-100 bg-gray-50/30">
+                <div className="flex items-center justify-between p-4 rounded-[10px] border border-gray-200">
                   <div>
                     <p className="text-xs font-bold text-gray-900">Email d'alerte lors d'une candidature professeur</p>
                     <p className="text-[11px] text-gray-500 mt-0.5">
@@ -399,7 +399,7 @@ export default function ParametresPage() {
                     type="button"
                     onClick={() => handleToggle("notif_email_candidature")}
                     className={`relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none ${
-                      form.notif_email_candidature === "1" ? "bg-amber-500" : "bg-gray-200"
+                      form.notif_email_candidature === "1" ? "bg-gray-900" : "bg-gray-200"
                     }`}
                   >
                     <span
@@ -411,7 +411,7 @@ export default function ParametresPage() {
                 </div>
               )}
 
-              <div className="flex items-center justify-between p-4 rounded-xl border border-gray-100 bg-gray-50/30">
+              <div className="flex items-center justify-between p-4 rounded-[10px] border border-gray-200">
                 <div>
                   <p className="text-xs font-bold text-gray-900">Email récapitulatif des nouveaux exercices</p>
                   <p className="text-[11px] text-gray-500 mt-0.5">
@@ -422,7 +422,7 @@ export default function ParametresPage() {
                   type="button"
                   onClick={() => handleToggle("notif_email_exercice")}
                   className={`relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none ${
-                    form.notif_email_exercice === "1" ? "bg-amber-500" : "bg-gray-200"
+                    form.notif_email_exercice === "1" ? "bg-gray-900" : "bg-gray-200"
                   }`}
                 >
                   <span
@@ -438,22 +438,22 @@ export default function ParametresPage() {
 
         {/* Onglet Sécurité */}
         {activeTab === "securite" && (
-          <div className="bg-white rounded-2xl border border-gray-100 p-6 shadow-sm space-y-6">
-            <h2 className="text-sm font-bold text-gray-900 border-b border-gray-100 pb-3 flex items-center gap-2">
-              <Shield size={16} className="text-amber-500" />
+          <div className="tely-card p-6 space-y-6">
+            <h2 className="tely-title text-lg border-b border-gray-200 pb-3 flex items-center gap-2">
+              <Shield size={16} className="text-gray-900" />
               Sécurité des comptes & Sessions
             </h2>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
               <div>
-                <label className="block text-xs font-semibold text-gray-700 mb-1.5">
+                <label className="tely-label block mb-1.5">
                   Longueur minimale des mots de passe
                 </label>
                 <select
                   value={form.longueur_min_mdp}
                   onChange={(e) => handleChange("longueur_min_mdp", e.target.value)}
                   disabled={!isAdmin}
-                  className="w-full text-xs px-3.5 py-2.5 rounded-xl border border-gray-200 bg-gray-50/50 outline-none focus:border-amber-500 transition-colors"
+                  className="tely-input"
                 >
                   <option value="6">6 caractères</option>
                   <option value="8">8 caractères (recommandé)</option>
@@ -463,14 +463,14 @@ export default function ParametresPage() {
               </div>
 
               <div>
-                <label className="block text-xs font-semibold text-gray-700 mb-1.5">
+                <label className="tely-label block mb-1.5">
                   Expiration de session pour inactivité
                 </label>
                 <select
                   value={form.expiration_session_min}
                   onChange={(e) => handleChange("expiration_session_min", e.target.value)}
                   disabled={!isAdmin}
-                  className="w-full text-xs px-3.5 py-2.5 rounded-xl border border-gray-200 bg-gray-50/50 outline-none focus:border-amber-500 transition-colors"
+                  className="tely-input"
                 >
                   <option value="60">1 heure</option>
                   <option value="120">2 heures</option>
@@ -480,11 +480,11 @@ export default function ParametresPage() {
               </div>
             </div>
 
-            <div className="p-4 rounded-xl bg-emerald-50/60 border border-emerald-200/60 flex items-start gap-3">
-              <CheckCircle2 size={18} className="text-emerald-600 shrink-0 mt-0.5" />
+            <div className="pt-2 border-t border-gray-200 flex items-start gap-3">
+              <CheckCircle2 size={18} className="text-gray-900 shrink-0 mt-0.5" />
               <div>
-                <p className="text-xs font-bold text-emerald-900">Authentification Google One Tap active</p>
-                <p className="text-[11px] text-emerald-700 mt-0.5">
+                <p className="text-xs font-bold text-gray-900">Authentification Google One Tap active</p>
+                <p className="text-[11px] text-gray-500 mt-0.5">
                   Les utilisateurs peuvent se connecter en un clic avec leur compte Google de manière chiffrée.
                 </p>
               </div>
@@ -497,7 +497,7 @@ export default function ParametresPage() {
           <button
             type="submit"
             disabled={saving || loading}
-            className="flex items-center gap-2 px-6 py-2.5 bg-amber-500 hover:bg-amber-600 text-white text-xs font-bold rounded-xl shadow-sm transition-colors cursor-pointer"
+            className="tely-btn"
           >
             {saving ? (
               <span className="inline-block h-3.5 w-32 bg-white/30 rounded animate-pulse" />

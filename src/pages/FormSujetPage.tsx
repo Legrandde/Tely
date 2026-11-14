@@ -207,20 +207,20 @@ export default function FormSujetPage() {
 
   if (fetchingInitial) {
     return (
-      <div className="min-h-screen bg-slate-50/70 pb-16 animate-pulse">
+      <div className="min-h-screen pb-16 animate-pulse">
         {/* Sticky Top Bar Skeleton */}
-        <div className="bg-white border-b border-slate-200 sticky top-0 z-20 px-4 sm:px-8 py-3.5 shadow-2xs">
+        <div className="tely-page border-b border-gray-200 sticky top-0 z-20 px-4 sm:px-8 py-3.5">
           <div className="max-w-7xl mx-auto flex flex-wrap items-center justify-between gap-4">
             <div className="flex items-center gap-3">
-              <div className="w-9 h-9 rounded-xl bg-slate-100" />
+              <div className="w-9 h-9 rounded-[10px] bg-gray-100" />
               <div className="space-y-1.5">
-                <div className="h-3 w-40 bg-slate-100 rounded" />
-                <div className="h-5 w-56 bg-slate-200 rounded" />
+                <div className="h-3 w-40 bg-gray-100 rounded" />
+                <div className="h-5 w-56 bg-gray-200 rounded" />
               </div>
             </div>
             <div className="flex items-center gap-2.5">
-              <div className="h-9 w-20 rounded-xl bg-slate-100 border border-slate-200" />
-              <div className="h-9 w-36 rounded-xl bg-amber-200/70" />
+              <div className="h-9 w-20 rounded-[10px] bg-gray-100 border border-gray-200" />
+              <div className="h-9 w-36 rounded-[10px] bg-gray-200" />
             </div>
           </div>
         </div>
@@ -230,34 +230,34 @@ export default function FormSujetPage() {
           {/* Colonne Gauche (8 cols) */}
           <div className="lg:col-span-8 space-y-6">
             {/* Carte 1 : Informations générales */}
-            <div className="bg-white rounded-2xl border border-slate-200/90 p-5 sm:p-6 shadow-2xs space-y-5">
-              <div className="flex items-center gap-2.5 pb-3 border-b border-slate-100">
-                <div className="w-8 h-8 rounded-lg bg-amber-100" />
+            <div className="tely-card p-5 sm:p-6 space-y-5">
+              <div className="flex items-center gap-2.5 pb-3 border-b border-gray-200">
+                <div className="w-8 h-8 rounded-lg bg-gray-100" />
                 <div className="space-y-1.5">
-                  <div className="h-4 w-52 bg-slate-200 rounded" />
-                  <div className="h-3 w-64 bg-slate-100 rounded" />
+                  <div className="h-4 w-52 bg-gray-200 rounded" />
+                  <div className="h-3 w-64 bg-gray-100 rounded" />
                 </div>
               </div>
               <div className="space-y-4">
                 <div>
-                  <div className="h-3.5 w-36 bg-slate-200 rounded mb-1.5" />
-                  <div className="h-10 w-full bg-slate-100 rounded-xl border border-slate-200" />
+                  <div className="h-3.5 w-36 bg-gray-200 rounded mb-1.5" />
+                  <div className="h-10 w-full bg-gray-100 rounded-[10px] border border-gray-200" />
                 </div>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div>
-                    <div className="h-3.5 w-24 bg-slate-200 rounded mb-1.5" />
-                    <div className="h-10 w-full bg-slate-100 rounded-xl border border-slate-200" />
+                    <div className="h-3.5 w-24 bg-gray-200 rounded mb-1.5" />
+                    <div className="h-10 w-full bg-gray-100 rounded-[10px] border border-gray-200" />
                   </div>
                   <div>
-                    <div className="h-3.5 w-32 bg-slate-200 rounded mb-1.5" />
-                    <div className="h-10 w-full bg-slate-100 rounded-xl border border-slate-200" />
+                    <div className="h-3.5 w-32 bg-gray-200 rounded mb-1.5" />
+                    <div className="h-10 w-full bg-gray-100 rounded-[10px] border border-gray-200" />
                   </div>
                 </div>
                 <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
                   {[1, 2, 3, 4].map((i) => (
                     <div key={i}>
-                      <div className="h-3.5 w-20 bg-slate-200 rounded mb-1.5" />
-                      <div className="h-10 w-full bg-slate-100 rounded-xl border border-slate-200" />
+                      <div className="h-3.5 w-20 bg-gray-200 rounded mb-1.5" />
+                      <div className="h-10 w-full bg-gray-100 rounded-[10px] border border-gray-200" />
                     </div>
                   ))}
                 </div>
@@ -265,38 +265,38 @@ export default function FormSujetPage() {
             </div>
 
             {/* Carte 2 : Énoncé & Importation PDF */}
-            <div className="bg-white rounded-2xl border border-slate-200/90 p-5 sm:p-6 shadow-2xs space-y-4">
-              <div className="flex items-center justify-between pb-3 border-b border-slate-100">
+            <div className="tely-card p-5 sm:p-6 space-y-4">
+              <div className="flex items-center justify-between pb-3 border-b border-gray-200">
                 <div className="flex items-center gap-2.5">
-                  <div className="w-8 h-8 rounded-lg bg-amber-100" />
+                  <div className="w-8 h-8 rounded-lg bg-gray-100" />
                   <div className="space-y-1.5">
-                    <div className="h-4 w-48 bg-slate-200 rounded" />
-                    <div className="h-3 w-60 bg-slate-100 rounded" />
+                    <div className="h-4 w-48 bg-gray-200 rounded" />
+                    <div className="h-3 w-60 bg-gray-100 rounded" />
                   </div>
                 </div>
-                <div className="h-8 w-36 bg-slate-100 rounded-xl" />
+                <div className="h-8 w-36 bg-gray-100 rounded-[10px]" />
               </div>
-              <div className="h-28 w-full rounded-xl border-2 border-dashed border-slate-200 bg-slate-50/70" />
-              <div className="h-72 w-full rounded-xl bg-slate-100 border border-slate-200" />
+              <div className="h-28 w-full rounded-[10px] border-2 border-dashed border-gray-200 bg-gray-50/70" />
+              <div className="h-72 w-full rounded-[10px] bg-gray-100 border border-gray-200" />
             </div>
           </div>
 
           {/* Colonne Droite (4 cols) */}
           <div className="lg:col-span-4 space-y-5">
-            <div className="bg-white rounded-2xl border border-slate-200/90 p-5 shadow-2xs space-y-4">
-              <div className="h-4 w-40 bg-slate-200 rounded" />
+            <div className="tely-card p-5 space-y-4">
+              <div className="h-4 w-40 bg-gray-200 rounded" />
               <div className="space-y-2.5">
                 {[1, 2, 3].map((i) => (
-                  <div key={i} className="h-4 w-full bg-slate-100 rounded" />
+                  <div key={i} className="h-4 w-full bg-gray-100 rounded" />
                 ))}
               </div>
-              <div className="h-10 w-full bg-amber-200/70 rounded-xl" />
-              <div className="h-9 w-full bg-slate-100 rounded-xl" />
+              <div className="h-10 w-full bg-gray-200 rounded-[10px]" />
+              <div className="h-9 w-full bg-gray-100 rounded-[10px]" />
             </div>
-            <div className="bg-white rounded-2xl border border-slate-200/90 p-5 shadow-2xs space-y-3">
-              <div className="h-3.5 w-36 bg-slate-200 rounded" />
+            <div className="tely-card p-5 space-y-3">
+              <div className="h-3.5 w-36 bg-gray-200 rounded" />
               {[1, 2, 3, 4].map((i) => (
-                <div key={i} className="h-12 w-full bg-slate-50 rounded-xl" />
+                <div key={i} className="h-12 w-full bg-gray-50 rounded-[10px]" />
               ))}
             </div>
           </div>
@@ -306,30 +306,30 @@ export default function FormSujetPage() {
   }
 
   return (
-    <div className="min-h-screen bg-slate-50/70 pb-16">
+    <div className="min-h-screen pb-16">
       {/* ── Entête supérieure avec fil d'ariane & actions rapides ── */}
-      <div className="bg-white border-b border-slate-200 sticky top-0 z-20 px-4 sm:px-8 py-3.5 shadow-2xs">
+      <div className="tely-page border-b border-gray-200 sticky top-0 z-20 px-4 sm:px-8 py-3.5">
         <div className="max-w-7xl mx-auto flex flex-wrap items-center justify-between gap-4">
           <div className="flex items-center gap-3">
             <button
               type="button"
               onClick={() => navigate(basePath)}
-              className="p-2 rounded-xl text-slate-500 hover:text-slate-800 hover:bg-slate-100 transition-colors cursor-pointer"
+              className="p-2 rounded-[10px] text-gray-500 hover:text-gray-800 hover:bg-gray-100 transition-colors cursor-pointer"
               title="Retour aux sujets"
             >
               <ArrowLeft size={20} />
             </button>
             <div>
-              <div className="flex items-center gap-2 text-xs text-slate-400">
+              <div className="flex items-center gap-2 text-xs text-gray-400">
                 <Link to={basePath} className="hover:underline">
                   Sujets d'examens
                 </Link>
                 <span>/</span>
-                <span className="text-slate-600 font-medium">
+                <span className="text-gray-900 font-medium">
                   {isEditMode ? "Modifier le sujet" : "Nouveau sujet officiel"}
                 </span>
               </div>
-              <h1 className="text-lg sm:text-xl font-bold text-slate-900 leading-tight">
+              <h1 className="tely-h1">
                 {isEditMode ? `Modifier : ${form.titre || "Sans titre"}` : "Créer un sujet d'examen"}
               </h1>
             </div>
@@ -339,7 +339,7 @@ export default function FormSujetPage() {
             <button
               type="button"
               onClick={() => navigate(basePath)}
-              className="px-4 py-2 text-sm font-medium text-slate-600 bg-white border border-slate-200 rounded-xl hover:bg-slate-50 transition-colors cursor-pointer"
+              className="tely-btn-outline"
             >
               Annuler
             </button>
@@ -347,7 +347,7 @@ export default function FormSujetPage() {
               type="button"
               onClick={handleSubmit}
               disabled={loading}
-              className="inline-flex items-center gap-2 px-5 py-2 text-sm font-semibold text-white bg-amber-500 hover:bg-amber-600 rounded-xl shadow-xs transition-all disabled:opacity-60 cursor-pointer"
+              className="tely-btn"
             >
               {loading ? (
                 <span className="inline-block h-4 w-28 bg-white/30 rounded animate-pulse" />
@@ -365,8 +365,8 @@ export default function FormSujetPage() {
       {/* ── Contenu principal (Grille 2 colonnes) ── */}
       <form onSubmit={handleSubmit} className="max-w-7xl mx-auto px-4 sm:px-8 pt-6">
         {error && (
-          <div className="mb-6 p-4 rounded-xl bg-red-50 border border-red-200 flex items-start gap-3 text-sm text-red-700">
-            <AlertCircle size={18} className="shrink-0 mt-0.5 text-red-500" />
+          <div className="mb-6 p-4 rounded-[10px] bg-red-50 border border-red-200 flex items-start gap-3 text-sm text-red-700">
+            <AlertCircle size={18} className="shrink-0 mt-0.5 text-gray-900" />
             <div>
               <p className="font-semibold">Vérification requise</p>
               <p>{error}</p>
@@ -378,15 +378,15 @@ export default function FormSujetPage() {
           {/* Colonne Gauche (8 cols) */}
           <div className="lg:col-span-8 space-y-6">
             {/* Boîte 1 : Métadonnées du Sujet */}
-            <div className="bg-white rounded-2xl border border-slate-200/90 p-5 sm:p-6 shadow-2xs">
-              <h2 className="text-base font-bold text-slate-900 mb-4 flex items-center gap-2">
-                <BookOpen size={18} className="text-amber-500" />
+            <div className="tely-card p-5 sm:p-6">
+              <h2 className="tely-title text-lg mb-4 flex items-center gap-2">
+                <BookOpen size={18} className="text-gray-900" />
                 Informations officielles de l'épreuve
               </h2>
 
               <div className="space-y-4">
                 <div>
-                  <label className="text-xs font-semibold text-slate-700 mb-1.5 block">
+                  <label className="tely-label block mb-1.5">
                     Titre complet de l'épreuve <span className="text-red-500">*</span>
                   </label>
                   <input
@@ -395,20 +395,20 @@ export default function FormSujetPage() {
                     value={form.titre}
                     onChange={(e) => handleChange("titre", e.target.value)}
                     placeholder="Ex: BAC 2023 — Épreuve de Physique-Chimie (Terminale SM)"
-                    className="w-full px-4 py-2.5 text-sm bg-white border border-slate-200 rounded-xl focus:outline-hidden focus:border-amber-400 focus:ring-2 focus:ring-amber-200/50"
+                    className="tely-input"
                   />
                 </div>
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div>
-                    <label className="text-xs font-semibold text-slate-700 mb-1.5 block">
+                    <label className="tely-label block mb-1.5">
                       Matière <span className="text-red-500">*</span>
                     </label>
                     <select
                       required
                       value={form.matiere_id}
                       onChange={(e) => handleChange("matiere_id", e.target.value)}
-                      className="w-full px-3.5 py-2.5 text-sm bg-white border border-slate-200 rounded-xl focus:outline-hidden focus:border-amber-400 focus:ring-2 focus:ring-amber-200/50"
+                      className="tely-input"
                     >
                       <option value="">Sélectionner une matière...</option>
                       {matieres.map((m) => (
@@ -420,14 +420,14 @@ export default function FormSujetPage() {
                   </div>
 
                   <div>
-                    <label className="text-xs font-semibold text-slate-700 mb-1.5 block">
+                    <label className="tely-label block mb-1.5">
                       Niveau scolaire <span className="text-red-500">*</span>
                     </label>
                     <select
                       required
                       value={form.niveau_id}
                       onChange={(e) => handleChange("niveau_id", e.target.value)}
-                      className="w-full px-3.5 py-2.5 text-sm bg-white border border-slate-200 rounded-xl focus:outline-hidden focus:border-amber-400 focus:ring-2 focus:ring-amber-200/50"
+                      className="tely-input"
                     >
                       <option value="">Sélectionner un niveau...</option>
                       {niveaux.map((n) => (
@@ -441,7 +441,7 @@ export default function FormSujetPage() {
 
                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 pt-1">
                   <div>
-                    <label className="text-xs font-semibold text-slate-700 mb-1.5 block">
+                    <label className="tely-label block mb-1.5">
                       Type d'examen
                     </label>
                     <select
@@ -449,7 +449,7 @@ export default function FormSujetPage() {
                       onChange={(e) =>
                         handleChange("type", e.target.value as SujetFormState["type"])
                       }
-                      className="w-full px-3 py-2 text-sm bg-white border border-slate-200 rounded-xl focus:outline-hidden focus:border-amber-400 focus:ring-2 focus:ring-amber-200/50"
+                      className="tely-input"
                     >
                       <option value="bac">Baccalauréat Unique</option>
                       <option value="brevet">BEPC / Brevet</option>
@@ -459,7 +459,7 @@ export default function FormSujetPage() {
                   </div>
 
                   <div>
-                    <label className="text-xs font-semibold text-slate-700 mb-1.5 block">
+                    <label className="tely-label block mb-1.5">
                       Année de session
                     </label>
                     <input
@@ -468,12 +468,12 @@ export default function FormSujetPage() {
                       max={2035}
                       value={form.annee}
                       onChange={(e) => handleChange("annee", Number(e.target.value))}
-                      className="w-full px-3.5 py-2 text-sm bg-white border border-slate-200 rounded-xl focus:outline-hidden focus:border-amber-400 focus:ring-2 focus:ring-amber-200/50"
+                      className="tely-input"
                     />
                   </div>
 
                   <div>
-                    <label className="text-xs font-semibold text-slate-700 mb-1.5 block">
+                    <label className="tely-label block mb-1.5">
                       Session
                     </label>
                     <select
@@ -481,7 +481,7 @@ export default function FormSujetPage() {
                       onChange={(e) =>
                         handleChange("session", e.target.value as SujetFormState["session"])
                       }
-                      className="w-full px-3 py-2 text-sm bg-white border border-slate-200 rounded-xl focus:outline-hidden focus:border-amber-400 focus:ring-2 focus:ring-amber-200/50"
+                      className="tely-input"
                     >
                       <option value="juin">Session Juin (Normale)</option>
                       <option value="septembre">Session Septembre (Remplacement)</option>
@@ -493,27 +493,27 @@ export default function FormSujetPage() {
             </div>
 
             {/* Boîte 2 : Énoncé & Extraction PDF */}
-            <div className="bg-white rounded-2xl border border-slate-200/90 p-5 sm:p-6 shadow-2xs">
+            <div className="tely-card p-5 sm:p-6">
               <div className="flex flex-wrap items-center justify-between gap-3 mb-4">
                 <div>
-                  <h2 className="text-base font-bold text-slate-900 flex items-center gap-2">
-                    <PenTool size={18} className="text-amber-500" />
+                  <h2 className="tely-title text-lg flex items-center gap-2">
+                    <PenTool size={18} className="text-gray-900" />
                     Texte intégral & Consignes de l'épreuve
                   </h2>
-                  <p className="text-xs text-slate-500">
+                  <p className="tely-subtitle">
                     Saisissez le texte complet ou importez directement un document PDF pour remplir automatiquement l'énoncé.
                   </p>
                 </div>
 
                 {/* Tabs Écriture / Aperçu */}
-                <div className="flex items-center gap-1 bg-slate-100 p-1 rounded-xl">
+                <div className="flex items-center gap-1 bg-gray-50 p-1 rounded-[10px]">
                   <button
                     type="button"
                     onClick={() => setActiveTab("edit")}
-                    className={`flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-lg transition-all cursor-pointer ${
+                    className={`flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-[10px] transition-all cursor-pointer ${
                       activeTab === "edit"
-                        ? "bg-white text-slate-900 shadow-2xs"
-                        : "text-slate-500 hover:text-slate-700"
+                        ? "bg-gray-900 text-white"
+                        : "text-gray-500 hover:text-gray-900 [&_svg]:text-gray-900"
                     }`}
                   >
                     <PenTool size={13} />
@@ -522,10 +522,10 @@ export default function FormSujetPage() {
                   <button
                     type="button"
                     onClick={() => setActiveTab("preview")}
-                    className={`flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-lg transition-all cursor-pointer ${
+                    className={`flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-[10px] transition-all cursor-pointer ${
                       activeTab === "preview"
-                        ? "bg-white text-slate-900 shadow-2xs"
-                        : "text-slate-500 hover:text-slate-700"
+                        ? "bg-gray-900 text-white"
+                        : "text-gray-500 hover:text-gray-900 [&_svg]:text-gray-900"
                     }`}
                   >
                     <Eye size={13} />
@@ -537,12 +537,12 @@ export default function FormSujetPage() {
               {/* ── Zone Import PDF interactive ── */}
               <div className="mb-4">
                 <label
-                  className={`relative flex flex-col items-center justify-center p-6 border-2 border-dashed rounded-2xl text-center transition-all cursor-pointer ${
+                  className={`relative flex flex-col items-center justify-center p-6 border-2 border-dashed rounded-[10px] text-center transition-all cursor-pointer ${
                     extractingPdf
-                      ? "border-amber-400 bg-amber-50/70 cursor-wait"
+                      ? "border-gray-900 bg-gray-50 cursor-wait"
                       : pdfSuccessName
-                      ? "border-emerald-300 bg-emerald-50/40 hover:bg-emerald-50/70"
-                      : "border-slate-200 hover:border-amber-400 hover:bg-amber-50/20"
+                      ? "border-gray-900 bg-gray-50 hover:bg-gray-100"
+                      : "border-gray-200 bg-gray-50 hover:border-gray-900"
                   }`}
                 >
                   <input
@@ -559,27 +559,27 @@ export default function FormSujetPage() {
 
                   {extractingPdf ? (
                     <div className="w-full max-w-md mx-auto space-y-2.5 animate-pulse py-1">
-                      <div className="h-3.5 bg-amber-200/80 rounded w-3/4 mx-auto" />
-                      <div className="h-2.5 bg-amber-200/60 rounded w-full" />
-                      <div className="h-2.5 bg-amber-200/60 rounded w-5/6 mx-auto" />
+                      <div className="h-3.5 bg-gray-200 rounded w-3/4 mx-auto" />
+                      <div className="h-2.5 bg-gray-200/70 rounded w-full" />
+                      <div className="h-2.5 bg-gray-200/70 rounded w-5/6 mx-auto" />
                     </div>
                   ) : pdfSuccessName ? (
-                    <div className="flex flex-col items-center gap-1.5 text-emerald-800">
-                      <CheckCircle2 size={32} className="text-emerald-500" />
+                    <div className="flex flex-col items-center gap-1.5 text-gray-900">
+                      <CheckCircle2 size={32} className="text-gray-900" />
                       <p className="text-sm font-bold">Fichier extrait avec succès</p>
-                      <p className="text-xs text-emerald-600">
+                      <p className="text-xs text-gray-500">
                         Document source : <span className="font-medium underline">{pdfSuccessName}</span> (cliquez pour remplacer)
                       </p>
                     </div>
                   ) : (
                     <div className="flex flex-col items-center gap-1.5">
-                      <div className="p-3 bg-amber-50 text-amber-600 rounded-full mb-1">
+                      <div className="p-3 bg-white text-gray-900 rounded-full mb-1">
                         <UploadCloud size={24} />
                       </div>
-                      <p className="text-sm font-bold text-slate-800">
-                        Glissez-déposez le PDF de l'épreuve ici, ou <span className="text-amber-600 underline">parcourez</span>
+                      <p className="text-sm font-bold text-gray-800">
+                        Glissez-déposez le PDF de l'épreuve ici, ou <span className="tely-link underline">parcourez</span>
                       </p>
-                      <p className="text-xs text-slate-400">
+                      <p className="text-xs text-gray-400">
                         Le texte de l'énoncé, les questions et barèmes seront automatiquement extraits
                       </p>
                     </div>
@@ -596,19 +596,19 @@ export default function FormSujetPage() {
                     value={form.ennonce}
                     onChange={(e) => handleChange("ennonce", e.target.value)}
                     placeholder="Tapez ici le contenu de l'épreuve (Partie I, Partie II, Exercice 1, Problème...) ou utilisez l'importation PDF ci-dessus."
-                    className="w-full p-4 font-mono text-xs sm:text-sm text-slate-800 bg-white border border-slate-200 rounded-xl focus:outline-hidden focus:border-amber-400 focus:ring-2 focus:ring-amber-200/50 leading-relaxed"
+                    className="tely-input leading-relaxed"
                   />
-                  <div className="flex items-center justify-between text-[11px] text-slate-400 pt-2 px-1">
+                  <div className="flex items-center justify-between text-[11px] text-gray-400 pt-2 px-1">
                     <span>Supporte les formules KaTeX / LaTeX et le formatage texte</span>
                     <span>{form.ennonce.length} caractères | {form.ennonce.split(/\s+/).filter(Boolean).length} mots</span>
                   </div>
                 </div>
               ) : (
-                <div className="p-6 bg-slate-50 border border-slate-200 rounded-xl min-h-[300px] whitespace-pre-wrap font-serif text-sm text-slate-800 leading-relaxed">
+                <div className="p-6 bg-gray-50 border border-gray-200 rounded-[10px] min-h-[300px] whitespace-pre-wrap font-serif text-sm text-gray-800 leading-relaxed">
                   {form.ennonce ? (
                     form.ennonce
                   ) : (
-                    <p className="text-slate-400 italic text-center py-12">
+                    <p className="text-gray-400 italic text-center py-12">
                       L'énoncé est actuellement vide. Rédigez du texte ou importez un PDF pour afficher l'aperçu.
                     </p>
                   )}
@@ -620,26 +620,26 @@ export default function FormSujetPage() {
           {/* Colonne Droite : Sidebar (4 cols) */}
           <div className="lg:col-span-4 space-y-5 lg:sticky lg:top-24">
             {/* Carte 1 : Actions principales */}
-            <div className="bg-white rounded-2xl border border-slate-200/90 p-5 shadow-2xs">
-              <h3 className="text-sm font-bold text-slate-900 mb-3">
+            <div className="tely-card p-5">
+              <h3 className="tely-title text-lg mb-3">
                 Publication & Statut
               </h3>
 
               <div className="space-y-3 mb-4">
-                <div className="flex items-center justify-between text-xs py-2 border-b border-slate-100">
-                  <span className="text-slate-500">Statut de l'épreuve</span>
-                  <span className="inline-flex items-center gap-1 font-semibold text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-full text-[11px]">
+                <div className="flex items-center justify-between text-xs py-2 border-b border-gray-200">
+                  <span className="text-gray-500">Statut de l'épreuve</span>
+                  <span className="inline-flex items-center gap-1 font-semibold text-gray-500 text-[11px]">
                     <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
                     Prêt à publier
                   </span>
                 </div>
-                <div className="flex items-center justify-between text-xs py-2 border-b border-slate-100">
-                  <span className="text-slate-500">Visibilité</span>
-                  <span className="font-medium text-slate-800">Public (Élèves & Profs)</span>
+                <div className="flex items-center justify-between text-xs py-2 border-b border-gray-200">
+                  <span className="text-gray-500">Visibilité</span>
+                  <span className="font-medium text-gray-800">Public (Élèves & Profs)</span>
                 </div>
-                <div className="flex items-center justify-between text-xs py-2 border-b border-slate-100">
-                  <span className="text-slate-500">Mode</span>
-                  <span className="font-medium text-slate-800">{isEditMode ? "Mise à jour" : "Création"}</span>
+                <div className="flex items-center justify-between text-xs py-2 border-b border-gray-200">
+                  <span className="text-gray-500">Mode</span>
+                  <span className="font-medium text-gray-800">{isEditMode ? "Mise à jour" : "Création"}</span>
                 </div>
               </div>
 
@@ -647,7 +647,7 @@ export default function FormSujetPage() {
                 <button
                   type="submit"
                   disabled={loading}
-                  className="w-full flex items-center justify-center gap-2 px-4 py-2.5 text-sm font-bold text-white bg-amber-500 hover:bg-amber-600 rounded-xl shadow-xs transition-all disabled:opacity-60 cursor-pointer"
+                  className="tely-btn w-full"
                 >
                   {loading ? (
                     <span className="inline-block h-4 w-32 bg-white/30 rounded animate-pulse" />
@@ -661,7 +661,7 @@ export default function FormSujetPage() {
                 <button
                   type="button"
                   onClick={() => navigate(basePath)}
-                  className="w-full text-center text-xs font-medium text-slate-500 hover:text-slate-700 py-2 transition-colors cursor-pointer"
+                  className="tely-btn-outline w-full"
                 >
                   Annuler les modifications
                 </button>
@@ -669,24 +669,24 @@ export default function FormSujetPage() {
             </div>
 
             {/* Carte 2 : Synthèse pédagogique en direct */}
-            <div className="bg-white rounded-2xl border border-slate-200/90 p-5 shadow-2xs">
-              <h3 className="text-sm font-bold text-slate-900 mb-3 flex items-center gap-2">
-                <GraduationCap size={16} className="text-amber-500" />
+            <div className="tely-card p-5">
+              <h3 className="tely-title text-lg mb-3 flex items-center gap-2">
+                <GraduationCap size={16} className="text-gray-900" />
                 Synthèse de l'épreuve
               </h3>
 
               <div className="space-y-2.5 text-xs">
-                <div className="p-2.5 bg-slate-50 rounded-xl">
-                  <p className="text-slate-400 mb-0.5">Matière officielle</p>
-                  <p className="font-semibold text-slate-800">{selectedMatiereLabel}</p>
+                <div className="p-2.5 bg-gray-50 rounded-[10px]">
+                  <p className="text-gray-400 mb-0.5">Matière officielle</p>
+                  <p className="font-semibold text-gray-800">{selectedMatiereLabel}</p>
                 </div>
-                <div className="p-2.5 bg-slate-50 rounded-xl">
-                  <p className="text-slate-400 mb-0.5">Niveau & Cycle</p>
-                  <p className="font-semibold text-slate-800">{selectedNiveauLabel}</p>
+                <div className="p-2.5 bg-gray-50 rounded-[10px]">
+                  <p className="text-gray-400 mb-0.5">Niveau & Cycle</p>
+                  <p className="font-semibold text-gray-800">{selectedNiveauLabel}</p>
                 </div>
-                <div className="p-2.5 bg-slate-50 rounded-xl">
-                  <p className="text-slate-400 mb-0.5">Session d'examen</p>
-                  <p className="font-semibold text-slate-800">
+                <div className="p-2.5 bg-gray-50 rounded-[10px]">
+                  <p className="text-gray-400 mb-0.5">Session d'examen</p>
+                  <p className="font-semibold text-gray-800">
                     Session {form.session.toUpperCase()} {form.annee} ({form.type.toUpperCase()})
                   </p>
                 </div>
@@ -694,12 +694,12 @@ export default function FormSujetPage() {
             </div>
 
             {/* Carte 3 : Conseils de rédaction */}
-            <div className="bg-amber-50/70 border border-amber-200/60 rounded-2xl p-4 text-xs text-amber-900 space-y-2">
-              <p className="font-bold flex items-center gap-1.5 text-amber-800">
-                <FileText size={14} />
+            <div className="tely-card p-4 text-xs text-gray-500 space-y-2">
+              <p className="font-bold flex items-center gap-1.5 text-gray-900">
+                <FileText size={14} className="text-gray-900" />
                 Conseils officiels MEPU-A
               </p>
-              <ul className="list-disc pl-4 space-y-1 text-amber-800/90">
+              <ul className="list-disc pl-4 space-y-1 text-gray-500">
                 <li>Précisez bien le barème total (ex: Théorie 5 pts, Pratique 15 pts).</li>
                 <li>Pour les épreuves scientifiques, spécifiez les constantes données (ex: g = 10 N/kg).</li>
                 <li>L'énoncé extrait du PDF peut être complété ou réajusté à tout moment.</li>

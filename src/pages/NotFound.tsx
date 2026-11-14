@@ -167,8 +167,7 @@ export default function NotFoundPage() {
         {/* Message Titre et Sous-titre */}
         <div className="space-y-1.5 mt-2">
           <h2
-            className="text-2xl sm:text-3xl font-serif font-bold text-gray-900 tracking-tight"
-            style={{ fontFamily: "'Playfair Display', Georgia, serif" }}
+            className="text-2xl sm:text-3xl font-bold text-gray-900 tracking-tight"
           >
             Look like you're lost
           </h2>

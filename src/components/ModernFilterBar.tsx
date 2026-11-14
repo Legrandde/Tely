@@ -83,7 +83,7 @@ export default function ModernFilterBar({
     <div className="w-full mb-8">
       {/* ── 1. Champ de recherche principal ── */}
       <div className="relative w-full mb-3.5">
-        <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-slate-400">
+        <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-gray-400">
           <Search size={18} />
         </div>
         <input
@@ -91,7 +91,7 @@ export default function ModernFilterBar({
           value={values.q ?? ""}
           onChange={(e) => updateField("q", e.target.value)}
           placeholder={placeholder}
-          className="w-full pl-11 pr-4 py-2.5 sm:py-3 text-sm text-slate-700 bg-white rounded-full border border-slate-200/90 shadow-2xs placeholder:text-slate-400 focus:outline-hidden focus:border-amber-400 focus:ring-2 focus:ring-amber-200/50 transition-all"
+          className="w-full pl-11 pr-4 py-2.5 sm:py-3 text-sm text-gray-700 bg-white rounded-full border border-gray-200/90 shadow-2xs placeholder:text-gray-400 focus:outline-hidden focus:border-amber-400 focus:ring-2 focus:ring-amber-200/50 transition-all"
         />
       </div>
 
@@ -102,7 +102,7 @@ export default function ModernFilterBar({
           <select
             value={values.cycle ?? ""}
             onChange={(e) => updateField("cycle", e.target.value)}
-            className="appearance-none bg-white border border-slate-200/90 hover:border-slate-300 text-slate-700 text-xs sm:text-sm font-normal rounded-full pl-4 pr-8 py-2 shadow-2xs focus:outline-hidden focus:ring-2 focus:ring-amber-300/40 cursor-pointer transition-all"
+            className="appearance-none bg-white border border-gray-200/90 hover:border-gray-300 text-gray-700 text-xs sm:text-sm font-normal rounded-full pl-4 pr-8 py-2 shadow-2xs focus:outline-hidden focus:ring-2 focus:ring-amber-300/40 cursor-pointer transition-all"
           >
             <option value="">Tous les cycles</option>
             {cycles.map((c) => (
@@ -113,7 +113,7 @@ export default function ModernFilterBar({
           </select>
           <ChevronDown
             size={14}
-            className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none"
+            className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none"
           />
         </div>
 
@@ -122,7 +122,7 @@ export default function ModernFilterBar({
           <select
             value={values.niveau_id ?? ""}
             onChange={(e) => updateField("niveau_id", e.target.value)}
-            className="appearance-none bg-white border border-slate-200/90 hover:border-slate-300 text-slate-700 text-xs sm:text-sm font-normal rounded-full pl-4 pr-8 py-2 shadow-2xs focus:outline-hidden focus:ring-2 focus:ring-amber-300/40 cursor-pointer transition-all"
+            className="appearance-none bg-white border border-gray-200/90 hover:border-gray-300 text-gray-700 text-xs sm:text-sm font-normal rounded-full pl-4 pr-8 py-2 shadow-2xs focus:outline-hidden focus:ring-2 focus:ring-amber-300/40 cursor-pointer transition-all"
           >
             <option value="">Tous les niveaux</option>
             {filteredNiveaux.map((n) => (
@@ -133,7 +133,7 @@ export default function ModernFilterBar({
           </select>
           <ChevronDown
             size={14}
-            className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none"
+            className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none"
           />
         </div>
 
@@ -142,7 +142,7 @@ export default function ModernFilterBar({
           <select
             value={values.matiere_id ?? ""}
             onChange={(e) => updateField("matiere_id", e.target.value)}
-            className="appearance-none bg-white border border-slate-200/90 hover:border-slate-300 text-slate-700 text-xs sm:text-sm font-normal rounded-full pl-4 pr-8 py-2 shadow-2xs focus:outline-hidden focus:ring-2 focus:ring-amber-300/40 cursor-pointer transition-all"
+            className="appearance-none bg-white border border-gray-200/90 hover:border-gray-300 text-gray-700 text-xs sm:text-sm font-normal rounded-full pl-4 pr-8 py-2 shadow-2xs focus:outline-hidden focus:ring-2 focus:ring-amber-300/40 cursor-pointer transition-all"
           >
             <option value="">Toutes les matières</option>
             {matieres.map((m) => (
@@ -153,7 +153,7 @@ export default function ModernFilterBar({
           </select>
           <ChevronDown
             size={14}
-            className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none"
+            className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none"
           />
         </div>
 
@@ -162,7 +162,7 @@ export default function ModernFilterBar({
           <select
             value={values.serie ?? ""}
             onChange={(e) => updateField("serie", e.target.value)}
-            className="appearance-none bg-white border border-slate-200/90 hover:border-slate-300 text-slate-700 text-xs sm:text-sm font-normal rounded-full pl-4 pr-8 py-2 shadow-2xs focus:outline-hidden focus:ring-2 focus:ring-amber-300/40 cursor-pointer transition-all"
+            className="appearance-none bg-white border border-gray-200/90 hover:border-gray-300 text-gray-700 text-xs sm:text-sm font-normal rounded-full pl-4 pr-8 py-2 shadow-2xs focus:outline-hidden focus:ring-2 focus:ring-amber-300/40 cursor-pointer transition-all"
           >
             <option value="">Toutes les séries</option>
             {SERIES_OPTIONS.map((s) => (
@@ -173,7 +173,7 @@ export default function ModernFilterBar({
           </select>
           <ChevronDown
             size={14}
-            className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none"
+            className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none"
           />
         </div>
 
@@ -182,7 +182,7 @@ export default function ModernFilterBar({
           <select
             value={values.tri ?? "pertinence"}
             onChange={(e) => updateField("tri", e.target.value)}
-            className="appearance-none bg-white border border-slate-200/90 hover:border-slate-300 text-slate-700 text-xs sm:text-sm font-normal rounded-full pl-4 pr-8 py-2 shadow-2xs focus:outline-hidden focus:ring-2 focus:ring-amber-300/40 cursor-pointer transition-all"
+            className="appearance-none bg-white border border-gray-200/90 hover:border-gray-300 text-gray-700 text-xs sm:text-sm font-normal rounded-full pl-4 pr-8 py-2 shadow-2xs focus:outline-hidden focus:ring-2 focus:ring-amber-300/40 cursor-pointer transition-all"
           >
             {TRI_OPTIONS.map((t) => (
               <option key={t.value} value={t.value}>
@@ -192,7 +192,7 @@ export default function ModernFilterBar({
           </select>
           <ChevronDown
             size={14}
-            className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none"
+            className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none"
           />
         </div>
 

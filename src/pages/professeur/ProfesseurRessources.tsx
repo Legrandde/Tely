@@ -22,11 +22,11 @@ import {
 import type { RessourceItem } from "../../types/admin";
 
 const TYPE_CONFIG: Record<string, { label: string; class: string }> = {
-  cours: { label: "Cours complet", class: "bg-blue-50 text-blue-700 border-blue-200" },
-  resume: { label: "Fiche résumé", class: "bg-amber-50 text-amber-700 border-amber-200" },
-  fiche: { label: "Fiche méthode", class: "bg-emerald-50 text-emerald-700 border-emerald-200" },
-  td: { label: "Feuille de TD", class: "bg-purple-50 text-purple-700 border-purple-200" },
-  autre: { label: "Autre document", class: "bg-gray-100 text-gray-700 border-gray-200" },
+  cours: { label: "Cours complet", class: "text-gray-900" },
+  resume: { label: "Fiche résumé", class: "text-gray-900" },
+  fiche: { label: "Fiche méthode", class: "text-gray-900" },
+  td: { label: "Feuille de TD", class: "text-gray-900" },
+  autre: { label: "Autre document", class: "text-gray-600" },
 };
 
 export default function ProfesseurRessources() {
@@ -248,15 +248,15 @@ export default function ProfesseurRessources() {
       {/* Entête */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
-          <h1 className="text-xl font-bold text-gray-900">Documents & Ressources PDF</h1>
-          <p className="text-sm text-gray-500">
+          <h1 className="tely-h1">Documents & Ressources PDF</h1>
+          <p className="tely-subtitle mt-1">
             Mettez à disposition de vos élèves des cours complets, des fiches méthodes et des résumés téléchargeables
           </p>
         </div>
 
         <button
           onClick={openCreate}
-          className="flex items-center gap-2 text-sm font-medium bg-amber-500 text-white rounded-xl px-4 py-2.5 hover:bg-amber-600 shadow-sm transition-colors cursor-pointer self-start sm:self-auto"
+          className="tely-btn self-start sm:self-auto"
         >
           <Upload size={16} />
           Publier un document PDF
@@ -264,26 +264,26 @@ export default function ProfesseurRessources() {
       </div>
 
       {/* Barre d'outils / Recherche & Filtres */}
-      <div className="flex flex-col lg:flex-row items-center gap-3 bg-white p-3.5 rounded-xl border border-gray-100 shadow-sm">
-        <div className="flex items-center gap-2 bg-gray-50 rounded-lg px-3 py-2 flex-1 w-full lg:max-w-md">
-          <Search size={16} className="text-gray-400" />
+      <div className="flex flex-col lg:flex-row items-center gap-3 tely-card p-3.5">
+        <div className="relative flex-1 w-full lg:min-w-[260px] lg:max-w-md">
+          <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-900 pointer-events-none" />
           <input
             type="text"
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             placeholder="Rechercher par titre ou description..."
-            className="bg-transparent text-sm text-gray-800 outline-none w-full placeholder-gray-400"
+            className="tely-input pl-10"
           />
         </div>
 
         <div className="flex flex-wrap items-center gap-2 w-full lg:w-auto">
-          <div className="flex items-center gap-1.5 text-xs text-gray-500">
-            <Filter size={14} /> Type :
+          <div className="flex items-center gap-1.5 tely-label">
+            <Filter size={14} className="text-gray-900" /> Type :
           </div>
           <select
             value={filterType}
             onChange={(e) => setFilterType(e.target.value)}
-            className="text-xs border border-gray-200 rounded-lg px-2.5 py-2 bg-gray-50 text-gray-700 outline-none focus:ring-2 focus:ring-amber-200"
+            className="tely-input w-auto max-w-[190px] truncate"
           >
             <option value="all">Tous les types</option>
             <option value="cours">Cours complets</option>
@@ -293,13 +293,13 @@ export default function ProfesseurRessources() {
             <option value="autre">Autres</option>
           </select>
 
-          <div className="flex items-center gap-1.5 text-xs text-gray-500 ml-1">
+          <div className="flex items-center gap-1.5 tely-label ml-1">
             Matière :
           </div>
           <select
             value={filterMatiere}
             onChange={(e) => setFilterMatiere(e.target.value)}
-            className="text-xs border border-gray-200 rounded-lg px-2.5 py-2 bg-gray-50 text-gray-700 outline-none focus:ring-2 focus:ring-amber-200"
+            className="tely-input w-auto max-w-[190px] truncate"
           >
             <option value="all">Toutes matières</option>
             {matieres.map((m) => (
@@ -310,17 +310,17 @@ export default function ProfesseurRessources() {
           </select>
         </div>
 
-        <div className="lg:ml-auto text-xs text-gray-500 whitespace-nowrap">
+        <div className="lg:ml-auto tely-label whitespace-nowrap">
           Total : <span className="font-semibold text-gray-800">{filteredRessources.length}</span> document(s)
         </div>
       </div>
 
       {/* Contenu */}
       {loading ? (
-        <div className="overflow-x-auto border border-gray-100 rounded-2xl bg-white shadow-sm animate-pulse">
+        <div className="overflow-x-auto tely-card animate-pulse">
           <table className="w-full text-sm">
             <thead>
-              <tr className="bg-gray-50/75 text-left text-xs text-gray-500 uppercase tracking-wider border-b border-gray-100">
+              <tr className="text-left tely-overline border-b border-gray-100">
                 <th className="px-5 py-3.5">Document</th>
                 <th className="px-5 py-3.5">Type</th>
                 <th className="px-5 py-3.5">Matière & Niveau</th>
@@ -334,7 +334,7 @@ export default function ProfesseurRessources() {
                 <tr key={i}>
                   <td className="px-5 py-3.5 max-w-xs">
                     <div className="flex items-center gap-2.5">
-                      <div className="w-8 h-8 rounded-lg bg-red-50 shrink-0" />
+                      <div className="w-8 h-8 rounded-lg bg-gray-100 shrink-0" />
                       <div className="space-y-1.5">
                         <div className="h-4 w-40 bg-gray-200 rounded" />
                         <div className="h-3 w-48 bg-gray-100 rounded" />
@@ -342,7 +342,7 @@ export default function ProfesseurRessources() {
                     </div>
                   </td>
                   <td className="px-5 py-3.5">
-                    <div className="h-5 w-24 bg-amber-50 rounded-full" />
+                    <div className="h-5 w-24 bg-gray-100 rounded-full" />
                   </td>
                   <td className="px-5 py-3.5 space-y-1.5">
                     <div className="h-3.5 w-24 bg-gray-200 rounded" />
@@ -367,13 +367,13 @@ export default function ProfesseurRessources() {
           </table>
         </div>
       ) : error ? (
-        <div className="py-16 text-center text-sm text-red-500 bg-red-50 rounded-xl border border-red-100">
+        <div className="py-16 text-center tely-card tely-error">
           {error}
         </div>
       ) : filteredRessources.length === 0 ? (
-        <div className="flex flex-col items-center justify-center py-16 text-center bg-white rounded-2xl border border-gray-100">
-          <div className="w-12 h-12 rounded-full bg-amber-50 flex items-center justify-center mb-3">
-            <FileText size={22} className="text-amber-500" />
+        <div className="flex flex-col items-center justify-center py-16 text-center tely-card">
+          <div className="w-12 h-12 rounded-full bg-gray-50 flex items-center justify-center mb-3">
+            <FileText size={22} className="text-gray-900" />
           </div>
           <p className="text-sm text-gray-500 font-medium">Aucun document pour le moment</p>
           <p className="text-xs text-gray-400 mt-1 max-w-sm">
@@ -384,17 +384,17 @@ export default function ProfesseurRessources() {
           {!search && filterType === "all" && filterMatiere === "all" && (
             <button
               onClick={openCreate}
-              className="text-sm font-medium text-amber-600 hover:text-amber-700 mt-3"
+              className="tely-link text-sm mt-3"
             >
               Publier un premier document PDF
             </button>
           )}
         </div>
       ) : (
-        <div className="overflow-x-auto border border-gray-100 rounded-2xl bg-white shadow-sm">
+        <div className="overflow-x-auto tely-card">
           <table className="w-full text-sm">
             <thead>
-              <tr className="bg-gray-50/75 text-left text-xs text-gray-500 uppercase tracking-wider border-b border-gray-100">
+              <tr className="text-left tely-overline border-b border-gray-100">
                 <th className="px-5 py-3.5">Document</th>
                 <th className="px-5 py-3.5">Type</th>
                 <th className="px-5 py-3.5">Matière & Niveau</th>
@@ -407,10 +407,10 @@ export default function ProfesseurRessources() {
               {filteredRessources.map((r) => {
                 const typeInfo = TYPE_CONFIG[r.type] ?? TYPE_CONFIG.autre;
                 return (
-                  <tr key={r.id} className="hover:bg-amber-50/30 transition-colors">
+                  <tr key={r.id} className="hover:bg-gray-50 transition-colors">
                     <td className="px-5 py-3.5 font-medium text-gray-900 max-w-xs">
                       <div className="flex items-center gap-2.5">
-                        <div className="w-8 h-8 rounded-lg bg-red-50 text-red-600 flex items-center justify-center shrink-0">
+                        <div className="w-8 h-8 rounded-[10px] bg-gray-50 text-gray-900 flex items-center justify-center shrink-0">
                           <FileText size={16} />
                         </div>
                         <div className="min-w-0">
@@ -423,7 +423,7 @@ export default function ProfesseurRessources() {
                     </td>
                     <td className="px-5 py-3.5">
                       <span
-                        className={`text-[11px] font-semibold px-2.5 py-0.5 rounded-full border ${typeInfo.class}`}
+                        className={`tely-chip ${typeInfo.class}`}
                       >
                         {typeInfo.label}
                       </span>
@@ -440,7 +440,7 @@ export default function ProfesseurRessources() {
                         : "Enseignant certifié"}
                     </td>
                     <td className="px-5 py-3.5 text-center">
-                      <span className="font-mono text-xs px-2 py-0.5 rounded bg-gray-100 text-gray-700 uppercase font-semibold">
+                      <span className="tely-chip uppercase font-mono">
                         {r.format || "PDF"}
                       </span>
                     </td>
@@ -452,7 +452,7 @@ export default function ProfesseurRessources() {
                             target="_blank"
                             rel="noreferrer"
                             title="Télécharger / Visualiser"
-                            className="p-1.5 rounded-lg text-gray-400 hover:text-emerald-600 hover:bg-emerald-50 transition-colors"
+                            className="tely-icon-btn text-gray-900"
                           >
                             <Download size={15} />
                           </a>
@@ -460,14 +460,14 @@ export default function ProfesseurRessources() {
                         <button
                           onClick={() => openEdit(r)}
                           title="Modifier"
-                          className="p-1.5 rounded-lg text-gray-400 hover:text-amber-600 hover:bg-amber-50 transition-colors"
+                          className="tely-icon-btn text-gray-900"
                         >
                           <Pencil size={15} />
                         </button>
                         <button
                           onClick={() => setDeleteTarget(r)}
                           title="Supprimer"
-                          className="p-1.5 rounded-lg text-gray-400 hover:text-red-500 hover:bg-red-50 transition-colors"
+                          className="tely-icon-btn text-gray-900 hover:bg-red-50"
                         >
                           <Trash2 size={15} />
                         </button>
@@ -485,22 +485,22 @@ export default function ProfesseurRessources() {
       <Modal open={modalOpen} onClose={closeModal}>
         <form onSubmit={handleSubmit} className="flex flex-col gap-4">
           <div>
-            <h2 className="text-lg font-bold text-gray-900">
+            <h2 className="tely-title text-xl">
               {editingRessource ? "Modifier la ressource" : "Publier une ressource pédagogique"}
             </h2>
-            <p className="text-xs text-gray-500 mt-0.5">
+            <p className="tely-subtitle mt-1">
               Partagez des fiches de cours, résumés de formules ou exercices complémentaires en PDF.
             </p>
           </div>
 
           {formError && (
-            <div className="text-xs text-red-500 bg-red-50 border border-red-100 rounded-xl px-3 py-2.5">
+            <div className="tely-error">
               {formError}
             </div>
           )}
 
           <div>
-            <label className="text-xs font-semibold text-gray-600 mb-1 block">
+            <label className="tely-label mb-1.5 block">
               Titre du document <span className="text-red-500">*</span>
             </label>
             <input
@@ -509,18 +509,18 @@ export default function ProfesseurRessources() {
               value={formTitre}
               onChange={(e) => setFormTitre(e.target.value)}
               placeholder="Ex: Formulaire complet de trigonométrie et dérivées"
-              className="w-full text-sm border border-gray-200 rounded-xl px-3.5 py-2.5 focus:outline-none focus:ring-2 focus:ring-amber-200"
+              className="tely-input"
             />
           </div>
 
           <div>
-            <label className="text-xs font-semibold text-gray-600 mb-1 block">
+            <label className="tely-label mb-1.5 block">
               Type de document <span className="text-red-500">*</span>
             </label>
             <select
               value={formType}
               onChange={(e) => setFormType(e.target.value)}
-              className="w-full text-sm border border-gray-200 rounded-xl px-3.5 py-2.5 focus:outline-none focus:ring-2 focus:ring-amber-200"
+              className="tely-input"
             >
               <option value="cours">Cours complet</option>
               <option value="resume">Fiche résumé / Mémento</option>
@@ -532,13 +532,13 @@ export default function ProfesseurRessources() {
 
           <div className="grid grid-cols-2 gap-3">
             <div>
-              <label className="text-xs font-semibold text-gray-600 mb-1 block">
+              <label className="tely-label mb-1.5 block">
                 Matière <span className="text-red-500">*</span>
               </label>
               <select
                 value={formMatiereId}
                 onChange={(e) => setFormMatiereId(e.target.value)}
-                className="w-full text-sm border border-gray-200 rounded-xl px-3.5 py-2.5 focus:outline-none focus:ring-2 focus:ring-amber-200"
+                className="tely-input"
               >
                 <option value="">Sélectionner une matière...</option>
                 {matieres.map((m) => (
@@ -550,13 +550,13 @@ export default function ProfesseurRessources() {
             </div>
 
             <div>
-              <label className="text-xs font-semibold text-gray-600 mb-1 block">
+              <label className="tely-label mb-1.5 block">
                 Niveau scolaire <span className="text-red-500">*</span>
               </label>
               <select
                 value={formNiveauId}
                 onChange={(e) => setFormNiveauId(e.target.value)}
-                className="w-full text-sm border border-gray-200 rounded-xl px-3.5 py-2.5 focus:outline-none focus:ring-2 focus:ring-amber-200"
+                className="tely-input"
               >
                 <option value="">Sélectionner un niveau...</option>
                 {niveaux.map((n) => (
@@ -569,7 +569,7 @@ export default function ProfesseurRessources() {
           </div>
 
           <div>
-            <label className="text-xs font-semibold text-gray-600 mb-1 block">
+            <label className="tely-label mb-1.5 block">
               Description / Conseils de lecture
             </label>
             <textarea
@@ -577,13 +577,13 @@ export default function ProfesseurRessources() {
               value={formDescription}
               onChange={(e) => setFormDescription(e.target.value)}
               placeholder="Explications pour l'élève sur l'utilisation de cette ressource..."
-              className="w-full text-sm border border-gray-200 rounded-xl px-3.5 py-2 focus:outline-none focus:ring-2 focus:ring-amber-200"
+              className="tely-input"
             />
           </div>
 
           {/* Fichier upload */}
-          <div className="p-4 border-2 border-dashed border-gray-200 rounded-2xl bg-gray-50/60 flex flex-col items-center justify-center text-center">
-            <Upload size={22} className="text-amber-500 mb-2" />
+          <div className="p-4 border border-dashed border-gray-200 rounded-[10px] bg-gray-50 flex flex-col items-center justify-center text-center">
+            <Upload size={22} className="text-gray-900 mb-2" />
             <span className="text-xs font-semibold text-gray-700">
               {formFile ? formFile.name : "Sélectionner un fichier (PDF, DOCX, etc.)"}
             </span>
@@ -592,7 +592,7 @@ export default function ProfesseurRessources() {
               type="file"
               accept=".pdf,.docx,.doc,.odt,.txt"
               onChange={(e) => setFormFile(e.target.files?.[0] ?? null)}
-              className="mt-2 text-xs text-gray-500 file:mr-3 file:py-1 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-amber-50 file:text-amber-700 hover:file:bg-amber-100 cursor-pointer"
+              className="mt-2 text-xs text-gray-500 file:mr-3 file:py-1 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-gray-900 file:text-white hover:file:bg-gray-700 cursor-pointer"
             />
           </div>
 
@@ -600,14 +600,14 @@ export default function ProfesseurRessources() {
             <button
               type="button"
               onClick={closeModal}
-              className="flex-1 text-sm font-medium border border-gray-200 rounded-xl px-4 py-2.5 hover:bg-gray-50 transition-colors"
+              className="tely-btn-outline flex-1"
             >
               Annuler
             </button>
             <button
               type="submit"
               disabled={submitting}
-              className="flex-1 text-sm font-medium bg-amber-500 text-white rounded-xl px-4 py-2.5 hover:bg-amber-600 transition-colors disabled:opacity-60 cursor-pointer shadow-sm"
+              className="tely-btn flex-1"
             >
               {submitting ? "Téléversement..." : editingRessource ? "Mettre à jour" : "Publier le document"}
             </button>

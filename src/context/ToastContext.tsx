@@ -21,17 +21,17 @@ interface ToastContextValue {
 const ToastContext = createContext<ToastContextValue | null>(null);
 
 const ICONS: Record<ToastType, React.ReactNode> = {
-  success: <CheckCircle2 size={18} className="text-emerald-500 shrink-0 mt-0.5" />,
-  error: <XCircle size={18} className="text-rose-500 shrink-0 mt-0.5" />,
-  warning: <AlertTriangle size={18} className="text-amber-500 shrink-0 mt-0.5" />,
-  info: <Info size={18} className="text-blue-500 shrink-0 mt-0.5" />,
+  success: <CheckCircle2 size={18} className="text-gray-900 shrink-0 mt-0.5" />,
+  error: <XCircle size={18} className="text-gray-900 shrink-0 mt-0.5" />,
+  warning: <AlertTriangle size={18} className="text-gray-900 shrink-0 mt-0.5" />,
+  info: <Info size={18} className="text-gray-900 shrink-0 mt-0.5" />,
 };
 
 const BORDERS: Record<ToastType, string> = {
   success: "border-emerald-100 bg-white shadow-emerald-500/5",
-  error: "border-rose-100 bg-white shadow-rose-500/5",
+  error: "border-red-100 bg-white shadow-red-500/5",
   warning: "border-amber-100 bg-white shadow-amber-500/5",
-  info: "border-blue-100 bg-white shadow-blue-500/5",
+  info: "border-gray-100 bg-white shadow-gray-500/5",
 };
 
 export function ToastProvider({ children }: { children: React.ReactNode }) {
@@ -78,7 +78,7 @@ export function ToastProvider({ children }: { children: React.ReactNode }) {
         {toasts.map((toast) => (
           <div
             key={toast.id}
-            className={`pointer-events-auto flex items-start justify-between gap-3 p-3.5 rounded-2xl border shadow-lg text-sm transition-all duration-300 ${
+            className={`pointer-events-auto flex items-start justify-between gap-3 p-3.5 rounded-lg border shadow-xl text-sm transition-all duration-300 ${
               BORDERS[toast.type]
             }`}
           >
@@ -91,7 +91,7 @@ export function ToastProvider({ children }: { children: React.ReactNode }) {
             <button
               type="button"
               onClick={() => removeToast(toast.id)}
-              className="text-gray-400 hover:text-gray-600 transition-colors shrink-0"
+              className="text-gray-900 hover:text-gray-600 transition-colors shrink-0"
               title="Fermer"
             >
               <X size={15} />

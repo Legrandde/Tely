@@ -23,7 +23,6 @@ export function AuthLayout() {
     </div>
 
       <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&display=swap');
         @keyframes fadeSlideIn {
           from { opacity: 0; transform: translateY(16px); }
           to   { opacity: 1; transform: translateY(0);    }

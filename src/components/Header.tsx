@@ -8,8 +8,10 @@ import NotificationDropdown from "./notifications/NotificationDropdown";
 const TITLES: Record<string, string> = {
   statistiques: "Statistiques & Audience",
   candidatures: "Candidatures Enseignants",
-  parametres: "Paramètres & Configuration",
-  profile: "Mon Profil Utilisateur",
+  utilisateurs: "Comptes & rôles",
+  parametres: "Paramètres & Compte",
+  profile: "Paramètres & Compte",
+  notifications: "Paramètres & Compte",
   exercices: "Gestion des exercices",
   sujets: "Gestion des sujets d'examen",
   corrections: "Gestion des corrections",
@@ -68,30 +70,30 @@ export default function Header({ title }: { title?: string }) {
   const { toggleMobile } = useSidebar();
 
   return (
-    <div className="flex items-center h-16 justify-between px-3 sm:px-6 bg-white border-b border-gray-100 w-full shrink-0">
+    <div className="flex items-center h-16 justify-between px-3 sm:px-6 tely-page w-full shrink-0">
       {/* Bouton Hamburger mobile + Titre page */}
       <div className="flex items-center gap-2 min-w-0">
         <button
           type="button"
           onClick={toggleMobile}
-          className="lg:hidden p-2 rounded-lg text-gray-600 hover:text-amber-500 hover:bg-amber-50 transition-colors cursor-pointer shrink-0"
+          className="lg:hidden tely-icon-btn shrink-0"
           aria-label="Ouvrir le menu latéral"
           title="Menu de navigation"
         >
           <Menu size={20} />
         </button>
-        <h1 className="text-sm sm:text-base font-bold text-gray-800 truncate">{getPageTitle()}</h1>
+        <h1 className="tely-title text-lg sm:text-xl truncate">{getPageTitle()}</h1>
       </div>
 
       {/* Droite : search + icons + avatar */}
       <div className="flex items-center gap-2 sm:gap-4 shrink-0">
         {/* Search bar */}
-        <div className="hidden md:flex items-center gap-2 bg-gray-50 rounded-xl px-3.5 py-2 w-48 lg:w-64 border border-gray-100">
-          <Search size={15} className="text-gray-400 shrink-0" />
+        <div className="hidden md:flex items-center gap-2 bg-white rounded-[10px] px-3 py-2.5 w-48 lg:w-64 border border-gray-200 transition-all duration-200 focus-within:border-gray-900 focus-within:shadow-[0_0_0_3px_rgba(17,17,17,0.06)]">
+          <Search size={15} className="text-gray-900 shrink-0" />
           <input
             type="text"
             placeholder="Recherche globale..."
-            className="bg-transparent text-xs text-gray-700 outline-none w-full placeholder-gray-400"
+            className="bg-transparent text-sm text-gray-900 outline-none w-full placeholder:text-gray-400"
           />
         </div>
 
@@ -100,7 +102,7 @@ export default function Header({ title }: { title?: string }) {
           type="button"
           onClick={() => navigate(settingsPath)}
           title="Paramètres & Configuration"
-          className="p-1.5 sm:p-2 rounded-lg text-gray-400 hover:text-amber-500 hover:bg-amber-50 transition-colors cursor-pointer"
+          className="tely-icon-btn hover:bg-white"
         >
           <Settings size={18} />
         </button>
@@ -112,7 +114,7 @@ export default function Header({ title }: { title?: string }) {
         <button
           type="button"
           onClick={() => navigate(profilePath)}
-          className="w-9 h-9 rounded-full overflow-hidden cursor-pointer ring-2 ring-amber-500/30 hover:ring-amber-500 shrink-0 transition-all"
+          className="w-9 h-9 rounded-full overflow-hidden cursor-pointer ring-2 ring-white hover:ring-gray-900 shrink-0 transition-all"
           title={`Profil de ${nomComplet || "l'utilisateur"}`}
         >
           {avatarUrl ? (
@@ -123,7 +125,7 @@ export default function Header({ title }: { title?: string }) {
               className="w-full h-full object-cover"
             />
           ) : (
-            <div className="w-full h-full bg-amber-500 text-white flex items-center justify-center text-xs font-semibold">
+            <div className="w-full h-full bg-gray-900 text-white flex items-center justify-center text-xs font-semibold">
               {initiales}
             </div>
           )}

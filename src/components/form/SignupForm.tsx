@@ -1,16 +1,15 @@
 import { useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
-import { Lock } from "lucide-react";
 import { AppInput } from "../shared/ui/AppInput";
 import { AppButton } from "../shared/ui/AppButton";
 import { IconEye } from "../shared/ui/IconEye";
 import { IconGoogle } from "../shared/ui/IconGoogle";
 import { register, loginWithGoogle } from "../../services/authService";
+import { trackEvent } from "../../services/analyticsTracker";
 
 export function SignupForm() {
   const navigate = useNavigate();
   const location = useLocation();
-  const stateRaison = (location.state as { raison?: string } | null)?.raison;
 
   const [values, setValues] = useState({
     nom: "",
@@ -81,6 +80,7 @@ export function SignupForm() {
         password_confirmation: values.confirmPassword,
         role: "eleve",
       });
+      void trackEvent("register");
 
       if (user.role === "professeur") {
         navigate("/Dashboard-professeur", { replace: true });
@@ -105,22 +105,15 @@ export function SignupForm() {
 
   return (
     <form onSubmit={handleSubmit} className="flex flex-col">
-      <h1 className="text-[28px] font-bold text-gray-900 leading-tight mb-1" style={{ fontFamily: "'Playfair Display', serif" }}>
+      <h1 className="text-[28px] font-bold text-gray-900 leading-tight mb-1">
         Créer un compte
       </h1>
       <p className="text-sm text-gray-400 mb-7">Rejoins Tely et commence à t'exercer</p>
 
-      {stateRaison && (
-        <div className="flex items-center gap-2 text-xs text-amber-800 bg-amber-50 border border-amber-200 rounded-lg px-3 py-2.5 mb-3.5">
-          <Lock size={15} className="text-amber-600 shrink-0" />
-          <span>{stateRaison}</span>
-        </div>
-      )}
-
       {errors.global && (
-        <div className="text-xs text-red-500 bg-red-50 border border-red-100 rounded-lg px-3 py-2 mb-3.5">
+        <p className="text-xs text-red-500 mb-3.5">
           {errors.global}
-        </div>
+        </p>
       )}
 
       <div className="flex flex-col gap-3.5 mb-3.5">

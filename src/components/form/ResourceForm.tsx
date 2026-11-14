@@ -122,9 +122,8 @@ export default function ResourceForm({
 
   function renderField(field: FieldConfig) {
     const error = errors[field.name];
-    const baseInputClass = `w-full text-sm border ${
-      error ? "border-red-300 focus:ring-red-200" : "border-gray-200 focus:ring-amber-200"
-    } rounded-lg px-3 py-2 focus:outline-hidden focus:ring-2`;
+    // Même champ que la page de connexion (AppInput)
+    const baseInputClass = `tely-input ${error ? "border-red-500 focus:border-red-500" : ""}`;
 
     switch (field.type) {
       case "textarea": {
@@ -137,10 +136,10 @@ export default function ResourceForm({
                   Saisie directe ou extraction depuis un sujet PDF
                 </span>
                 <label
-                  className={`inline-flex items-center gap-1.5 px-2.5 py-1 text-xs font-medium rounded-md border transition-all cursor-pointer ${
+                  className={`inline-flex items-center gap-1.5 px-2.5 py-1 text-xs font-medium rounded-[10px] border transition-all cursor-pointer ${
                     extractingField === field.name
-                      ? "bg-amber-100 text-amber-800 border-amber-300 animate-pulse cursor-wait"
-                      : "bg-amber-50 hover:bg-amber-100 text-amber-700 border-amber-200"
+                      ? "bg-gray-100 text-gray-900 border-gray-200 animate-pulse cursor-wait"
+                      : "bg-white hover:bg-gray-50 text-gray-900 border-gray-200"
                   }`}
                 >
                   <FileText size={13} />
@@ -164,7 +163,7 @@ export default function ResourceForm({
               </div>
             )}
             {extractingField === field.name ? (
-              <div className="w-full border border-gray-200 rounded-lg p-3 space-y-2.5 bg-gray-50 animate-pulse">
+              <div className="w-full border border-gray-200 rounded-[10px] p-3 space-y-2.5 bg-gray-50 animate-pulse">
                 <div className="h-3 bg-gray-200 rounded w-3/4" />
                 <div className="h-3 bg-gray-200 rounded w-full" />
                 <div className="h-3 bg-gray-200 rounded w-5/6" />
@@ -201,7 +200,7 @@ export default function ResourceForm({
               type="checkbox"
               checked={!!values[field.name]}
               onChange={(e) => setValue(field.name, e.target.checked)}
-              className="accent-amber-500 w-4 h-4"
+              className="tely-checkbox"
             />
             {field.helperText ?? "Actif"}
           </label>
@@ -227,7 +226,7 @@ export default function ResourceForm({
         const options = asyncOptions[field.name] ?? [];
         if (loadingOptions) {
           return (
-            <div className="h-9 w-full bg-gray-100 border border-gray-200 rounded-lg animate-pulse" />
+            <div className="h-12 w-full bg-gray-50 border border-gray-200 rounded-[10px] animate-pulse" />
           );
         }
         return (
@@ -262,7 +261,7 @@ export default function ResourceForm({
 
   return (
     <form onSubmit={handleSubmit} className="flex flex-col gap-3.5">
-      <h2 className="text-lg font-bold text-gray-900">
+      <h2 className="tely-title text-xl">
         {isEditMode ? `Modifier : ${schema.title}` : `Ajouter : ${schema.title}`}
       </h2>
 
@@ -275,14 +274,14 @@ export default function ResourceForm({
       {schema.fields.map((field) => (
         <div key={field.name}>
           {field.type !== "checkbox" && (
-            <label className="text-xs font-medium text-gray-500 mb-1 block">
+            <label className="tely-label mb-1.5 block">
               {field.label}
-              {field.required && <span className="text-red-400"> *</span>}
+              {field.required && <span className="text-red-500"> *</span>}
             </label>
           )}
           {renderField(field)}
           {errors[field.name] && (
-            <p className="text-xs text-red-500 mt-1">{errors[field.name]}</p>
+            <p className="tely-error mt-1">{errors[field.name]}</p>
           )}
           {field.helperText && field.type !== "checkbox" && (
             <p className="text-xs text-gray-400 mt-1">{field.helperText}</p>
@@ -295,7 +294,7 @@ export default function ResourceForm({
           <button
             type="button"
             onClick={onCancel}
-            className="flex-1 text-sm font-medium border border-gray-200 rounded-lg px-4 py-2 hover:bg-gray-50 cursor-pointer"
+            className="tely-btn-outline flex-1"
           >
             Annuler
           </button>
@@ -303,7 +302,7 @@ export default function ResourceForm({
         <button
           type="submit"
           disabled={loading || extractingField !== null}
-          className="flex-1 text-sm font-medium bg-amber-500 rounded-lg px-4 py-2 text-white hover:bg-amber-600 transition-colors disabled:opacity-60 cursor-pointer"
+          className="tely-btn flex-1"
         >
           {loading ? "Enregistrement..." : isEditMode ? "Mettre à jour" : "Créer"}
         </button>
