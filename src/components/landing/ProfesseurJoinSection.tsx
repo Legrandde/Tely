@@ -85,36 +85,85 @@ export default function ProfesseurJoinSection() {
   };
 
   return (
-    <section className="w-full bg-amber-50 px-4 py-8">
-      {/* ── Bloc épuré aux règles existantes de l'application ── */}
-      <div className="mx-auto flex max-w-3xl flex-col items-center gap-4 rounded-lg border bg-white px-6 py-10 text-center shadow-lg">
-        <h2 className="text-2xl font-bold text-black sm:text-3xl">
-          Vous êtes enseignant ? Rejoignez Tely
-        </h2>
-        <p className="mx-auto max-w-xl text-base text-black/70 leading-relaxed">
-          Participez à l'aventure pédagogique. Publiez vos exercices, anciens sujets et corrigés détaillés pour accompagner des milliers d'élèves. Votre compte sera activé après validation de votre candidature.
-        </p>
-
-        <button
-          type="button"
-          onClick={() => {
-            resetForm();
-            setModalOpen(true);
-          }}
-          className="mt-2 flex items-center justify-center gap-3 rounded-lg bg-black hover:bg-gray-800 px-6 py-3 font-semibold text-white shadow-md transition-colors cursor-pointer"
-        >
-          Postuler comme enseignant <GoArrowRight />
-        </button>
+    <section
+      id="enseignants"
+      aria-labelledby="enseignants-titre"
+      className="w-full scroll-mt-20 px-4 py-16 sm:py-20"
+    >
+      {/* ── Bloc enseignants ── */}
+      <div className="mx-auto grid max-w-6xl items-center gap-8 overflow-hidden rounded-3xl bg-gray-900 px-6 py-10 text-white shadow-xl sm:px-10 md:grid-cols-[1.4fr_1fr] md:py-14">
+        <div className="flex flex-col items-start gap-4 text-left">
+          <span className="rounded-full bg-amber-500/15 px-3 py-1 text-xs font-semibold uppercase tracking-wider text-amber-300">
+            Espace enseignants
+          </span>
+          <h2 id="enseignants-titre" className="text-2xl font-bold tracking-tight sm:text-3xl">
+            Vous êtes enseignant ? Partagez votre savoir sur Tely
+          </h2>
+          <p className="max-w-xl text-base leading-relaxed text-gray-300">
+            Publiez vos exercices, anciens sujets et corrigés détaillés pour accompagner les élèves dans
+            leurs révisions. Votre compte est activé après validation de votre candidature par notre équipe.
+          </p>
+          <ul className="grid gap-2 text-sm text-gray-300 sm:grid-cols-2">
+            <li className="flex items-center gap-2">
+              <CheckCircle2 size={16} className="shrink-0 text-amber-400" aria-hidden="true" />
+              Tableau de bord dédié
+            </li>
+            <li className="flex items-center gap-2">
+              <CheckCircle2 size={16} className="shrink-0 text-amber-400" aria-hidden="true" />
+              Statistiques de consultation
+            </li>
+            <li className="flex items-center gap-2">
+              <CheckCircle2 size={16} className="shrink-0 text-amber-400" aria-hidden="true" />
+              Publication simple et rapide
+            </li>
+            <li className="flex items-center gap-2">
+              <CheckCircle2 size={16} className="shrink-0 text-amber-400" aria-hidden="true" />
+              Visibilité auprès des élèves
+            </li>
+          </ul>
+          <button
+            type="button"
+            onClick={() => {
+              resetForm();
+              setModalOpen(true);
+            }}
+            className="mt-2 inline-flex cursor-pointer items-center justify-center gap-3 rounded-[10px] bg-amber-500 px-6 py-3.5 text-sm font-semibold text-gray-900 shadow-md transition-colors hover:bg-amber-400 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-amber-300"
+          >
+            Postuler comme enseignant <GoArrowRight aria-hidden="true" />
+          </button>
+        </div>
+        <div className="relative mx-auto hidden w-full max-w-xs md:block">
+          <div className="absolute inset-4 rounded-full bg-amber-500/20 blur-2xl" aria-hidden="true" />
+          <img
+            src="/banniere.png"
+            alt=""
+            width={638}
+            height={1000}
+            loading="lazy"
+            decoding="async"
+            className="relative h-auto w-full max-h-80 object-contain"
+          />
+        </div>
       </div>
 
       {/* ── Modal simple & épurée ── */}
       {modalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4">
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4"
+          role="dialog"
+          aria-modal="true"
+          aria-label="Candidature enseignant"
+          onKeyDown={(e) => {
+            if (e.key === "Escape") setModalOpen(false);
+          }}
+        >
           <div className="bg-white rounded-xl shadow-xl w-full max-w-lg max-h-[90vh] overflow-y-auto p-6 relative text-black border border-gray-200">
             {/* Bouton fermer */}
             <button
               type="button"
               onClick={() => setModalOpen(false)}
+              aria-label="Fermer"
+              autoFocus
               className="absolute top-4 right-4 text-gray-400 hover:text-gray-700 cursor-pointer"
             >
               <X size={20} />

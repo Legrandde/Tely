@@ -2,6 +2,7 @@ import { GraduationCap, BookOpen, Lock } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import type { Exercice } from "../types/exercice";
 import { useAuth } from "../context/authContext";
+import FavoriButton from "./eleve/FavoriButton";
 
 interface ExerciceCardProps {
   exercice: Exercice;
@@ -52,6 +53,9 @@ export default function ExerciceCard({ exercice }: ExerciceCardProps) {
       <div
         className={`relative h-36 w-full flex items-center justify-center overflow-hidden bg-gradient-to-br ${gradientFor(id)}`}
       >
+        <div className="absolute top-2 left-2 z-10">
+          <FavoriButton exerciceId={id} titre={titre} />
+        </div>
         <span className="absolute top-2 right-2 text-[10px] font-semibold bg-white/90 text-gray-700 px-2 py-0.5 rounded-full">
           {niveau?.libelle}
         </span>

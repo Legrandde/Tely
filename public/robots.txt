@@ -1,0 +1,11 @@
+User-agent: *
+Allow: /
+Disallow: /Dashbord-admin
+Disallow: /Dashboard-professeur
+Disallow: /dashboard-admin
+Disallow: /espace
+Disallow: /page-builder
+Disallow: /auth
+Disallow: /profile
+Disallow: /parametres
+Disallow: /notifications

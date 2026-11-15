@@ -1,14 +1,46 @@
 import Header from "../components/ui/Header";
+import Footer from "../components/ui/Footer";
 import ExerciceCardSkeleton from "../components/ExerciceCardSkeleton";
 import UseSujet from "../hooks/useSujet";
 import SujetCard from "../components/SujetCard";
 import ModernFilterBar, { type FilterValues } from "../components/ModernFilterBar";
-import { useState, useMemo } from "react";
+import ConversionBanner from "../components/site/ConversionBanner";
+import { useSeo } from "../hooks/useSeo";
+import { useMemo } from "react";
+import { useSearchParams } from "react-router-dom";
+
+const CLES_FILTRES: (keyof FilterValues)[] = ["q", "cycle", "niveau_id", "matiere_id", "serie", "tri"];
+
+/** Filtres lus depuis l'URL (liens profonds `/sujets?matiere_id=…`, partage, retour arrière). */
+function lireFiltres(params: URLSearchParams): FilterValues {
+  const v: FilterValues = { tri: "pertinence" };
+  for (const cle of CLES_FILTRES) {
+    const valeur = params.get(cle)?.trim();
+    if (valeur) v[cle] = valeur;
+  }
+  return v;
+}
+
+function ecrireFiltres(v: FilterValues): URLSearchParams {
+  const p = new URLSearchParams();
+  for (const cle of CLES_FILTRES) {
+    const valeur = v[cle];
+    if (!valeur || (cle === "tri" && valeur === "pertinence")) continue;
+    p.set(cle, valeur);
+  }
+  return p;
+}
 
 export default function ListeSujets() {
   const { sujet, loadingSujet, err } = UseSujet();
-  const [filterValues, setFilterValues] = useState<FilterValues>({
-    tri: "pertinence",
+  const [searchParams, setSearchParams] = useSearchParams();
+  const filterValues = useMemo(() => lireFiltres(searchParams), [searchParams]);
+  const setFilterValues = (v: FilterValues) => setSearchParams(ecrireFiltres(v), { replace: true });
+
+  useSeo({
+    title: "Anciens sujets d'examen corrigés (Brevet, BAC)",
+    description:
+      "Retrouvez les anciens sujets d'examen et de compositions, classés par matière et par niveau, avec leurs corrigés détaillés pour vous préparer efficacement.",
   });
 
   const sujetFiltre = useMemo(() => {
@@ -62,20 +94,18 @@ export default function ListeSujets() {
   }, [sujet, filterValues]);
 
   return (
-    <div className="min-h-screen bg-gray-50 relative">
-      <div className="px-4 sm:px-8 pt-4">
-        <Header />
-      </div>
-      <div className="px-4 sm:px-8 py-6 max-w-7xl mx-auto">
+    <div className="tely-page relative flex min-h-screen flex-col">
+      <Header />
+      <main id="contenu" className="mx-auto w-full max-w-7xl flex-1 px-4 py-6 sm:px-8">
         {/* Entête */}
         <div className="mb-6">
-          <h1 className="text-2xl font-bold text-gray-900">
-            Tous les Sujets d'Examens
-          </h1>
-          <p className="text-sm text-gray-500">
+          <h1 className="tely-title text-2xl sm:text-3xl">Tous les sujets d'examen</h1>
+          <p className="mt-1 text-sm text-gray-500">
             Retrouvez les annales officielles des examens d'État (BAC, BEPC, CEE) et compositions
           </p>
         </div>
+
+        <ConversionBanner />
 
         {/* ── NOUVELLE BARRE DE FILTRE MODERNE (conforme à la maquette) ── */}
         <ModernFilterBar
@@ -93,7 +123,12 @@ export default function ListeSujets() {
             ))}
           </div>
         ) : err ? (
-          <p className="text-sm text-red-500 text-center py-16">{String(err)}</p>
+          <div className="rounded-2xl border border-red-100 bg-white p-8 text-center" role="alert">
+            <p className="mb-3 text-sm text-red-600">Impossible de charger les sujets d'examen.</p>
+            <button type="button" onClick={() => window.location.reload()} className="tely-btn-outline">
+              Réessayer
+            </button>
+          </div>
         ) : sujetFiltre.length === 0 ? (
           <div className="text-center py-16 bg-white rounded-2xl border border-gray-100 p-8">
             <p className="text-base font-medium text-gray-700 mb-1">
@@ -103,8 +138,9 @@ export default function ListeSujets() {
               Essayez de réinitialiser vos critères de recherche pour afficher tous les sujets disponibles.
             </p>
             <button
+              type="button"
               onClick={() => setFilterValues({ tri: "pertinence" })}
-              className="text-sm font-medium text-amber-600 hover:text-amber-700 underline"
+              className="text-sm font-medium text-amber-700 hover:text-amber-800 underline"
             >
               Réinitialiser les filtres
             </button>
@@ -116,7 +152,8 @@ export default function ListeSujets() {
             ))}
           </div>
         )}
-      </div>
+      </main>
+      <Footer />
     </div>
   );
 }

@@ -7,6 +7,7 @@ import { professeurSchema } from "../config/resourceSchemas";
 import { deleteProfesseur, listProfesseurs } from "../services/resourceService";
 import { useToast } from "../context/ToastContext";
 
+import { resolveImageUrl } from "../utils/imageUrl";
 interface Professeur {
   id: string | number;
   specialite?: string;
@@ -266,7 +267,7 @@ export default function GestionProfesseurs() {
                         <div className="w-9 h-9 rounded-full bg-gray-900 text-white font-bold text-xs flex items-center justify-center shrink-0">
                           {professeur.user?.avatar ? (
                             <img
-                              src={professeur.user.avatar}
+                              src={resolveImageUrl(professeur.user.avatar) ?? undefined}
                               alt={nomComplet}
                               className="w-full h-full rounded-full object-cover"
                             />
@@ -349,7 +350,7 @@ export default function GestionProfesseurs() {
               <div className="w-14 h-14 rounded-full bg-gray-900 text-white font-bold text-lg flex items-center justify-center shrink-0">
                 {viewProfesseur.user?.avatar ? (
                   <img
-                    src={viewProfesseur.user.avatar}
+                    src={resolveImageUrl(viewProfesseur.user.avatar) ?? undefined}
                     alt="avatar"
                     className="w-full h-full rounded-full object-cover"
                   />

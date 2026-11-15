@@ -1,140 +1,227 @@
-import { ArrowRight } from "lucide-react";
-import { Link, useNavigate } from "react-router-dom";
-import { motion } from "framer-motion";
-import Service from "../components/Services";
-import { GoArrowRight } from "react-icons/go";
-import PartainerSponsor from "../components/PartenaireSponsort";
+import { Suspense, lazy, useEffect, useMemo, useRef, useState, type ComponentProps } from "react";
+import { useLocation } from "react-router-dom";
+import { MotionConfig } from "framer-motion";
 import Header from "../components/ui/Header";
-import { useAuth } from "../context/authContext";
+import Footer from "../components/ui/Footer";
 import NouvelleLettre from "../components/NouvelleLettre";
-import FooterSection from "../components/FooterSection";
 import GoogleOneTap from "../components/auth/GoogleOneTap";
 import ProfesseurJoinSection from "../components/landing/ProfesseurJoinSection";
+import HeroSection from "../components/landing/HeroSection";
+import ReassuranceBand from "../components/landing/ReassuranceBand";
+import HowItWorks from "../components/landing/HowItWorks";
+import BenefitsSection from "../components/landing/BenefitsSection";
+import ExploreSection from "../components/landing/ExploreSection";
+import RecentExercises from "../components/landing/RecentExercises";
+import FaqSection from "../components/landing/FaqSection";
+import DerniersArticles from "../features/blog/components/DerniersArticles";
+import FinalCta from "../components/landing/FinalCta";
+import LandingSkeleton from "../components/landing/LandingSkeleton";
+import { FAQ } from "../components/landing/faqData";
+import { useCtaInscription } from "../components/landing/useCtaInscription";
+import StickyCta from "../components/site/StickyCta";
+import { useAuth } from "../context/authContext";
+import { useSite, useSiteNom } from "../context/SiteContext";
+import { useJsonLd, useSeo } from "../hooks/useSeo";
+import { getPageAccueil } from "../services/siteService";
+import type { PagePublique } from "../types/site";
 
-// ── Variants ────────────────────────────────────────────────────────────────
-const fadeUp = {
-  hidden: { opacity: 0, y: 24 },
-  show:   { opacity: 1, y: 0  },
-};
+// Rendu des pages CMS (agent Page builder) — chargé uniquement si une page d'accueil est publiée.
+const PageRenderer = lazy(() => import("../features/pagebuilder/PageRenderer"));
+type BlocsRenderer = ComponentProps<typeof PageRenderer>["blocs"];
 
-const staggerContainer = {
-  hidden: {},
-  show: {
-    transition: {
-      staggerChildren: 0.12,
-      delayChildren: 0.1,
-    },
-  },
-};
+type EtatAccueil = { statut: "chargement" } | { statut: "defaut" } | { statut: "cms"; page: PagePublique };
+
+/** Réponse définitive de /api/site/accueil, gardée pour la session (pas de nouveau squelette au retour). */
+let cacheAccueil: EtatAccueil | null = null;
+const DELAI_ACCUEIL_MS = 2500;
+
+const TITRE_DEFAUT = "Exercices corrigés et sujets d'examen pour réussir";
+const DESCRIPTION_DEFAUT =
+  "Révisez avec des exercices corrigés, des anciens sujets d'examen (Brevet, BAC) et des corrections détaillées, classés par matière et par niveau. Inscription gratuite.";
 
 export default function Landing() {
-  const navigate = useNavigate();
-  const { isAuthenticated } = useAuth();
+  const location = useLocation();
+  const { isAuthenticated, isLoading: authLoading } = useAuth();
+  const { parametres } = useSite();
+  const siteNom = useSiteNom();
+  const cta = useCtaInscription();
+  const finHeroRef = useRef<HTMLDivElement>(null);
+
+  const [etat, setEtat] = useState<EtatAccueil>(() => cacheAccueil ?? { statut: "chargement" });
+
+  // Page d'accueil CMS : si aucune réponse sous 2,5 s, on affiche la landing par défaut.
+  useEffect(() => {
+    if (cacheAccueil) return;
+    const controleur = new AbortController();
+    let regle = false;
+
+    const minuteur = window.setTimeout(() => {
+      if (regle) return;
+      regle = true;
+      controleur.abort();
+      setEtat({ statut: "defaut" });
+    }, DELAI_ACCUEIL_MS);
+
+    getPageAccueil(controleur.signal)
+      .then((page) => {
+        if (regle) return;
+        regle = true;
+        window.clearTimeout(minuteur);
+        const resultat: EtatAccueil = page ? { statut: "cms", page } : { statut: "defaut" };
+        cacheAccueil = resultat;
+        setEtat(resultat);
+      })
+      .catch(() => {
+        if (regle) return;
+        regle = true;
+        window.clearTimeout(minuteur);
+        setEtat({ statut: "defaut" });
+      });
+
+    return () => {
+      regle = true;
+      window.clearTimeout(minuteur);
+      controleur.abort();
+    };
+  }, []);
+
+  const page = etat.statut === "cms" ? etat.page : null;
+
+  useSeo({
+    title: page ? page.titre : TITRE_DEFAUT,
+    description: page?.meta_description || DESCRIPTION_DEFAUT,
+    image: page?.image_og || "/banner3.png",
+  });
+
+  // Données structurées Organization + WebSite
+  const jsonLdSite = useMemo(() => {
+    const origine = window.location.origin;
+    const sameAs = ["reseau_facebook", "reseau_instagram", "reseau_linkedin", "reseau_youtube", "reseau_tiktok"]
+      .map((cle) => parametres?.[cle]?.trim())
+      .filter((u): u is string => !!u && /^https?:\/\//i.test(u));
+    const organisation: Record<string, unknown> = {
+      "@type": "EducationalOrganization",
+      "@id": `${origine}/#organisation`,
+      name: siteNom,
+      url: `${origine}/`,
+      logo: `${origine}/favicon.svg`,
+    };
+    if (parametres?.site_description) organisation.description = parametres.site_description;
+    if (parametres?.contact_email) organisation.email = parametres.contact_email;
+    if (parametres?.contact_telephone) organisation.telephone = parametres.contact_telephone;
+    if (sameAs.length) organisation.sameAs = sameAs;
+    return {
+      "@context": "https://schema.org",
+      "@graph": [
+        organisation,
+        {
+          "@type": "WebSite",
+          "@id": `${origine}/#website`,
+          name: siteNom,
+          url: `${origine}/`,
+          inLanguage: "fr",
+          publisher: { "@id": `${origine}/#organisation` },
+          potentialAction: {
+            "@type": "SearchAction",
+            target: { "@type": "EntryPoint", urlTemplate: `${origine}/exercices?q={search_term_string}` },
+            "query-input": "required name=search_term_string",
+          },
+        },
+      ],
+    };
+  }, [parametres, siteNom]);
+  useJsonLd("site", jsonLdSite);
+
+  const candidaturesOuvertes = parametres?.candidatures_ouvertes !== "0";
+  const questions = useMemo(
+    () => FAQ.filter((q) => !q.enseignant || candidaturesOuvertes),
+    [candidaturesOuvertes]
+  );
+  const jsonLdFaq = useMemo(
+    () =>
+      etat.statut === "defaut"
+        ? {
+            "@context": "https://schema.org",
+            "@type": "FAQPage",
+            mainEntity: questions.map((q) => ({
+              "@type": "Question",
+              name: q.question,
+              acceptedAnswer: { "@type": "Answer", text: q.reponse },
+            })),
+          }
+        : null,
+    [etat.statut, questions]
+  );
+  useJsonLd("faq", jsonLdFaq);
+
+  // Ancres (/#faq, /#enseignants, /#newsletter) une fois le contenu affiché
+  useEffect(() => {
+    if (etat.statut === "chargement" || !location.hash) return;
+    const id = decodeURIComponent(location.hash.slice(1));
+    const raf = requestAnimationFrame(() => {
+      document.getElementById(id)?.scrollIntoView({ block: "start" });
+    });
+    return () => cancelAnimationFrame(raf);
+  }, [location.hash, etat.statut]);
+
+  const visiteur = !authLoading && !isAuthenticated;
+
+  if (etat.statut === "chargement") {
+    return (
+      <div className="tely-page min-h-screen">
+        <Header />
+        <main id="contenu">
+          <LandingSkeleton />
+        </main>
+      </div>
+    );
+  }
+
+  if (etat.statut === "cms") {
+    return (
+      <div className="tely-page flex min-h-screen flex-col">
+        <GoogleOneTap />
+        <Header />
+        <main id="contenu" className="flex-1">
+          <Suspense fallback={<LandingSkeleton />}>
+            <PageRenderer blocs={etat.page.blocs as BlocsRenderer} />
+          </Suspense>
+        </main>
+        <Footer />
+      </div>
+    );
+  }
 
   return (
-    <div className="flex flex-col gap-7">
-      {/* Google One Tap */}
-      <GoogleOneTap />
-
-      <div className="flex flex-col w-full bg-amber-50 gap-4">
+    <MotionConfig reducedMotion="user">
+      <div className="tely-page min-h-screen">
+        <GoogleOneTap />
         <Header />
 
-        {/* ── Hero text block ──────────────────────────────────────────────── */}
-        <motion.div
-          className="flex self-center flex-col w-full max-w-xl px-4 gap-4"
-          variants={staggerContainer}
-          initial="hidden"
-          animate="show"
-        >
-          <motion.h1
-            className="text-3xl font-bold text-center"
-            variants={fadeUp}
-            transition={{ duration: 0.55, ease: "easeOut" }}
-          >
-            Trouver vos Exercices, Facilement et rapidement
-          </motion.h1>
+        <main id="contenu">
+          <HeroSection ref={finHeroRef} />
+          <ReassuranceBand />
+          <HowItWorks />
+          <BenefitsSection />
+          <ExploreSection />
+          <RecentExercises />
+          {candidaturesOuvertes && <ProfesseurJoinSection />}
+          <DerniersArticles />
+          <FaqSection questions={questions} />
+          <NouvelleLettre />
+          <FinalCta />
+        </main>
 
-          <motion.p
-            className="text-base text-center"
-            variants={fadeUp}
-            transition={{ duration: 0.55, ease: "easeOut" }}
-          >
-            Accédez à une vaste bibliothèque d'exercices, d'anciens sujets et de corrigés conçus pour vous aider à réussir. Révisez efficacement, entraînez-vous à votre rythme et améliorez vos performances grâce à des ressources fiables et accessibles à tout moment.
-          </motion.p>
+        <Footer />
 
-          {/* ── CTA buttons ──────────────────────────────────────────────── */}
-          <motion.div
-            className="flex gap-7 justify-center"
-            variants={fadeUp}
-            transition={{ duration: 0.55, ease: "easeOut" }}
-          >
-            <motion.button
-              onClick={() => navigate('/exercices')}
-              whileHover={{ scale: 1.06, backgroundColor: "#fbbf24" }}
-              whileTap={{ scale: 0.96 }}
-              className="bg-amber-500 cursor-pointer p-1 rounded-lg flex justify-center items-center gap-4 transition-colors duration-200"
-            >
-              Explorer <ArrowRight size={20} />
-            </motion.button>
-
-            {!isAuthenticated && (
-              <motion.div
-                whileHover={{ scale: 1.04 }}
-                whileTap={{ scale: 0.97 }}
-              >
-                <Link
-                  to="/auth/login"
-                  className="cursor-pointer flex items-center gap-4 border-t border-b border-gray-100 hover:bg-black hover:text-white hover:rounded-lg justify-center shadow-xs p-1 transition-all duration-200"
-                >
-                  <img
-                    src="banniere.png"
-                    alt=""
-                    className="w-4 h-4 object-cover font-semibold bg-amber-500 rounded-full"
-                  />
-                  Se connecter
-                </Link>
-              </motion.div>
-            )}
-          </motion.div>
-        </motion.div>
-
-        {/* ── Banner image ─────────────────────────────────────────────────── */}
-        <motion.img
-          src="banner3.png"
-          alt=""
-          className="h-96 object-cover self-center"
-          initial={{ opacity: 0, y: 32, scale: 0.97 }}
-          animate={{ opacity: 1, y: 0,  scale: 1 }}
-          transition={{ duration: 0.7, ease: "easeOut", delay: 0.45 }}
-        />
+        {visiteur && (
+          <>
+            <StickyCta apresRef={finHeroRef} to={cta.to} label={cta.label} />
+            {/* Espace réservé pour que le CTA collant ne masque pas le bas du footer */}
+            <div className="h-20 bg-gray-900 md:hidden" aria-hidden="true" />
+          </>
+        )}
       </div>
-
-      {/* Services sections ------------------------------------------------------------------ */}
-      <div className="flex flex-col p-3">
-        <motion.div transition={{ duration: 0.55, ease: "easeOut" }} variants={fadeUp} className="flex md:flex-row gap-2 items-center flex-col justify-center">
-          <Service titre="Exercices" rotation={-2}/>
-          <Service titre="Sujets Exams" couleur="bg-white" image="banniere.png" />
-          <Service titre="Corrigés" image="banner3.png" couleur="bg-amber-200" rotation={2}/>
-        </motion.div>
-
-        <div className="flex bg-amber-50 p-3 items-center gap-7 mt-7 justify-center flex-col">
-          <h2 className="font-semibold text-2xl text-center">Commencez dès maintenant à vous exercer !</h2>
-          <p className="text-center w-full max-w-xl self-center">Des milliers d'exercices, d'anciens sujets d'examen et de corrigés détaillés vous attendent. Choisissez votre niveau et votre matière, entraînez-vous à votre rythme et suivez vos progrès pour aborder vos examens en toute confiance.</p>
-          <button onClick={() => navigate('/exercices')} className="p-1 shadow-xl cursor-pointer bg-black rounded-lg flex items-center gap-4 text-white px-3 py-2">Commencer la pratique <GoArrowRight /> </button>
-        </div>
-      </div>
-
-      {/* Section Partenaires */}
-      <PartainerSponsor />
-
-      {/* ── Section Rejoindre en tant qu'enseignant ── */}
-      <ProfesseurJoinSection />
-
-      {/* Section Newsletter */}
-      <NouvelleLettre />
-
-      {/* Section Footer */}
-      <FooterSection />
-    </div>
+    </MotionConfig>
   );
 }

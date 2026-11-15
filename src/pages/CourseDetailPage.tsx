@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useLocation, useNavigate, useParams, useSearchParams } from "react-router-dom";
 import CourseDetailSkeleton from "../components/CourseDetailSkeleton";
 import type { LucideIcon } from "lucide-react";
@@ -23,7 +23,11 @@ import type { Exercice } from "../types/exercice";
 import { useAuth } from "../context/authContext";
 import { PrintableDocument, imprimerDocument } from "../components/print/PrintableDocument";
 import { trackEvent } from "../services/analyticsTracker";
+import { enregistrerActivite } from "../services/eleveService";
+import FavoriButton from "../components/eleve/FavoriButton";
+import MurInscription from "../components/eleve/MurInscription";
 
+import { resolveImageUrl } from "../utils/imageUrl";
 // ── Types ────────────────────────────────────────────────────────────────
 
 type Tab = "Énoncé" | "Corrigé" | "Ressources";
@@ -91,13 +95,35 @@ export default function CourseDetailPage() {
   const [searchParams] = useSearchParams();
   const exerciceId = paramId || searchParams.get("id");
 
-  const { isAuthenticated, isLoading: authLoading } = useAuth();
+  const { user, isAuthenticated, isLoading: authLoading } = useAuth();
+  const estEleve = user?.role === "eleve";
 
   const [exercice, setExercice] = useState<Exercice | null>(null);
   const [loading, setLoading] = useState(!!exerciceId);
   const [error, setError] = useState<string | undefined>(!exerciceId ? "Aucun exercice sélectionné." : undefined);
   const [activeTab, setActiveTab] = useState<Tab>("Énoncé");
   const [copied, setCopied] = useState(false);
+  // Évite un double envoi pour un même affichage du corrigé (StrictMode, re-rendus)
+  const correctionTraceeRef = useRef<string | null>(null);
+
+  const correctionDisponible = !!(
+    exercice as unknown as { correction?: { contenu?: string } } | null
+  )?.correction?.contenu;
+
+  // Trace « correction_vue » à chaque affichage de l'onglet Corrigé par un élève
+  useEffect(() => {
+    if (activeTab !== "Corrigé") {
+      correctionTraceeRef.current = null;
+      return;
+    }
+    if (!estEleve || !exercice || !correctionDisponible) return;
+    const cle = String(exercice.id);
+    if (correctionTraceeRef.current === cle) return;
+    correctionTraceeRef.current = cle;
+    enregistrerActivite(exercice.id, "correction_vue").catch(() => {
+      // Non bloquant : le suivi d'activité ne doit jamais gêner la lecture
+    });
+  }, [activeTab, estEleve, exercice, correctionDisponible]);
 
   useEffect(() => {
     if (!exerciceId) return;
@@ -228,7 +254,7 @@ export default function CourseDetailPage() {
           <div className="flex items-center gap-3 mt-4">
             {exercice.professeur?.user?.avatar ? (
               <img
-                src={exercice.professeur.user.avatar}
+                src={resolveImageUrl(exercice.professeur.user.avatar) ?? undefined}
                 alt={auteur}
                 referrerPolicy="no-referrer"
                 className="w-9 h-9 rounded-full object-cover"
@@ -272,7 +298,13 @@ export default function CourseDetailPage() {
                 <h2 className="text-xl font-bold mb-4">Énoncé de l'exercice</h2>
                 <div className="text-gray-800 leading-relaxed whitespace-pre-line text-base">
                   {enonceTexte}
+                  {!isAuthenticated && enonceTexte.length >= 180 && "…"}
                 </div>
+                {!isAuthenticated && (
+                  <div className="mt-2">
+                    <MurInscription from={location.pathname + location.search} />
+                  </div>
+                )}
               </div>
             )}
 
@@ -280,28 +312,7 @@ export default function CourseDetailPage() {
               <div className="bg-white border border-gray-200 rounded-xl p-6 shadow-sm">
                 <h2 className="text-xl font-bold mb-4">Corrigé</h2>
                 {!isAuthenticated ? (
-                  <div className="flex flex-col items-center text-center py-10 text-gray-500">
-                    <div className="w-12 h-12 rounded-full bg-amber-50 text-amber-600 flex items-center justify-center mb-3">
-                      <Lock size={24} />
-                    </div>
-                    <p className="font-semibold text-gray-800 text-base">
-                      Le corrigé est réservé aux utilisateurs connectés.
-                    </p>
-                    <p className="text-sm text-gray-500 mt-1 mb-5 max-w-sm">
-                      Connecte-toi pour débloquer la solution détaillée étape par étape et les explications pédagogiques.
-                    </p>
-                    <button
-                      onClick={() =>
-                        redirigerVersConnexion(
-                          "Connecte-toi pour accéder au corrigé de cet exercice."
-                        )
-                      }
-                      className="bg-emerald-600 hover:bg-emerald-700 text-white font-medium text-sm px-5 py-2.5 rounded-lg shadow-sm transition-colors flex items-center gap-2"
-                    >
-                      <Lock size={14} />
-                      Se connecter pour voir le corrigé
-                    </button>
-                  </div>
+                  <MurInscription from={location.pathname + location.search} contexte="corrige" />
                 ) : correction?.contenu ? (
                   <div className="space-y-4">
                     <div className="text-gray-800 leading-relaxed whitespace-pre-line text-base">
@@ -388,17 +399,16 @@ export default function CourseDetailPage() {
             </dl>
 
             <button
-              onClick={() =>
-                gererActionProtegee(
-                  "Connecte-toi pour accéder au corrigé de cet exercice.",
-                  () => setActiveTab("Corrigé")
-                )
-              }
+              onClick={() => setActiveTab("Corrigé")}
               className="w-full bg-amber-100 hover:bg-amber-200 text-amber-600 font-medium py-2.5 rounded-lg mt-6 transition-colors flex items-center justify-center gap-2"
             >
               {!isAuthenticated && <Lock size={14} />}
               Voir le corrigé
             </button>
+
+            <div className="mt-2.5">
+              <FavoriButton exerciceId={exercice.id} titre={exercice.titre} variante="bouton" />
+            </div>
 
             <hr className="my-5 border-gray-200" />
 

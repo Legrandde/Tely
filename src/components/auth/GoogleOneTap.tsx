@@ -1,8 +1,14 @@
 import { useEffect, useRef } from "react";
-import { useNavigate } from "react-router-dom";
+import { flushSync } from "react-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { useAuth } from "../../context/authContext";
 import { useToast } from "../../context/ToastContext";
-import { loginWithGoogleOneTap } from "../../services/authService";
+import {
+  loginWithGoogleOneTap,
+  cheminApresConnexion,
+  codeErreurApi,
+  extraireCheminFrom,
+} from "../../services/authService";
 
 declare global {
   interface Window {
@@ -30,7 +36,13 @@ export default function GoogleOneTap() {
   const { isAuthenticated, setUser } = useAuth();
   const { addToast } = useToast();
   const navigate = useNavigate();
+  const location = useLocation();
   const initializedRef = useRef(false);
+  // Page d'origine (state.from) lue au moment du callback, sans relancer l'initialisation
+  const fromRef = useRef<string | null>(null);
+  useEffect(() => {
+    fromRef.current = extraireCheminFrom(location.state);
+  }, [location.state]);
 
   useEffect(() => {
     if (isAuthenticated) return;
@@ -50,19 +62,19 @@ export default function GoogleOneTap() {
             if (!response.credential) return;
             try {
               const loggedUser = await loginWithGoogleOneTap(response.credential);
-              setUser(loggedUser);
+              flushSync(() => setUser(loggedUser));
               addToast("success", `Connexion réussie ! Bienvenue ${loggedUser.prenom || loggedUser.nom}.`);
-
-              if (loggedUser.role === "administrateur") {
-                navigate("/Dashbord-admin");
-              } else if (loggedUser.role === "professeur") {
-                navigate("/Dashboard-professeur");
-              } else {
-                navigate("/exercices");
-              }
+              navigate(cheminApresConnexion(loggedUser, fromRef.current), { replace: true });
             } catch (err: unknown) {
               console.error("Google One Tap error:", err);
-              addToast("error", "Impossible de vous connecter avec Google One Tap.");
+              const code = codeErreurApi(err);
+              if (code === "compte_suspendu") {
+                addToast("error", "Votre compte a été suspendu. Contactez l'équipe Tely.");
+              } else if (code === "inscriptions_fermees") {
+                addToast("warning", "Les inscriptions sont momentanément fermées.");
+              } else {
+                addToast("error", "Impossible de vous connecter avec Google One Tap.");
+              }
             }
           },
           auto_select: false,

@@ -7,6 +7,7 @@ import { eleveSchema } from "../config/resourceSchemas";
 import { deleteEleve, listEleves, listNiveaux } from "../services/resourceService";
 import { useToast } from "../context/ToastContext";
 
+import { resolveImageUrl } from "../utils/imageUrl";
 interface Eleve {
   id: string | number;
   matricule: string;
@@ -305,7 +306,7 @@ export default function GestionEleves() {
                         <div className="w-9 h-9 rounded-full bg-gray-900 text-white font-bold text-xs flex items-center justify-center shrink-0">
                           {eleve.user?.avatar ? (
                             <img
-                              src={eleve.user.avatar}
+                              src={resolveImageUrl(eleve.user.avatar) ?? undefined}
                               alt={nomComplet}
                               className="w-full h-full rounded-full object-cover"
                             />
@@ -384,7 +385,7 @@ export default function GestionEleves() {
               <div className="w-14 h-14 rounded-full bg-gray-900 text-white font-bold text-lg flex items-center justify-center shrink-0">
                 {viewEleve.user?.avatar ? (
                   <img
-                    src={viewEleve.user.avatar}
+                    src={resolveImageUrl(viewEleve.user.avatar) ?? undefined}
                     alt="avatar"
                     className="w-full h-full rounded-full object-cover"
                   />

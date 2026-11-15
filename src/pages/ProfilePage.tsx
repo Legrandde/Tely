@@ -20,6 +20,7 @@ import { resolveImageUrl } from "../utils/imageUrl";
 import api from "../api/axio";
 import { useNavigate } from "react-router-dom";
 import ConfirmModal from "../components/ui/ConfirmModal";
+import CompteDonneesSection from "../components/eleve/CompteDonneesSection";
 
 interface NiveauOption {
   id: number;
@@ -36,6 +37,8 @@ export default function ProfilePage({ embedded = false }: { embedded?: boolean }
   const [nom, setNom] = useState(user?.nom || "");
   const [prenom, setPrenom] = useState(user?.prenom || "");
   const [email, setEmail] = useState(user?.email || "");
+  const [motDePasseEmail, setMotDePasseEmail] = useState("");
+  const emailModifie = !!user && email.trim().toLowerCase() !== (user.email || "").toLowerCase();
   const [specialite, setSpecialite] = useState(user?.professeur?.specialite || "");
   const [classe, setClasse] = useState(user?.eleve?.classe || "");
   const [matricule, setMatricule] = useState(user?.eleve?.matricule || "");
@@ -126,6 +129,9 @@ export default function ProfilePage({ embedded = false }: { embedded?: boolean }
       formData.append("nom", nom);
       formData.append("prenom", prenom);
       formData.append("email", email);
+      if (emailModifie) {
+        formData.append("current_password", motDePasseEmail);
+      }
 
       if (avatarFile) {
         formData.append("avatar", avatarFile);
@@ -145,6 +151,7 @@ export default function ProfilePage({ embedded = false }: { embedded?: boolean }
 
       const res = await updateProfile(formData);
       setUser(res.user);
+      setMotDePasseEmail("");
       addToast("success", "Votre profil a été mis à jour avec succès !");
     } catch (err: unknown) {
       const errorMsg =
@@ -354,6 +361,28 @@ export default function ProfilePage({ embedded = false }: { embedded?: boolean }
               />
             </div>
 
+            {/* Changer d'adresse e-mail exige le mot de passe actuel (protection du compte) */}
+            {emailModifie && (
+              <div>
+                <label htmlFor="mdp-confirmation-email" className="tely-label block mb-1.5">
+                  Mot de passe actuel <span className="text-red-500">*</span>
+                </label>
+                <input
+                  id="mdp-confirmation-email"
+                  type="password"
+                  autoComplete="current-password"
+                  value={motDePasseEmail}
+                  onChange={(e) => setMotDePasseEmail(e.target.value)}
+                  required
+                  aria-describedby="mdp-confirmation-email-aide"
+                  className="tely-input"
+                />
+                <p id="mdp-confirmation-email-aide" className="tely-subtitle mt-1">
+                  Par sécurité, confirmez votre mot de passe pour changer d'adresse e-mail.
+                </p>
+              </div>
+            )}
+
             {/* Spécifique Professeur */}
             {user?.role === "professeur" && (
               <div className="pt-2 border-t border-gray-200 space-y-4">
@@ -524,6 +553,9 @@ export default function ProfilePage({ embedded = false }: { embedded?: boolean }
           </form>
         </div>
       </div>
+
+      {/* Droits RGPD : export & suppression du compte (tous les rôles) */}
+      <CompteDonneesSection />
 
       <ConfirmModal
         open={confirmRemoveAvatarOpen}

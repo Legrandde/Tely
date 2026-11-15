@@ -27,6 +27,7 @@ import { useAuth } from "../context/authContext";
 import { trackEvent } from "../services/analyticsTracker";
 import { PrintableDocument, imprimerDocument } from "../components/print/PrintableDocument";
 
+import { resolveImageUrl } from "../utils/imageUrl";
 // ── Types ────────────────────────────────────────────────────────────────
 
 type Tab = "Énoncé" | "Corrigé" | "Ressources";
@@ -231,7 +232,7 @@ export default function SujetDetailPage() {
           <div className="flex items-center gap-3 mt-4">
             {sujet.professeur?.user?.avatar ? (
               <img
-                src={sujet.professeur.user.avatar}
+                src={resolveImageUrl(sujet.professeur.user.avatar) ?? undefined}
                 alt={auteur}
                 referrerPolicy="no-referrer"
                 className="w-9 h-9 rounded-full object-cover"

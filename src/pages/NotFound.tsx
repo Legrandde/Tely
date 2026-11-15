@@ -1,35 +1,37 @@
 import { Link, useNavigate } from "react-router-dom";
-import { ArrowLeft, ArrowUpRight } from "lucide-react";
+import { ArrowLeft, BookOpen, FileText, Home } from "lucide-react";
+import Header from "../components/ui/Header";
+import Footer from "../components/ui/Footer";
+import { useSeo } from "../hooks/useSeo";
+
+const SUGGESTIONS = [
+  { to: "/exercices", label: "Exercices corrigés", Icone: BookOpen },
+  { to: "/sujets", label: "Sujets d'examen", Icone: FileText },
+  { to: "/", label: "Page d'accueil", Icone: Home },
+];
 
 export default function NotFoundPage() {
   const navigate = useNavigate();
 
+  useSeo({
+    title: "Page introuvable",
+    description: "La page demandée n'existe pas ou a été déplacée.",
+    noindex: true,
+  });
+
   return (
-    <div className="min-h-screen bg-white text-gray-900 flex flex-col justify-between p-6 sm:p-10 select-none relative overflow-hidden font-sans">
-      {/* Bouton retour en haut à gauche */}
-      <div>
-        <button
-          type="button"
-          onClick={() => navigate(-1)}
-          className="p-2 text-gray-900 hover:text-amber-600 transition-colors cursor-pointer inline-flex items-center"
-          title="Page précédente"
-        >
-          <ArrowLeft size={28} strokeWidth={2.2} />
-        </button>
-      </div>
+    <div className="tely-page flex min-h-screen flex-col">
+      <Header />
 
-      {/* Contenu central */}
-      <div className="flex-1 flex flex-col items-center justify-center text-center max-w-2xl mx-auto my-auto w-full">
-        {/* 404 Header */}
-        <h1 className="text-6xl sm:text-7xl font-bold text-gray-800 tracking-tight mb-2">
-          404
-        </h1>
+      <main id="contenu" className="mx-auto flex w-full max-w-2xl flex-1 flex-col items-center justify-center px-4 py-12 text-center">
+        <p className="text-6xl font-extrabold tracking-tight text-amber-500 sm:text-7xl">404</p>
 
-        {/* Scene Illustration SVG */}
-        <div className="w-full max-w-lg h-56 sm:h-64 relative flex items-center justify-center my-2">
+        <div className="relative my-2 flex h-56 w-full max-w-lg items-center justify-center sm:h-64">
           <svg
             viewBox="0 0 600 300"
-            className="w-full h-full drop-shadow-xs"
+            className="h-full w-full"
+            aria-hidden="true"
+            focusable="false"
             fill="none"
             xmlns="http://www.w3.org/2000/svg"
           >
@@ -164,39 +166,36 @@ export default function NotFoundPage() {
           </svg>
         </div>
 
-        {/* Message Titre et Sous-titre */}
-        <div className="space-y-1.5 mt-2">
-          <h2
-            className="text-2xl sm:text-3xl font-bold text-gray-900 tracking-tight"
-          >
-            Look like you're lost
-          </h2>
-          <p className="text-xs sm:text-sm text-gray-400 font-sans">
-            the page you are looking for not avaible!
-          </p>
-        </div>
+        <h1 className="tely-title text-2xl sm:text-3xl">Oups, cette page est introuvable</h1>
+        <p className="mt-2 max-w-md text-sm text-gray-500 sm:text-base">
+          Le lien est peut-être erroné ou la page a été déplacée. Voici quelques pistes pour reprendre vos révisions.
+        </p>
 
-        {/* Bouton vert Go to Home */}
-        <div className="mt-5">
-          <Link
-            to="/"
-            className="inline-block px-6 py-2.5 bg-[#39ac31] hover:bg-[#2f9227] text-white text-xs font-semibold rounded-md shadow-xs transition-all cursor-pointer"
-          >
-            Go to Home
-          </Link>
-        </div>
-      </div>
+        <ul className="mt-8 grid w-full gap-3 sm:grid-cols-3">
+          {SUGGESTIONS.map(({ to, label, Icone }) => (
+            <li key={to}>
+              <Link
+                to={to}
+                className="flex h-full items-center justify-center gap-2 rounded-xl border border-gray-100 bg-white px-4 py-3 text-sm font-semibold text-gray-900 shadow-sm transition-colors hover:border-amber-300 hover:bg-amber-50 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-amber-500"
+              >
+                <Icone size={16} className="text-amber-600" aria-hidden="true" />
+                {label}
+              </Link>
+            </li>
+          ))}
+        </ul>
 
-      {/* Bouton bas à gauche : Visiter le site */}
-      <div className="flex items-center justify-between">
-        <Link
-          to="/"
-          className="inline-flex items-center gap-2 px-5 py-3 bg-gray-50 hover:bg-gray-100 border border-gray-100 rounded-2xl text-xs sm:text-sm font-bold text-gray-800 shadow-xs transition-all cursor-pointer"
+        <button
+          type="button"
+          onClick={() => navigate(-1)}
+          className="mt-6 inline-flex items-center gap-2 text-sm font-medium text-gray-600 hover:text-gray-900"
         >
-          <ArrowUpRight size={17} strokeWidth={2.5} className="text-gray-900" />
-          Visiter le site
-        </Link>
-      </div>
+          <ArrowLeft size={16} aria-hidden="true" />
+          Revenir à la page précédente
+        </button>
+      </main>
+
+      <Footer />
     </div>
   );
 }

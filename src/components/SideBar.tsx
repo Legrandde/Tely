@@ -18,6 +18,12 @@ import {
   ChevronDown,
   X,
   UserCog,
+  FileText,
+  Image,
+  ScrollText,
+  ExternalLink,
+  UserCircle2,
+  Newspaper,
 } from "lucide-react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { useAuth } from "../context/authContext";
@@ -29,17 +35,81 @@ interface NavItem {
   route: string;
   label: string;
   icon: React.ReactNode;
-  children?: Array<{
-    route: string;
-    label: string;
-    icon: React.ReactNode;
-  }>;
+}
+
+interface NavGroup {
+  id: string;
+  label: string;
+  items: NavItem[];
+}
+
+const NAV_GROUPS: NavGroup[] = [
+  {
+    id: "pilotage",
+    label: "Pilotage",
+    items: [
+      { route: "", label: "Vue d'ensemble", icon: <LayoutDashboard size={19} /> },
+      { route: "statistiques", label: "Statistiques", icon: <TrendingUp size={19} /> },
+    ],
+  },
+  {
+    id: "contenu",
+    label: "Contenu pédagogique",
+    items: [
+      { route: "exercices", label: "Exercices", icon: <BookOpen size={19} /> },
+      { route: "sujets", label: "Sujets d'examen", icon: <ClipboardList size={19} /> },
+      { route: "corrections", label: "Corrections", icon: <CheckCircle2 size={19} /> },
+      { route: "matieres", label: "Matières", icon: <Library size={19} /> },
+      { route: "niveaux", label: "Niveaux", icon: <Layers size={19} /> },
+      { route: "categories", label: "Catégories", icon: <Tag size={19} /> },
+    ],
+  },
+  {
+    id: "site",
+    label: "Site & CMS",
+    items: [
+      { route: "pages", label: "Pages", icon: <FileText size={19} /> },
+      { route: "blog", label: "Blog", icon: <Newspaper size={19} /> },
+      { route: "medias", label: "Médiathèque", icon: <Image size={19} /> },
+    ],
+  },
+  {
+    id: "communaute",
+    label: "Communauté",
+    items: [
+      { route: "utilisateurs", label: "Utilisateurs", icon: <UserCog size={19} /> },
+      { route: "eleves", label: "Élèves", icon: <Users size={19} /> },
+      { route: "professeurs", label: "Professeurs", icon: <GraduationCap size={19} /> },
+      { route: "candidatures", label: "Candidatures", icon: <UserCheck size={19} /> },
+    ],
+  },
+  {
+    id: "systeme",
+    label: "Système",
+    items: [
+      { route: "journal", label: "Journal d'audit", icon: <ScrollText size={19} /> },
+      { route: "parametres", label: "Paramètres", icon: <Settings size={19} /> },
+    ],
+  },
+];
+
+const CLE_GROUPES_FERMES = "tely.admin.sidebar.groupesFermes";
+
+function lireGroupesFermes(): string[] {
+  try {
+    const brut = localStorage.getItem(CLE_GROUPES_FERMES);
+    const val: unknown = brut ? JSON.parse(brut) : [];
+    return Array.isArray(val) ? val.filter((v): v is string => typeof v === "string") : [];
+  } catch {
+    return [];
+  }
 }
 
 export default function SideBar() {
   const [collapsed, setCollapsed] = useState(false);
   const [confirmLogoutOpen, setConfirmLogoutOpen] = useState(false);
   const [loggingOut, setLoggingOut] = useState(false);
+  const [groupesFermes, setGroupesFermes] = useState<string[]>(lireGroupesFermes);
   const navigate = useNavigate();
   const location = useLocation();
   const { logoutLocal } = useAuth();
@@ -55,16 +125,23 @@ export default function SideBar() {
         currentPath === "/dashbord-admin/overview"
       );
     }
-    return currentPath.includes(`/dashbord-admin/${route.toLowerCase()}`);
+    const base = `/dashbord-admin/${route.toLowerCase()}`;
+    return currentPath === base || currentPath.startsWith(`${base}/`);
   };
 
-  const userSubRoutes = ["utilisateurs", "eleves", "professeurs", "candidatures"];
-  const isUserSectionActive = userSubRoutes.some((r) => isRouteActive(r));
-  const [usersOpen, setUsersOpen] = useState<boolean>(true);
+  const isAccountSectionActive = ["profile", "notifications"].some((r) => isRouteActive(r));
 
-  const isAccountSectionActive = ["profile", "parametres", "notifications"].some((r) =>
-    isRouteActive(r)
-  );
+  function basculerGroupe(id: string) {
+    setGroupesFermes((prev) => {
+      const suivant = prev.includes(id) ? prev.filter((g) => g !== id) : [...prev, id];
+      try {
+        localStorage.setItem(CLE_GROUPES_FERMES, JSON.stringify(suivant));
+      } catch {
+        /* stockage indisponible : préférence non mémorisée */
+      }
+      return suivant;
+    });
+  }
 
   async function confirmLogout() {
     setLoggingOut(true);
@@ -79,28 +156,6 @@ export default function SideBar() {
     }
   }
 
-  const navItems: NavItem[] = [
-    { route: "", label: "Tableau de bord", icon: <LayoutDashboard size={19} /> },
-    { route: "statistiques", label: "Statistiques & Trafic", icon: <TrendingUp size={19} /> },
-    {
-      route: "utilisateurs",
-      label: "Utilisateurs",
-      icon: <Users size={19} />,
-      children: [
-        { route: "utilisateurs", label: "Comptes & rôles", icon: <UserCog size={16} /> },
-        { route: "eleves", label: "Élèves", icon: <Users size={16} /> },
-        { route: "professeurs", label: "Professeurs", icon: <GraduationCap size={16} /> },
-        { route: "candidatures", label: "Candidatures Profs", icon: <UserCheck size={16} /> },
-      ],
-    },
-    { route: "exercices", label: "Exercices", icon: <BookOpen size={19} /> },
-    { route: "sujets", label: "Sujets Examens", icon: <ClipboardList size={19} /> },
-    { route: "corrections", label: "Corrections", icon: <CheckCircle2 size={19} /> },
-    { route: "matieres", label: "Matières", icon: <Library size={19} /> },
-    { route: "niveaux", label: "Niveaux", icon: <Layers size={19} /> },
-    { route: "categories", label: "Catégories", icon: <Tag size={19} /> },
-  ];
-
   const handleNavigate = (route: string) => {
     if (!route) {
       navigate("/Dashbord-admin");
@@ -110,21 +165,43 @@ export default function SideBar() {
     closeMobile();
   };
 
+  const renderItem = (item: NavItem, isCollapsedView: boolean) => {
+    const actif = isRouteActive(item.route);
+    return (
+      <button
+        key={item.route || "accueil"}
+        type="button"
+        onClick={() => handleNavigate(item.route)}
+        title={isCollapsedView ? item.label : undefined}
+        aria-label={isCollapsedView ? item.label : undefined}
+        aria-current={actif ? "page" : undefined}
+        className={`flex h-9 items-center gap-3 rounded-[10px] px-3 cursor-pointer transition-all duration-200 text-left w-full outline-none focus-visible:ring-2 focus-visible:ring-gray-900 ${
+          actif
+            ? "bg-gray-900 text-white font-semibold"
+            : "text-gray-500 hover:bg-gray-50 hover:text-gray-900 bg-transparent"
+        } ${isCollapsedView ? "justify-center" : ""}`}
+      >
+        <span className={`shrink-0 ${actif ? "text-white" : "text-gray-900"}`}>{item.icon}</span>
+        {!isCollapsedView && <span className="text-sm truncate">{item.label}</span>}
+      </button>
+    );
+  };
+
   const navContent = (isMobileView: boolean) => {
     const isCollapsedView = isMobileView ? false : collapsed;
-    const showUsersDropdown = usersOpen || isUserSectionActive;
 
     return (
       <>
         {/* Brand Header */}
         <div className="flex items-center justify-between pb-4 pt-1 px-2 border-b border-gray-100">
           {!isCollapsedView && (
-            <h1
+            <button
+              type="button"
               onClick={() => handleNavigate("")}
-              className="tely-title text-lg cursor-pointer"
+              className="tely-title text-lg cursor-pointer text-left"
             >
               Tely Elearning
-            </h1>
+            </button>
           )}
           {isMobileView ? (
             <button
@@ -132,6 +209,7 @@ export default function SideBar() {
               onClick={closeMobile}
               className="tely-icon-btn"
               title="Fermer le menu"
+              aria-label="Fermer le menu"
             >
               <X size={20} />
             </button>
@@ -141,120 +219,80 @@ export default function SideBar() {
               onClick={() => setCollapsed(!collapsed)}
               className="tely-icon-btn mx-auto"
               title={collapsed ? "Agrandir" : "Réduire"}
+              aria-label={collapsed ? "Agrandir le menu latéral" : "Réduire le menu latéral"}
+              aria-expanded={!collapsed}
             >
               <FiSidebar size={18} />
             </button>
           )}
         </div>
 
-        {/* Navigation Links */}
-        <div className="flex flex-col gap-1 py-3 flex-1 overflow-y-auto overflow-x-hidden no-scrollbar">
-          {!isCollapsedView && (
-            <span className="tely-overline px-3 mb-1">
-              Gestion & Contenus
-            </span>
-          )}
+        {/* Navigation groupée */}
+        <nav
+          aria-label="Navigation administrateur"
+          className="flex flex-col gap-3 py-3 flex-1 overflow-y-auto overflow-x-hidden no-scrollbar"
+        >
+          {NAV_GROUPS.map((groupe, index) => {
+            const groupeActif = groupe.items.some((i) => isRouteActive(i.route));
+            const ouvert = isCollapsedView || groupeActif || !groupesFermes.includes(groupe.id);
+            const listeId = `sidebar-groupe-${groupe.id}-${isMobileView ? "m" : "d"}`;
 
-          {navItems.map((item) => {
-            if (item.children) {
-              return (
-                <div key={item.route} className="space-y-1">
+            return (
+              <div key={groupe.id} className="flex flex-col gap-0.5">
+                {isCollapsedView ? (
+                  index > 0 && <div className="tely-divider mx-3 my-1" aria-hidden="true" />
+                ) : (
                   <button
                     type="button"
-                    onClick={() => {
-                      if (isCollapsedView) {
-                        setCollapsed(false);
-                        setUsersOpen(true);
-                      } else {
-                        setUsersOpen((prev) => !prev);
-                      }
-                    }}
-                    title={isCollapsedView ? item.label : undefined}
-                    className={`flex h-10 items-center rounded-[10px] p-3 cursor-pointer transition-all duration-200 text-left w-full ${
-                      isUserSectionActive && (!showUsersDropdown || isCollapsedView)
-                        ? "bg-gray-900 text-white font-semibold"
-                        : isUserSectionActive
-                        ? "bg-gray-50 text-gray-900 font-semibold"
-                        : "text-gray-500 hover:bg-gray-50 hover:text-gray-900 bg-transparent"
-                    } ${isCollapsedView ? "justify-center" : "justify-between"}`}
+                    onClick={() => basculerGroupe(groupe.id)}
+                    aria-expanded={ouvert}
+                    aria-controls={listeId}
+                    disabled={groupeActif}
+                    className="flex items-center justify-between px-3 py-1 rounded-md tely-overline hover:text-gray-900 cursor-pointer disabled:cursor-default disabled:hover:text-gray-400 outline-none focus-visible:ring-2 focus-visible:ring-gray-900"
                   >
-                    <div className="flex items-center gap-3 min-w-0">
-                      <span
-                        className={`shrink-0 ${
-                          isUserSectionActive && (!showUsersDropdown || isCollapsedView)
-                            ? "text-white"
-                            : isUserSectionActive
-                            ? "text-gray-900"
-                            : "text-gray-900"
-                        }`}
-                      >
-                        {item.icon}
-                      </span>
-                      {!isCollapsedView && (
-                        <span className="text-sm truncate">{item.label}</span>
-                      )}
-                    </div>
-                    {!isCollapsedView && (
+                    {groupe.label}
+                    {!groupeActif && (
                       <ChevronDown
-                        size={16}
-                        className={`shrink-0 transition-transform duration-200 ${
-                          showUsersDropdown ? "rotate-180" : ""
-                        } ${"text-gray-900"}`}
+                        size={13}
+                        aria-hidden="true"
+                        className={`transition-transform duration-200 ${ouvert ? "" : "-rotate-90"}`}
                       />
                     )}
                   </button>
-
-                  {!isCollapsedView && showUsersDropdown && (
-                    <div className="ml-5 pl-2.5 border-l border-gray-200 flex flex-col gap-1 py-0.5">
-                      {item.children.map((sub) => {
-                        const subActive = isRouteActive(sub.route);
-                        return (
-                          <button
-                            key={sub.route}
-                            type="button"
-                            onClick={() => handleNavigate(sub.route)}
-                            className={`flex h-9 items-center gap-2.5 rounded-[10px] px-3 text-left text-xs transition-all cursor-pointer ${
-                              subActive
-                                ? "bg-gray-900 text-white font-semibold"
-                                : "text-gray-500 hover:bg-gray-50 hover:text-gray-900"
-                            }`}
-                          >
-                            <span
-                              className={`shrink-0 ${
-                                subActive ? "text-white" : "text-gray-900"
-                              }`}
-                            >
-                              {sub.icon}
-                            </span>
-                            <span className="truncate">{sub.label}</span>
-                          </button>
-                        );
-                      })}
-                    </div>
-                  )}
-                </div>
-              );
-            }
-
-            return (
-              <SideBarMenuItem
-                key={item.route}
-                OnNavigate={() => handleNavigate(item.route)}
-                icons={item.icon}
-                Titre={item.label}
-                isActive={isRouteActive(item.route)}
-                collapsed={isCollapsedView}
-              />
+                )}
+                {ouvert && (
+                  <div id={listeId} className="flex flex-col gap-0.5">
+                    {groupe.items.map((item) => renderItem(item, isCollapsedView))}
+                  </div>
+                )}
+              </div>
             );
           })}
-        </div>
+        </nav>
 
-        {/* Section Compte & Paramètres + Déconnexion en bas */}
+        {/* Voir le site + Compte + Déconnexion */}
         <div className="pt-2.5 border-t border-gray-100 mt-auto space-y-1">
+          <a
+            href="/"
+            target="_blank"
+            rel="noopener noreferrer"
+            title={isCollapsedView ? "Voir le site (nouvel onglet)" : undefined}
+            aria-label={isCollapsedView ? "Voir le site (nouvel onglet)" : undefined}
+            className={`flex h-10 items-center gap-3 rounded-[10px] p-3 text-gray-500 hover:bg-gray-50 hover:text-gray-900 transition-all duration-200 outline-none focus-visible:ring-2 focus-visible:ring-gray-900 ${
+              isCollapsedView ? "justify-center" : ""
+            }`}
+          >
+            <ExternalLink size={19} className="shrink-0 text-gray-900" />
+            {!isCollapsedView && (
+              <span className="text-sm truncate">
+                Voir le site <span className="sr-only">(nouvel onglet)</span>
+              </span>
+            )}
+          </a>
           <SideBarMenuItem
             OnNavigate={() => handleNavigate("profile")}
-            icons={<Settings size={19} />}
-            Titre="Paramètres & Compte"
+            icons={<UserCircle2 size={19} />}
+            Titre="Mon compte"
             isActive={isAccountSectionActive}
             collapsed={isCollapsedView}
           />
@@ -282,7 +320,7 @@ export default function SideBar() {
 
       {/* ── Mobile Drawer (under lg screens) ── */}
       {isOpenMobile && (
-        <div className="fixed inset-0 z-50 lg:hidden flex">
+        <div className="fixed inset-0 z-50 lg:hidden flex" role="dialog" aria-modal="true" aria-label="Menu de navigation">
           {/* Backdrop */}
           <div
             onClick={closeMobile}

@@ -1,310 +1,197 @@
+import { lazy, Suspense, type ComponentType, type LazyExoticComponent, type ReactNode } from "react";
 import { createBrowserRouter, Navigate } from "react-router-dom";
 import Landing from "../pages/Landing";
 import { AuthLayout } from "../pages/Login";
-import DashbordAdmin from "../pages/DashbordAdmin";
-import DashboardProfesseur from "../pages/DashboardProfesseur";
-import ProfesseurOverView from "../pages/professeur/ProfesseurOverView";
-import ProfesseurRessources from "../pages/professeur/ProfesseurRessources";
-import AdminStatistiques from "../pages/admin/AdminStatistiques";
-import GestionCandidatures from "../pages/admin/GestionCandidatures";
-import GestionUtilisateurs from "../pages/admin/GestionUtilisateurs";
-import EspaceComptePage from "../pages/EspaceComptePage";
-
-import CourseDetailPage from "../pages/CourseDetailPage";
-
 import { LoginForm } from "../components/form/LoginForm";
 import { SignupForm } from "../components/form/SignupForm";
 import { GoogleCallback } from "../pages/auth/GoogleCallback";
 import { ForgotPasswordForm } from "../components/form/ForgotPasswordForm";
 import { ResetPasswordForm } from "../components/form/ResetPasswordForm";
-import ListeExercices from "../pages/Listeexercices";
-import OverView from "../pages/OverView";
-import GestionExercices from "../pages/GestionExercices";
-import GestionProfesseurs from "../pages/GestionProfesseurs";
-import GestionEleves from "../pages/GestionEleves";
-import GestionSujets from "../pages/GestionSujets";
-import FormSujetPage from "../pages/FormSujetPage";
-import FormExercicePage from "../pages/FormExercicePage";
-import GestionCorrections from "../pages/GestionCorrections";
-import GestionMatieres from "../pages/GestionMatieres";
-import GestionNiveaux from "../pages/GestionNiveaux";
-import GestionCategories from "../pages/GestionCategories";
 import NotFoundPage from "../pages/NotFound";
 import { RequireGuest } from "./RequireGuest";
 import { RequireAuth } from "./RequireAuth";
-import ListeSujets from "../pages/ListeSujets";
-import SujetDetailPage from "../pages/SujetsDetailPage";
-
 import RootAnalyticsTracker from "./RootAnalyticsTracker";
+
+// ─── Chargement à la demande : chaque espace a son propre fichier JS ──────────
+// Le visiteur de la landing ne télécharge ni le back-office ni le page builder.
+
+/* eslint-disable react-refresh/only-export-components */
+const DashbordAdmin = lazy(() => import("../pages/DashbordAdmin"));
+const DashboardProfesseur = lazy(() => import("../pages/DashboardProfesseur"));
+const ProfesseurOverView = lazy(() => import("../pages/professeur/ProfesseurOverView"));
+const ProfesseurRessources = lazy(() => import("../pages/professeur/ProfesseurRessources"));
+const AdminStatistiques = lazy(() => import("../pages/admin/AdminStatistiques"));
+const GestionCandidatures = lazy(() => import("../pages/admin/GestionCandidatures"));
+const GestionUtilisateurs = lazy(() => import("../pages/admin/GestionUtilisateurs"));
+const JournalActivite = lazy(() => import("../pages/admin/JournalActivite"));
+const GestionPages = lazy(() => import("../pages/admin/GestionPages"));
+const MediathequePage = lazy(() => import("../pages/admin/MediathequePage"));
+const PageBuilderPage = lazy(() => import("../pages/admin/PageBuilderPage"));
+const EspaceComptePage = lazy(() => import("../pages/EspaceComptePage"));
+const CourseDetailPage = lazy(() => import("../pages/CourseDetailPage"));
+const SujetDetailPage = lazy(() => import("../pages/SujetsDetailPage"));
+const ListeExercices = lazy(() => import("../pages/Listeexercices"));
+const ListeSujets = lazy(() => import("../pages/ListeSujets"));
+const PublicPage = lazy(() => import("../pages/PublicPage"));
+const OverView = lazy(() => import("../pages/OverView"));
+const GestionExercices = lazy(() => import("../pages/GestionExercices"));
+const GestionProfesseurs = lazy(() => import("../pages/GestionProfesseurs"));
+const GestionEleves = lazy(() => import("../pages/GestionEleves"));
+const GestionSujets = lazy(() => import("../pages/GestionSujets"));
+const FormSujetPage = lazy(() => import("../pages/FormSujetPage"));
+const FormExercicePage = lazy(() => import("../pages/FormExercicePage"));
+const GestionCorrections = lazy(() => import("../pages/GestionCorrections"));
+const GestionMatieres = lazy(() => import("../pages/GestionMatieres"));
+const GestionNiveaux = lazy(() => import("../pages/GestionNiveaux"));
+const GestionCategories = lazy(() => import("../pages/GestionCategories"));
+const EleveLayout = lazy(() => import("../layout/EleveLayout"));
+const EleveDashboard = lazy(() => import("../pages/eleve/EleveDashboard"));
+const MesFavoris = lazy(() => import("../pages/eleve/MesFavoris"));
+const MonHistorique = lazy(() => import("../pages/eleve/MonHistorique"));
+const BlogListe = lazy(() => import("../pages/blog/BlogListe"));
+const BlogArticle = lazy(() => import("../pages/blog/BlogArticle"));
+const GestionBlog = lazy(() => import("../pages/admin/GestionBlog"));
+const BlogEditorPage = lazy(() => import("../pages/admin/BlogEditorPage"));
+
+function Chargement() {
+  return (
+    <div className="min-h-[50vh] flex items-center justify-center" role="status" aria-live="polite">
+      <span className="w-8 h-8 rounded-full border-2 border-amber-200 border-t-amber-500 animate-spin" aria-hidden="true" />
+      <span className="sr-only">Chargement…</span>
+    </div>
+  );
+}
+
+function charger(Composant: LazyExoticComponent<ComponentType>): ReactNode {
+  return (
+    <Suspense fallback={<Chargement />}>
+      <Composant />
+    </Suspense>
+  );
+}
+
+function invite(children: ReactNode): ReactNode {
+  return <RequireGuest>{children}</RequireGuest>;
+}
+
+/** Pages de contenu partagées par les espaces administrateur et professeur. */
+const routesContenu = () => [
+  { path: "profile", element: charger(EspaceComptePage) },
+  { path: "parametres", element: charger(EspaceComptePage) },
+  { path: "notifications", element: charger(EspaceComptePage) },
+  { path: "exercices", element: charger(GestionExercices) },
+  { path: "exercices/nouveau", element: charger(FormExercicePage) },
+  { path: "exercices/:id/modifier", element: charger(FormExercicePage) },
+  { path: "sujets", element: charger(GestionSujets) },
+  { path: "sujets/nouveau", element: charger(FormSujetPage) },
+  { path: "sujets/:id/modifier", element: charger(FormSujetPage) },
+  { path: "corrections", element: charger(GestionCorrections) },
+];
 
 export const Route = createBrowserRouter([
   {
     element: <RootAnalyticsTracker />,
     children: [
+      { path: "/", element: <Landing /> },
+
+      // ─── Authentification ───
       {
-        path: "/",
-        element: <Landing />,
+        path: "auth",
+        element: <AuthLayout />,
+        children: [
+          { index: true, element: invite(<LoginForm />) },
+          { path: "login", element: invite(<LoginForm />) },
+          { path: "signup", element: invite(<SignupForm />) },
+          { path: "google/callback", element: <GoogleCallback /> },
+          { path: "forgot-password", element: <ForgotPasswordForm /> },
+          { path: "reset-password", element: <ResetPasswordForm /> },
+        ],
       },
-  {
-    path: "auth",
-    element: <AuthLayout />,
-    children: [
+
+      // ─── Back-office administrateur ───
       {
-        index: true,
+        path: "Dashbord-admin",
+        element: <RequireAuth allowedRoles={["administrateur"]}>{charger(DashbordAdmin)}</RequireAuth>,
+        children: [
+          { index: true, element: charger(OverView) },
+          { path: "overview", element: charger(OverView) },
+          { path: "statistiques", element: charger(AdminStatistiques) },
+          { path: "candidatures", element: charger(GestionCandidatures) },
+          { path: "utilisateurs", element: charger(GestionUtilisateurs) },
+          { path: "journal", element: charger(JournalActivite) },
+          { path: "pages", element: charger(GestionPages) },
+          { path: "medias", element: charger(MediathequePage) },
+          { path: "blog", element: charger(GestionBlog) },
+          ...routesContenu(),
+          { path: "eleves", element: charger(GestionEleves) },
+          { path: "professeurs", element: charger(GestionProfesseurs) },
+          { path: "matieres", element: charger(GestionMatieres) },
+          { path: "niveaux", element: charger(GestionNiveaux) },
+          { path: "categories", element: charger(GestionCategories) },
+        ],
+      },
+      { path: "dashboard-admin/*", element: <Navigate to="/Dashbord-admin" replace /> },
+
+      // ─── Éditeurs plein écran (hors layout du tableau de bord) ───
+      {
+        path: "page-builder/:id",
+        element: <RequireAuth allowedRoles={["administrateur"]}>{charger(PageBuilderPage)}</RequireAuth>,
+      },
+      {
+        path: "blog-editor/:id",
+        element: <RequireAuth allowedRoles={["administrateur"]}>{charger(BlogEditorPage)}</RequireAuth>,
+      },
+
+      // ─── Espace professeur ───
+      {
+        path: "Dashboard-professeur",
         element: (
-          <RequireGuest>
-            <LoginForm />
-          </RequireGuest>
+          <RequireAuth allowedRoles={["professeur", "administrateur"]}>{charger(DashboardProfesseur)}</RequireAuth>
         ),
+        children: [
+          { index: true, element: charger(ProfesseurOverView) },
+          { path: "overview", element: charger(ProfesseurOverView) },
+          ...routesContenu(),
+          { path: "ressources", element: charger(ProfesseurRessources) },
+        ],
       },
+
+      // ─── Espace élève ───
       {
-        path: "login",
-        element: (
-          <RequireGuest>
-            <LoginForm />
-          </RequireGuest>
-        ),
+        path: "espace",
+        element: <RequireAuth allowedRoles={["eleve"]}>{charger(EleveLayout)}</RequireAuth>,
+        children: [
+          { index: true, element: charger(EleveDashboard) },
+          { path: "favoris", element: charger(MesFavoris) },
+          { path: "historique", element: charger(MonHistorique) },
+          { path: "compte", element: charger(EspaceComptePage) },
+        ],
       },
-      {
-        path: "signup",
-        element: (
-          <RequireGuest>
-            <SignupForm />
-          </RequireGuest>
-        ),
-      },
-      {
-        path: "google/callback",
-        element: <GoogleCallback />,
-      },
-      {
-        path: "forgot-password",
-        element: <ForgotPasswordForm />,
-      },
-      {
-        path: "reset-password",
-        element: <ResetPasswordForm />,
-      },
-    ],
-  },
-  {
-    path: "Dashbord-admin",
-    element: (
-      <RequireAuth allowedRoles={["administrateur"]}>
-        <DashbordAdmin />
-      </RequireAuth>
-    ),
-    children: [
-      {
-        path: "",
-        index: true,
-        element: <OverView />,
-      },
-      {
-        path: "overview",
-        element: <OverView />,
-      },
-      {
-        path: "statistiques",
-        element: <AdminStatistiques />,
-      },
-      {
-        path: "candidatures",
-        element: <GestionCandidatures />,
-      },
-      {
-        path: "utilisateurs",
-        element: <GestionUtilisateurs />,
-      },
-      {
-        path: "profile",
-        element: <EspaceComptePage />,
-      },
-      {
-        path: "parametres",
-        element: <EspaceComptePage />,
-      },
-      {
-        path: "notifications",
-        element: <EspaceComptePage />,
-      },
-      {
-        path: "exercices",
-        element: <GestionExercices />,
-      },
-      {
-        path: "exercices/nouveau",
-        element: <FormExercicePage />,
-      },
-      {
-        path: "exercices/:id/modifier",
-        element: <FormExercicePage />,
-      },
-      {
-        path: "sujets",
-        element: <GestionSujets />,
-      },
-      {
-        path: "sujets/nouveau",
-        element: <FormSujetPage />,
-      },
-      {
-        path: "sujets/:id/modifier",
-        element: <FormSujetPage />,
-      },
-      {
-        path: "corrections",
-        element: <GestionCorrections />,
-      },
-      {
-        path: "eleves",
-        element: <GestionEleves />,
-      },
-      {
-        path: "professeurs",
-        element: <GestionProfesseurs />,
-      },
-      {
-        path: "matieres",
-        element: <GestionMatieres />,
-      },
-      {
-        path: "niveaux",
-        element: <GestionNiveaux />,
-      },
-      {
-        path: "categories",
-        element: <GestionCategories />,
-      },
-    ],
-  },
-  {
-    path: "Dashboard-professeur",
-    element: (
-      <RequireAuth allowedRoles={["professeur", "administrateur"]}>
-        <DashboardProfesseur />
-      </RequireAuth>
-    ),
-    children: [
-      {
-        path: "",
-        index: true,
-        element: <ProfesseurOverView />,
-      },
-      {
-        path: "overview",
-        element: <ProfesseurOverView />,
-      },
-      {
-        path: "profile",
-        element: <EspaceComptePage />,
-      },
-      {
-        path: "parametres",
-        element: <EspaceComptePage />,
-      },
-      {
-        path: "notifications",
-        element: <EspaceComptePage />,
-      },
-      {
-        path: "exercices",
-        element: <GestionExercices />,
-      },
-      {
-        path: "exercices/nouveau",
-        element: <FormExercicePage />,
-      },
-      {
-        path: "exercices/:id/modifier",
-        element: <FormExercicePage />,
-      },
-      {
-        path: "sujets",
-        element: <GestionSujets />,
-      },
-      {
-        path: "sujets/nouveau",
-        element: <FormSujetPage />,
-      },
-      {
-        path: "sujets/:id/modifier",
-        element: <FormSujetPage />,
-      },
-      {
-        path: "corrections",
-        element: <GestionCorrections />,
-      },
-      {
-        path: "ressources",
-        element: <ProfesseurRessources />,
-      },
-    ],
-  },
-  {
-    path: "dashboard-admin/*",
-    element: <Navigate to="/Dashbord-admin" replace />,
-  },
-  {
-    path: "profile",
-    element: (
-      <RequireAuth>
-        <EspaceComptePage />
-      </RequireAuth>
-    ),
-  },
-  {
-    path: "parametres",
-    element: (
-      <RequireAuth>
-        <EspaceComptePage />
-      </RequireAuth>
-    ),
-  },
-  {
-    path: "notifications",
-    element: (
-      <RequireAuth>
-        <EspaceComptePage />
-      </RequireAuth>
-    ),
-  },
-  {
-    path: "ennoncer",
-    element: <CourseDetailPage />,
-  },
-  {
-    path: "ennoncer-sujet",
-    element: <SujetDetailPage />,
-  },
-  {
-    path: "exercices/:id",
-    element: <CourseDetailPage />,
-  },
-  {
-    path: "exercice/:id",
-    element: <CourseDetailPage />,
-  },
-  {
-    path: "exercices",
-    element: <ListeExercices />,
-  },
-  {
-    path: "exercice",
-    element: <Navigate to="/exercices" replace />,
-  },
-  {
-    path: "sujets",
-    element: <ListeSujets />,
-  },
-  {
-    path: "sujet",
-    element: <Navigate to="/sujets" replace />,
-  },
-  {
-    path: "*",
-    element: <NotFoundPage />,
-  },
+
+      // ─── Compte (tous rôles, hors espaces) ───
+      { path: "profile", element: <RequireAuth>{charger(EspaceComptePage)}</RequireAuth> },
+      { path: "parametres", element: <RequireAuth>{charger(EspaceComptePage)}</RequireAuth> },
+      { path: "notifications", element: <RequireAuth>{charger(EspaceComptePage)}</RequireAuth> },
+
+      // ─── Catalogue public ───
+      { path: "ennoncer", element: charger(CourseDetailPage) },
+      { path: "ennoncer-sujet", element: charger(SujetDetailPage) },
+      { path: "exercices", element: charger(ListeExercices) },
+      { path: "exercices/:id", element: charger(CourseDetailPage) },
+      { path: "exercice/:id", element: charger(CourseDetailPage) },
+      { path: "exercice", element: <Navigate to="/exercices" replace /> },
+      { path: "sujets", element: charger(ListeSujets) },
+      { path: "sujet", element: <Navigate to="/sujets" replace /> },
+
+      // ─── Pages du CMS ───
+      { path: "p/:slug", element: charger(PublicPage) },
+
+      // ─── Blog ───
+      { path: "blog", element: charger(BlogListe) },
+      { path: "blog/categorie/:slug", element: charger(BlogListe) },
+      { path: "blog/:slug", element: charger(BlogArticle) },
+
+      { path: "*", element: <NotFoundPage /> },
     ],
   },
 ]);

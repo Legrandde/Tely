@@ -1,4 +1,5 @@
 import api from "../api/axio";
+import { hasAnalyticsConsent } from "../components/site/consent";
 
 export interface AnalyticsSummary {
   total_visits: number;
@@ -155,6 +156,9 @@ export async function trackEvent(
   path?: string,
   metadata?: Record<string, unknown>
 ): Promise<void> {
+  // RGPD : aucune mesure d'audience sans consentement explicite (bandeau cookies)
+  if (!hasAnalyticsConsent()) return;
+
   const resolvedPath = path || window.location.pathname;
   if (isDuplicate(`${action}|${resolvedPath}|${JSON.stringify(metadata ?? {})}`)) return;
 

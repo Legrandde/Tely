@@ -1,0 +1,19 @@
+{
+  "name": "Tely — Exercices corrigés et sujets d'examen",
+  "short_name": "Tely",
+  "description": "Exercices corrigés, anciens sujets d'examen et corrections détaillées pour réviser et réussir.",
+  "lang": "fr",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "background_color": "#fffbeb",
+  "theme_color": "#fffbeb",
+  "icons": [
+    {
+      "src": "/favicon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    }
+  ]
+}

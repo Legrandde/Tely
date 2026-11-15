@@ -1,4 +1,4 @@
-import { useLocation, useNavigate } from "react-router-dom";
+import { useLocation, useNavigate, useSearchParams } from "react-router-dom";
 import { User, Settings, Bell } from "lucide-react";
 import ProfilePage from "./ProfilePage";
 import ParametresPage from "./ParametresPage";
@@ -11,10 +11,18 @@ export default function EspaceComptePage() {
   const location = useLocation();
   const navigate = useNavigate();
   const { user } = useAuth();
+  const [searchParams] = useSearchParams();
 
   const path = location.pathname.toLowerCase();
+  // Espace élève : une seule route (/espace/compte), l'onglet est porté par ?onglet=
+  const estEspaceEleve = path.startsWith("/espace");
+  const onglet = searchParams.get("onglet");
 
-  const activeTab: AccountTab = path.includes("parametres")
+  const activeTab: AccountTab = estEspaceEleve
+    ? onglet === "parametres" || onglet === "notifications"
+      ? onglet
+      : "profile"
+    : path.includes("parametres")
     ? "parametres"
     : path.includes("notifications")
     ? "notifications"
@@ -27,6 +35,10 @@ export default function EspaceComptePage() {
     : "";
 
   const handleTabChange = (tab: AccountTab) => {
+    if (estEspaceEleve) {
+      navigate(tab === "profile" ? "/espace/compte" : `/espace/compte?onglet=${tab}`);
+      return;
+    }
     navigate(`${basePath}/${tab}`);
   };
 
@@ -60,7 +72,7 @@ export default function EspaceComptePage() {
   ];
 
   return (
-    <div className="p-4 sm:p-6 lg:p-8 max-w-5xl mx-auto space-y-6">
+    <div className={`${estEspaceEleve ? "pb-8" : "p-4 sm:p-6 lg:p-8"} max-w-5xl mx-auto space-y-6`}>
       {/* ── Barre d'onglets unifiée (Mon Profil / Paramètres / Notifications) ── */}
       <div className="tely-card p-2">
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">

@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { MoreHorizontal, Circle, Shield, GraduationCap, BookOpen, Plus } from "lucide-react";
 
+import { resolveImageUrl } from "../utils/imageUrl";
 // ─── Data ──────────────────────────────────────────────────────────
 const users = [
   { id: 1, name: "Alhassane Diallo", email: "alhassane@tely.sn", phone: "+221 77 123 45 67", role: "Admin",      avatar: "https://i.pravatar.cc/150?img=11" },
@@ -85,7 +86,7 @@ export default function UsersPage() {
                   <td className="px-5 py-3">
                     <div className="flex items-center gap-3">
                       <img
-                        src={user.avatar}
+                        src={resolveImageUrl(user.avatar) ?? undefined}
                         alt={user.name}
                         className="w-9 h-9 rounded-full object-cover ring-2 ring-gray-100"
                       />
@@ -152,7 +153,7 @@ export default function UsersPage() {
               {/* Avatar + badge vert */}
               <div className="relative flex-shrink-0">
                 <img
-                  src={user.avatar}
+                  src={resolveImageUrl(user.avatar) ?? undefined}
                   alt={user.name}
                   className="w-9 h-9 rounded-full object-cover"
                 />

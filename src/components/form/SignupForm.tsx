@@ -1,15 +1,67 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { flushSync } from "react-dom";
 import { Link, useLocation, useNavigate } from "react-router-dom";
+import { CheckCircle2, Lock } from "lucide-react";
 import { AppInput } from "../shared/ui/AppInput";
 import { AppButton } from "../shared/ui/AppButton";
 import { IconEye } from "../shared/ui/IconEye";
 import { IconGoogle } from "../shared/ui/IconGoogle";
-import { register, loginWithGoogle } from "../../services/authService";
+import {
+  register,
+  loginWithGoogle,
+  cheminApresConnexion,
+  codeErreurApi,
+  extraireCheminFrom,
+} from "../../services/authService";
+import { useAuth } from "../../context/authContext";
+import api from "../../api/axio";
+
+const REASSURANCES = ["100 % gratuit", "Sans engagement", "Corrigés détaillés"];
+
+/** Score 1–4 et libellé de la robustesse d'un mot de passe. */
+function forceMotDePasse(mdp: string): { score: number; label: string; couleur: string } {
+  if (!mdp) return { score: 0, label: "", couleur: "bg-gray-200" };
+  let score = 0;
+  if (mdp.length >= 8) score++;
+  if (mdp.length >= 12) score++;
+  if (/[a-z]/.test(mdp) && /[A-Z]/.test(mdp)) score++;
+  if (/\d/.test(mdp)) score++;
+  if (/[^A-Za-z0-9]/.test(mdp)) score++;
+  if (mdp.length < 8) score = Math.min(score, 1);
+  const niveau = Math.min(4, Math.max(1, score));
+  const table = [
+    { label: "Trop faible", couleur: "bg-red-500" },
+    { label: "Moyen", couleur: "bg-amber-400" },
+    { label: "Bon", couleur: "bg-amber-500" },
+    { label: "Excellent", couleur: "bg-emerald-500" },
+  ];
+  return { score: niveau, ...table[niveau - 1] };
+}
 import { trackEvent } from "../../services/analyticsTracker";
 
 export function SignupForm() {
   const navigate = useNavigate();
   const location = useLocation();
+  const { setUser } = useAuth();
+  const [inscriptionsFermees, setInscriptionsFermees] = useState<string | null>(null);
+
+  // Les inscriptions peuvent être fermées par l'administrateur
+  useEffect(() => {
+    let annule = false;
+    api
+      .get<{ parametres?: { inscriptions_ouvertes?: string } }>("/api/site/parametres")
+      .then(({ data }) => {
+        if (!annule && data?.parametres?.inscriptions_ouvertes === "0") {
+          setInscriptionsFermees("Les inscriptions sont momentanément fermées. Revenez bientôt !");
+        }
+      })
+      .catch(() => {
+        // En cas d'échec, le serveur reste l'arbitre (403 inscriptions_fermees)
+      });
+    return () => {
+      annule = true;
+    };
+  }, []);
 
   const [values, setValues] = useState({
     nom: "",
@@ -20,7 +72,7 @@ export function SignupForm() {
   });
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirm, setShowConfirm] = useState(false);
-  const [accepteConditions, setAccepteConditions] = useState(true);
+  const [accepteConditions, setAccepteConditions] = useState(false);
   const [loading, setLoading] = useState(false);
   const [errors, setErrors] = useState<{
     nom?: string;
@@ -28,19 +80,12 @@ export function SignupForm() {
     email?: string;
     password?: string;
     confirmPassword?: string;
+    conditions?: string;
     global?: string;
   }>({});
 
   function getTargetRedirectPath(): string | null {
-    const fromState = (location.state as { from?: unknown } | null)?.from;
-    if (typeof fromState === "string") {
-      return fromState;
-    }
-    if (fromState && typeof fromState === "object" && "pathname" in fromState) {
-      const loc = fromState as { pathname: string; search?: string; hash?: string };
-      return `${loc.pathname}${loc.search || ""}${loc.hash || ""}`;
-    }
-    return null;
+    return extraireCheminFrom(location.state);
   }
 
   function handleGoogleLogin() {
@@ -51,6 +96,8 @@ export function SignupForm() {
     loginWithGoogle();
   }
 
+  const force = forceMotDePasse(values.password);
+
   function validate() {
     const e: typeof errors = {};
     if (values.nom.trim().length < 2) e.nom = "Nom trop court";
@@ -59,11 +106,14 @@ export function SignupForm() {
     if (values.password.length < 8) e.password = "8 caractères minimum";
     if (values.confirmPassword !== values.password)
       e.confirmPassword = "Les mots de passe ne correspondent pas";
+    if (!accepteConditions)
+      e.conditions = "Veuillez accepter les conditions d'utilisation et la politique de confidentialité";
     return e;
   }
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
+    if (inscriptionsFermees) return;
     const errs = validate();
     if (Object.keys(errs).length) {
       setErrors(errs);
@@ -81,22 +131,16 @@ export function SignupForm() {
         role: "eleve",
       });
       void trackEvent("register");
-
-      if (user.role === "professeur") {
-        navigate("/Dashboard-professeur", { replace: true });
-      } else if (user.role === "administrateur") {
-        navigate("/Dashbord-admin", { replace: true });
-      } else {
-        const targetPath = getTargetRedirectPath();
-        if (targetPath) {
-          navigate(targetPath, { replace: true });
-        } else {
-          navigate("/exercices", { replace: true });
-        }
-      }
+      flushSync(() => setUser(user));
+      navigate(cheminApresConnexion(user, getTargetRedirectPath()), { replace: true });
     } catch (err: unknown) {
       const message =
         (err as { response?: { data?: { message?: string } } })?.response?.data?.message ?? "Une erreur est survenue, réessaie";
+      if (codeErreurApi(err) === "inscriptions_fermees") {
+        setInscriptionsFermees(message || "Les inscriptions sont momentanément fermées.");
+        setErrors({});
+        return;
+      }
       setErrors({ global: message });
     } finally {
       setLoading(false);
@@ -104,18 +148,38 @@ export function SignupForm() {
   }
 
   return (
-    <form onSubmit={handleSubmit} className="flex flex-col">
+    <form onSubmit={handleSubmit} className="flex flex-col" noValidate>
       <h1 className="text-[28px] font-bold text-gray-900 leading-tight mb-1">
         Créer un compte
       </h1>
-      <p className="text-sm text-gray-400 mb-7">Rejoins Tely et commence à t'exercer</p>
+      <p className="text-sm text-gray-400 mb-4">Rejoins Tely et commence à t'exercer</p>
+
+      <ul className="flex flex-wrap gap-x-4 gap-y-1.5 mb-6" aria-label="Avantages">
+        {REASSURANCES.map((r) => (
+          <li key={r} className="flex items-center gap-1.5 text-xs font-medium text-gray-700">
+            <CheckCircle2 size={14} className="text-amber-500" aria-hidden="true" />
+            {r}
+          </li>
+        ))}
+      </ul>
+
+      {inscriptionsFermees && (
+        <div role="alert" className="flex items-start gap-2.5 text-xs text-amber-800 bg-amber-50 border border-amber-200 rounded-[10px] px-3 py-2.5 mb-4">
+          <Lock size={15} className="shrink-0 mt-px" aria-hidden="true" />
+          <div>
+            <p className="font-semibold">Inscriptions fermées</p>
+            <p className="mt-0.5">{inscriptionsFermees}</p>
+          </div>
+        </div>
+      )}
 
       {errors.global && (
-        <p className="text-xs text-red-500 mb-3.5">
+        <p className="text-xs text-red-500 mb-3.5" role="alert">
           {errors.global}
         </p>
       )}
 
+      <fieldset disabled={!!inscriptionsFermees} className={`contents ${inscriptionsFermees ? "[&>*]:opacity-50" : ""}`}>
       <div className="flex flex-col gap-3.5 mb-3.5">
         <div className="flex gap-3">
           <div className="flex-1">
@@ -146,7 +210,7 @@ export function SignupForm() {
           error={errors.email}
         />
         <AppInput
-          label="Password"
+          label="Mot de passe"
           type={showPassword ? "text" : "password"}
           value={values.password}
           onChange={(e) => setValues((v) => ({ ...v, password: e.target.value }))}
@@ -155,8 +219,26 @@ export function SignupForm() {
           iconRight={<IconEye open={showPassword} />}
           onIconRightClick={() => setShowPassword((v) => !v)}
         />
+        {values.password && (
+          <div className="-mt-1.5" aria-live="polite">
+            <div className="flex gap-1" aria-hidden="true">
+              {[1, 2, 3, 4].map((i) => (
+                <div
+                  key={i}
+                  className={`h-1 flex-1 rounded-full transition-colors ${
+                    i <= force.score ? force.couleur : "bg-gray-200"
+                  }`}
+                />
+              ))}
+            </div>
+            <p className="text-[11px] text-gray-500 mt-1">
+              Robustesse : <span className="font-semibold text-gray-700">{force.label}</span>
+              {force.score < 3 && " · ajoutez majuscules, chiffres ou symboles"}
+            </p>
+          </div>
+        )}
         <AppInput
-          label="Confirm password"
+          label="Confirmer le mot de passe"
           type={showConfirm ? "text" : "password"}
           value={values.confirmPassword}
           onChange={(e) => setValues((v) => ({ ...v, confirmPassword: e.target.value }))}
@@ -167,15 +249,30 @@ export function SignupForm() {
         />
       </div>
 
-      <label className="flex items-center gap-2 text-xs text-gray-400 cursor-pointer select-none mb-0">
+      <label className="flex items-start gap-2 text-xs text-gray-500 cursor-pointer select-none mb-0 leading-relaxed">
         <input
           type="checkbox"
           checked={accepteConditions}
-          onChange={(e) => setAccepteConditions(e.target.checked)}
-          className="accent-gray-900 w-3.5 h-3.5"
+          onChange={(e) => {
+            setAccepteConditions(e.target.checked);
+            if (e.target.checked) setErrors((er) => ({ ...er, conditions: undefined }));
+          }}
+          aria-invalid={!!errors.conditions}
+          className="accent-gray-900 w-3.5 h-3.5 mt-0.5 shrink-0"
         />
-        J'accepte les conditions d'utilisation
+        <span>
+          J'accepte les{" "}
+          <Link to="/p/cgu" target="_blank" rel="noopener" className="tely-link">
+            conditions d'utilisation
+          </Link>{" "}
+          et la{" "}
+          <Link to="/p/confidentialite" target="_blank" rel="noopener" className="tely-link">
+            politique de confidentialité
+          </Link>
+        </span>
       </label>
+      {errors.conditions && <p className="tely-error mt-1.5">{errors.conditions}</p>}
+      </fieldset>
 
       <div className="flex items-center gap-3 my-5">
         <div className="flex-1 h-px bg-gray-200" />
@@ -190,11 +287,17 @@ export function SignupForm() {
           type="button"
           variant="outline"
           onClick={handleGoogleLogin}
+          disabled={!!inscriptionsFermees}
           iconLeft={<IconGoogle />}
           fullWidth
         >
           Inscription avec Google
         </AppButton>
+        <p className="text-[11px] text-gray-400 mt-1.5 text-center">
+          En continuant avec Google, vous acceptez nos{" "}
+          <Link to="/p/cgu" target="_blank" rel="noopener" className="underline hover:text-gray-700">CGU</Link> et notre{" "}
+          <Link to="/p/confidentialite" target="_blank" rel="noopener" className="underline hover:text-gray-700">politique de confidentialité</Link>.
+        </p>
       </div>
 
       <AppButton
@@ -202,7 +305,7 @@ export function SignupForm() {
         type="submit"
         loading={loading}
         fullWidth
-        disabled={!accepteConditions}
+        disabled={!!inscriptionsFermees}
       >
         Créer mon compte
       </AppButton>

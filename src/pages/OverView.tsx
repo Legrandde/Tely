@@ -5,13 +5,17 @@ import type { AdminStats } from "../types/admin";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../context/authContext";
 import { ATraiter, ActionsRapides, DashboardHeader } from "../components/dashboard/DashboardHome";
+import ActiviteRecente from "../components/admin/ActiviteRecente";
+import { listCandidatures } from "../services/candidatureService";
+import { fetchUsers } from "../services/userService";
 import {
+  Ban,
   BookOpen,
   CheckCircle2,
   ClipboardList,
   EyeOff,
+  FilePlus2,
   Plus,
-  TrendingUp,
   UserCheck,
   UserPlus,
   Users,
@@ -35,6 +39,10 @@ const DIFFICULTE_COLORS: Record<string, string> = {
 export default function OverView() {
   const [stats, setStats] = useState<AdminStats | null>(null);
   const [loading, setLoading] = useState(true);
+  // Compteurs « back-office » chargés en parallèle (null = indisponible)
+  const [candidaturesEnAttente, setCandidaturesEnAttente] = useState<number | null>(null);
+  const [comptesSuspendus, setComptesSuspendus] = useState<number | null>(null);
+  const [loadingBackoffice, setLoadingBackoffice] = useState(true);
   const navigate = useNavigate();
   const { user } = useAuth();
 
@@ -55,6 +63,26 @@ export default function OverView() {
 
     return () => {
       isMounted = false;
+    };
+  }, []);
+
+  useEffect(() => {
+    let actif = true;
+    Promise.allSettled([
+      listCandidatures({ statut: "en_attente" }),
+      fetchUsers({ statut: "suspendu", per_page: 5 }),
+    ]).then(([candidatures, suspendus]) => {
+      if (!actif) return;
+      if (candidatures.status === "fulfilled") {
+        setCandidaturesEnAttente(candidatures.value.counts?.en_attente ?? candidatures.value.candidatures.total ?? 0);
+      }
+      if (suspendus.status === "fulfilled") {
+        setComptesSuspendus(suspendus.value.counts?.suspendus ?? suspendus.value.users.total ?? 0);
+      }
+      setLoadingBackoffice(false);
+    });
+    return () => {
+      actif = false;
     };
   }, []);
 
@@ -92,17 +120,24 @@ export default function OverView() {
       />
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 w-full min-w-0">
-        <div className="lg:col-span-2 min-w-0">
+        <div className="lg:col-span-2 min-w-0 flex flex-col gap-6">
           <ATraiter
-            loading={loading}
+            loading={loading || loadingBackoffice}
             taches={[
               {
-                count: aTraiter?.candidatures_en_attente ?? 0,
+                count: candidaturesEnAttente ?? aTraiter?.candidatures_en_attente ?? 0,
                 label: "candidature(s) enseignant en attente",
                 description: "Des enseignants attendent votre validation pour publier.",
                 to: "/Dashbord-admin/candidatures",
                 priorite: "urgent",
                 icon: <UserCheck size={18} />,
+              },
+              {
+                count: comptesSuspendus ?? 0,
+                label: "compte(s) suspendu(s)",
+                description: "Vérifiez les motifs et réactivez ou supprimez ces comptes.",
+                to: "/Dashbord-admin/utilisateurs?statut=suspendu",
+                icon: <Ban size={18} />,
               },
               {
                 count: aTraiter?.exercices_sans_corrige ?? 0,
@@ -134,15 +169,18 @@ export default function OverView() {
               },
             ]}
           />
+          <ActiviteRecente />
         </div>
-        <ActionsRapides
-          actions={[
-            { label: "Créer un compte", to: "/Dashbord-admin/utilisateurs", icon: <UserPlus size={18} /> },
-            { label: "Nouvel exercice", to: "/Dashbord-admin/exercices/nouveau", icon: <BookOpen size={18} /> },
-            { label: "Nouveau sujet", to: "/Dashbord-admin/sujets/nouveau", icon: <ClipboardList size={18} /> },
-            { label: "Statistiques", to: "/Dashbord-admin/statistiques", icon: <TrendingUp size={18} /> },
-          ]}
-        />
+        <div className="min-w-0">
+          <ActionsRapides
+            actions={[
+              { label: "Nouvelle page", to: "/Dashbord-admin/pages?nouvelle=1", icon: <FilePlus2 size={18} /> },
+              { label: "Nouvel exercice", to: "/Dashbord-admin/exercices/nouveau", icon: <BookOpen size={18} /> },
+              { label: "Inviter un utilisateur", to: "/Dashbord-admin/utilisateurs?nouveau=1", icon: <UserPlus size={18} /> },
+              { label: "Nouveau sujet", to: "/Dashbord-admin/sujets/nouveau", icon: <ClipboardList size={18} /> },
+            ]}
+          />
+        </div>
       </div>
 
       {/* ── Stat Cards ── */}

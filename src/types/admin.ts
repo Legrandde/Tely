@@ -174,3 +174,65 @@ export interface ProfesseurStats {
     created_at: string;
   }>;
 }
+
+/* ─────────────────────────────────────────────────────────────
+   Back-office : journal d'audit et recherche globale
+   ───────────────────────────────────────────────────────────── */
+
+export interface Pagination<T> {
+  data: T[];
+  current_page: number;
+  last_page: number;
+  per_page: number;
+  total: number;
+  from: number | null;
+  to: number | null;
+}
+
+export interface JournalActeur {
+  id: number;
+  nom: string;
+  prenom: string;
+  email: string;
+  role: "eleve" | "professeur" | "administrateur";
+}
+
+export interface JournalEntree {
+  id: number;
+  action: string;
+  description: string;
+  sujet_type: string | null;
+  sujet_id: number | null;
+  meta: Record<string, unknown> | unknown[] | null;
+  ip: string | null;
+  created_at: string;
+  user: JournalActeur | null;
+}
+
+export interface JournalResponse {
+  journal: Pagination<JournalEntree>;
+  actions: string[];
+}
+
+export interface JournalFiltres {
+  action?: string;
+  search?: string;
+  du?: string;
+  au?: string;
+  page?: number;
+}
+
+export interface RechercheResultats {
+  utilisateurs: Array<{
+    id: number;
+    nom: string;
+    prenom: string;
+    email: string;
+    role: "eleve" | "professeur" | "administrateur";
+    avatar?: string | null;
+    avatar_url?: string | null;
+  }>;
+  exercices: Array<{ id: number; titre: string; est_actif: boolean | number }>;
+  sujets: Array<{ id: number; titre: string }>;
+  pages: Array<{ id: number; titre: string; slug: string; statut: "brouillon" | "publie" }>;
+}
