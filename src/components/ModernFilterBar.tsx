@@ -1,6 +1,8 @@
 import { useMemo } from "react";
 import { Search, ChevronDown, RotateCcw } from "lucide-react";
-import { useReferenceData } from "../hooks/useReferenceData";
+import { useReferenceData } from "@/hooks/useReferenceData";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
 
 export interface FilterValues {
   q?: string;
@@ -34,6 +36,9 @@ const TRI_OPTIONS = [
   { value: "titre_asc", label: "Trier : titre A-Z" },
 ];
 
+const selectClass =
+  "appearance-none h-9 bg-card border border-input hover:bg-secondary/50 text-foreground text-xs sm:text-sm font-medium rounded-lg pl-3 pr-8 shadow-2xs outline-none focus:border-foreground focus:ring-2 focus:ring-ring/25 cursor-pointer transition-all";
+
 export default function ModernFilterBar({
   values,
   onChange,
@@ -42,13 +47,11 @@ export default function ModernFilterBar({
 }: ModernFilterBarProps) {
   const { matieres = [], niveaux = [] } = useReferenceData();
 
-  // Liste unique des cycles
   const cycles = useMemo(() => {
     const list = Array.from(new Set((niveaux || []).map((n) => n.cycle).filter(Boolean)));
     return list.length > 0 ? list : ["Élémentaire", "Collège", "Lycée"];
   }, [niveaux]);
 
-  // Niveaux filtrés par cycle si un cycle est choisi
   const filteredNiveaux = useMemo(() => {
     if (!values.cycle) return niveaux || [];
     return (niveaux || []).filter(
@@ -58,19 +61,20 @@ export default function ModernFilterBar({
 
   const hasActiveFilters = Boolean(
     values.q ||
-    values.cycle ||
-    values.niveau_id ||
-    values.matiere_id ||
-    values.serie ||
-    (values.tri && values.tri !== "pertinence")
+      values.cycle ||
+      values.niveau_id ||
+      values.matiere_id ||
+      values.serie ||
+      (values.tri && values.tri !== "pertinence")
   );
 
   function updateField(key: keyof FilterValues, val?: string) {
     const next = { ...values, [key]: val || undefined };
-    // Si on change de cycle et que le niveau choisi n'est plus dedans, on le réinitialise
     if (key === "cycle" && val) {
       const match = (niveaux || []).find(
-        (n) => String(n.id) === String(values.niveau_id) && n.cycle?.toLowerCase() === val.toLowerCase()
+        (n) =>
+          String(n.id) === String(values.niveau_id) &&
+          n.cycle?.toLowerCase() === val.toLowerCase()
       );
       if (!match) {
         delete next.niveau_id;
@@ -80,29 +84,26 @@ export default function ModernFilterBar({
   }
 
   return (
-    <div className="w-full mb-8">
+    <div className="w-full mb-8 space-y-3">
       {/* ── 1. Champ de recherche principal ── */}
-      <div className="relative w-full mb-3.5">
-        <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-gray-400">
-          <Search size={18} />
-        </div>
-        <input
+      <div className="relative w-full">
+        <Search className="size-4 absolute left-3.5 top-1/2 -translate-y-1/2 text-muted-foreground pointer-events-none" />
+        <Input
           type="text"
           value={values.q ?? ""}
           onChange={(e) => updateField("q", e.target.value)}
           placeholder={placeholder}
-          className="w-full pl-11 pr-4 py-2.5 sm:py-3 text-sm text-gray-700 bg-white rounded-full border border-gray-200/90 shadow-2xs placeholder:text-gray-400 focus:outline-hidden focus:border-amber-400 focus:ring-2 focus:ring-amber-200/50 transition-all"
+          className="h-11 pl-10 bg-card"
         />
       </div>
 
-      {/* ── 2. Ligne horizontale des filtres en pilule ── */}
-      <div className="flex flex-wrap items-center gap-2.5">
-        {/* Tous les cycles */}
+      {/* ── 2. Filtres ── */}
+      <div className="flex flex-wrap items-center gap-2">
         <div className="relative inline-flex items-center">
           <select
             value={values.cycle ?? ""}
             onChange={(e) => updateField("cycle", e.target.value)}
-            className="appearance-none bg-white border border-gray-200/90 hover:border-gray-300 text-gray-700 text-xs sm:text-sm font-normal rounded-full pl-4 pr-8 py-2 shadow-2xs focus:outline-hidden focus:ring-2 focus:ring-amber-300/40 cursor-pointer transition-all"
+            className={selectClass}
           >
             <option value="">Tous les cycles</option>
             {cycles.map((c) => (
@@ -111,58 +112,46 @@ export default function ModernFilterBar({
               </option>
             ))}
           </select>
-          <ChevronDown
-            size={14}
-            className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none"
-          />
+          <ChevronDown className="size-3.5 absolute right-2.5 top-1/2 -translate-y-1/2 text-muted-foreground pointer-events-none" />
         </div>
 
-        {/* Tous les niveaux */}
         <div className="relative inline-flex items-center">
           <select
             value={values.niveau_id ?? ""}
             onChange={(e) => updateField("niveau_id", e.target.value)}
-            className="appearance-none bg-white border border-gray-200/90 hover:border-gray-300 text-gray-700 text-xs sm:text-sm font-normal rounded-full pl-4 pr-8 py-2 shadow-2xs focus:outline-hidden focus:ring-2 focus:ring-amber-300/40 cursor-pointer transition-all"
+            className={selectClass}
           >
             <option value="">Tous les niveaux</option>
             {filteredNiveaux.map((n) => (
-              <option key={n.id} value={n.id}>
+              <option key={n.id} value={String(n.id)}>
                 {n.libelle}
               </option>
             ))}
           </select>
-          <ChevronDown
-            size={14}
-            className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none"
-          />
+          <ChevronDown className="size-3.5 absolute right-2.5 top-1/2 -translate-y-1/2 text-muted-foreground pointer-events-none" />
         </div>
 
-        {/* Toutes les matières */}
         <div className="relative inline-flex items-center">
           <select
             value={values.matiere_id ?? ""}
             onChange={(e) => updateField("matiere_id", e.target.value)}
-            className="appearance-none bg-white border border-gray-200/90 hover:border-gray-300 text-gray-700 text-xs sm:text-sm font-normal rounded-full pl-4 pr-8 py-2 shadow-2xs focus:outline-hidden focus:ring-2 focus:ring-amber-300/40 cursor-pointer transition-all"
+            className={selectClass}
           >
             <option value="">Toutes les matières</option>
             {matieres.map((m) => (
-              <option key={m.id} value={m.id}>
+              <option key={m.id} value={String(m.id)}>
                 {m.nom}
               </option>
             ))}
           </select>
-          <ChevronDown
-            size={14}
-            className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none"
-          />
+          <ChevronDown className="size-3.5 absolute right-2.5 top-1/2 -translate-y-1/2 text-muted-foreground pointer-events-none" />
         </div>
 
-        {/* Toutes les séries */}
         <div className="relative inline-flex items-center">
           <select
             value={values.serie ?? ""}
             onChange={(e) => updateField("serie", e.target.value)}
-            className="appearance-none bg-white border border-gray-200/90 hover:border-gray-300 text-gray-700 text-xs sm:text-sm font-normal rounded-full pl-4 pr-8 py-2 shadow-2xs focus:outline-hidden focus:ring-2 focus:ring-amber-300/40 cursor-pointer transition-all"
+            className={selectClass}
           >
             <option value="">Toutes les séries</option>
             {SERIES_OPTIONS.map((s) => (
@@ -171,18 +160,14 @@ export default function ModernFilterBar({
               </option>
             ))}
           </select>
-          <ChevronDown
-            size={14}
-            className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none"
-          />
+          <ChevronDown className="size-3.5 absolute right-2.5 top-1/2 -translate-y-1/2 text-muted-foreground pointer-events-none" />
         </div>
 
-        {/* Trier : pertinence */}
         <div className="relative inline-flex items-center">
           <select
             value={values.tri ?? "pertinence"}
             onChange={(e) => updateField("tri", e.target.value)}
-            className="appearance-none bg-white border border-gray-200/90 hover:border-gray-300 text-gray-700 text-xs sm:text-sm font-normal rounded-full pl-4 pr-8 py-2 shadow-2xs focus:outline-hidden focus:ring-2 focus:ring-amber-300/40 cursor-pointer transition-all"
+            className={selectClass}
           >
             {TRI_OPTIONS.map((t) => (
               <option key={t.value} value={t.value}>
@@ -190,26 +175,23 @@ export default function ModernFilterBar({
               </option>
             ))}
           </select>
-          <ChevronDown
-            size={14}
-            className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none"
-          />
+          <ChevronDown className="size-3.5 absolute right-2.5 top-1/2 -translate-y-1/2 text-muted-foreground pointer-events-none" />
         </div>
 
-        {/* Bouton Réinitialiser si des filtres sont appliqués */}
         {hasActiveFilters && (
-          <button
+          <Button
             type="button"
+            variant="ghost"
+            size="sm"
             onClick={() => {
               if (onReset) onReset();
               else onChange({});
             }}
-            className="inline-flex items-center gap-1.5 px-3 py-2 text-xs font-medium text-amber-600 bg-amber-50 hover:bg-amber-100/80 border border-amber-200 rounded-full transition-colors cursor-pointer"
-            title="Réinitialiser tous les filtres"
+            className="text-muted-foreground hover:text-foreground"
           >
-            <RotateCcw size={12} />
-            <span>Effacer les filtres</span>
-          </button>
+            <RotateCcw className="size-3.5" />
+            Réinitialiser
+          </Button>
         )}
       </div>
     </div>

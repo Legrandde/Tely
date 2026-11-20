@@ -1,10 +1,12 @@
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { Menu, Search } from "lucide-react";
 import { useState } from "react";
-import { useAuth } from "../../context/authContext";
-import { useSidebar } from "../../context/SidebarContext";
-import { resolveImageUrl } from "../../utils/imageUrl";
-import NotificationDropdown from "../notifications/NotificationDropdown";
+import { useAuth } from "@/context/authContext";
+import { useSidebar } from "@/context/SidebarContext";
+import { resolveImageUrl } from "@/utils/imageUrl";
+import NotificationDropdown from "@/components/notifications/NotificationDropdown";
+import { Button } from "@/components/ui/button";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
 const TITRES: Array<[string, string]> = [
   ["/espace/favoris", "Mes favoris"],
@@ -36,32 +38,32 @@ export default function HeaderEleve() {
   function rechercher(e: React.FormEvent) {
     e.preventDefault();
     const q = recherche.trim();
-    // La page /exercices lit ses filtres en interne : on y renvoie l'élève, la recherche
-    // est transmise en paramètre d'URL pour une éventuelle prise en charge.
     navigate(q ? `/exercices?q=${encodeURIComponent(q)}` : "/exercices");
   }
 
   return (
-    <header className="flex items-center h-16 justify-between gap-3 px-3 sm:px-6 tely-page w-full shrink-0">
-      <div className="flex items-center gap-2 min-w-0">
-        <button
+    <header className="flex items-center h-16 justify-between gap-3 px-4 sm:px-6 bg-background/95 backdrop-blur-sm border-b border-border w-full shrink-0">
+      <div className="flex items-center gap-2.5 min-w-0">
+        <Button
           type="button"
+          variant="ghost"
+          size="icon-sm"
           onClick={toggleMobile}
-          className="lg:hidden tely-icon-btn shrink-0"
+          className="lg:hidden shrink-0"
           aria-label="Ouvrir le menu"
         >
-          <Menu size={20} />
-        </button>
-        <p className="tely-title text-lg sm:text-xl truncate">{titre}</p>
+          <Menu className="size-5" />
+        </Button>
+        <h1 className="tely-title text-base sm:text-lg truncate">{titre}</h1>
       </div>
 
       <div className="flex items-center gap-2 sm:gap-3 shrink-0">
         <form
           role="search"
           onSubmit={rechercher}
-          className="hidden md:flex items-center gap-2 bg-white rounded-[10px] px-3 py-2.5 w-52 lg:w-72 border border-gray-200 transition-all focus-within:border-gray-900 focus-within:shadow-[0_0_0_3px_rgba(17,17,17,0.06)]"
+          className="hidden md:flex items-center gap-2 bg-card rounded-lg px-3 h-9 w-52 lg:w-72 border border-input transition-all focus-within:border-foreground focus-within:ring-2 focus-within:ring-ring/25"
         >
-          <Search size={15} className="text-gray-900 shrink-0" aria-hidden="true" />
+          <Search className="size-4 text-muted-foreground shrink-0" aria-hidden="true" />
           <label htmlFor="recherche-eleve" className="sr-only">
             Rechercher un exercice
           </label>
@@ -71,7 +73,7 @@ export default function HeaderEleve() {
             value={recherche}
             onChange={(e) => setRecherche(e.target.value)}
             placeholder="Rechercher un exercice..."
-            className="bg-transparent text-sm text-gray-900 outline-none w-full placeholder:text-gray-400"
+            className="bg-transparent text-xs sm:text-sm text-foreground outline-none w-full placeholder:text-muted-foreground"
           />
         </form>
 
@@ -79,16 +81,15 @@ export default function HeaderEleve() {
 
         <Link
           to="/espace/compte"
-          className="w-9 h-9 rounded-full overflow-hidden ring-2 ring-white hover:ring-gray-900 focus-visible:ring-gray-900 shrink-0 transition-all"
+          className="rounded-full outline-none focus-visible:ring-2 focus-visible:ring-ring shrink-0"
           aria-label={`Mon compte (${nomComplet || "élève"})`}
         >
-          {avatar ? (
-            <img src={avatar} alt="" referrerPolicy="no-referrer" className="w-full h-full object-cover" />
-          ) : (
-            <span className="w-full h-full bg-gray-900 text-white flex items-center justify-center text-xs font-semibold">
+          <Avatar className="size-8">
+            {avatar && <AvatarImage src={avatar} alt="" referrerPolicy="no-referrer" />}
+            <AvatarFallback className="bg-primary text-primary-foreground">
               {initiales}
-            </span>
-          )}
+            </AvatarFallback>
+          </Avatar>
         </Link>
       </div>
     </header>

@@ -1,13 +1,31 @@
-import { useEffect, useId, useRef, useState } from "react";
+import { useState } from "react";
 import { Link, NavLink, useLocation, useNavigate } from "react-router-dom";
-import { AnimatePresence, MotionConfig, motion } from "framer-motion";
-import { ArrowRight, ChevronDown, LayoutDashboard, LogOut, Menu, User, X } from "lucide-react";
-import { logout } from "../../services/authService";
-import { useAuth } from "../../context/authContext";
-import { useSite, useSiteNom } from "../../context/SiteContext";
-import { resolveImageUrl } from "../../utils/imageUrl";
-import ConfirmModal from "./ConfirmModal";
-import AnnonceBanner from "../site/AnnonceBanner";
+import { ArrowRight, ChevronDown, LayoutDashboard, LogOut, Menu, User } from "lucide-react";
+import { logout } from "@/services/authService";
+import { useAuth } from "@/context/authContext";
+import { useSite, useSiteNom } from "@/context/SiteContext";
+import { resolveImageUrl } from "@/utils/imageUrl";
+import ConfirmModal from "@/components/ui/ConfirmModal";
+import AnnonceBanner from "@/components/site/AnnonceBanner";
+import { Button } from "@/components/ui/button";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import {
+  Sheet,
+  SheetContent,
+  SheetHeader,
+  SheetTitle,
+  SheetTrigger,
+} from "@/components/ui/sheet";
+import { Separator } from "@/components/ui/separator";
+import { cn } from "@/lib/utils";
 
 type Role = "eleve" | "professeur" | "administrateur";
 
@@ -17,28 +35,20 @@ const ESPACES: Record<Role, { path: string; profil: string; label: string }> = {
   administrateur: { path: "/Dashbord-admin", profil: "/Dashbord-admin/profile", label: "Administration" },
 };
 
-const FOCUSABLES = 'a[href], button:not([disabled]), input, select, textarea, [tabindex]:not([tabindex="-1"])';
-
-function lienNavClasse({ isActive }: { isActive: boolean }) {
-  return `relative rounded-lg px-3 py-2 text-sm font-medium transition-colors focus-visible:outline-2 focus-visible:outline-amber-500 ${
-    isActive ? "text-gray-900 after:absolute after:inset-x-3 after:-bottom-0.5 after:h-0.5 after:rounded-full after:bg-amber-500" : "text-gray-600 hover:text-gray-900"
-  }`;
-}
-
 function Logo({ nom }: { nom: string }) {
   return (
     <Link
       to="/"
-      className="flex shrink-0 items-center gap-2 rounded-lg focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-amber-500"
+      className="flex shrink-0 items-center gap-2.5 rounded-lg outline-none focus-visible:ring-2 focus-visible:ring-ring"
       aria-label={`${nom} — accueil`}
     >
       <span
-        className="flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-tr from-amber-500 to-amber-400 text-lg font-black text-gray-950 shadow-md shadow-amber-500/25"
+        className="flex size-8 items-center justify-center rounded-lg bg-primary text-sm font-bold text-primary-foreground shadow-2xs"
         aria-hidden="true"
       >
         {nom.charAt(0).toUpperCase()}
       </span>
-      <span className="text-lg font-extrabold tracking-tight text-gray-900">
+      <span className="tely-title text-lg tracking-tight">
         {nom}
         <span className="text-amber-500">.</span>
       </span>
@@ -46,7 +56,7 @@ function Logo({ nom }: { nom: string }) {
   );
 }
 
-/** Header du site public : sticky, navigation CMS, CTA de conversion, menu mobile accessible. */
+/** Header du site public : sticky glassmorphic, navigation CMS, CTA de conversion, Sheet mobile accessible. */
 export default function Header() {
   const { user, isAuthenticated, logoutLocal } = useAuth();
   const { parametres, navigation } = useSite();
@@ -54,19 +64,9 @@ export default function Header() {
   const navigate = useNavigate();
   const location = useLocation();
 
-  // Le menu est « ouvert pour un chemin » : il se ferme tout seul au changement de page.
-  const [menuOuvertSur, setMenuOuvertSur] = useState<string | null>(null);
-  const menuOuvert = menuOuvertSur === location.pathname;
-  const [compteOuvert, setCompteOuvert] = useState(false);
+  const [sheetOpen, setSheetOpen] = useState(false);
   const [confirmLogoutOpen, setConfirmLogoutOpen] = useState(false);
   const [loggingOut, setLoggingOut] = useState(false);
-  const [defile, setDefile] = useState(() => typeof window !== "undefined" && window.scrollY > 8);
-
-  const burgerRef = useRef<HTMLButtonElement>(null);
-  const panneauRef = useRef<HTMLDivElement>(null);
-  const compteRef = useRef<HTMLDivElement>(null);
-  const drawerTitreId = useId();
-  const compteMenuId = useId();
 
   const inscriptionsOuvertes = parametres?.inscriptions_ouvertes !== "0";
   const role = (user?.role ?? "eleve") as Role;
@@ -81,68 +81,6 @@ export default function Header() {
     ...navigation.menu.slice(0, 3).map((p) => ({ label: p.titre, to: `/p/${p.slug}` })),
   ];
 
-  // Ombre + flou au défilement
-  useEffect(() => {
-    function onScroll() {
-      setDefile(window.scrollY > 8);
-    }
-    window.addEventListener("scroll", onScroll, { passive: true });
-    return () => window.removeEventListener("scroll", onScroll);
-  }, []);
-
-  // Menu mobile : verrouillage du scroll, Échap, piège de focus, restitution du focus
-  useEffect(() => {
-    if (!menuOuvert) return;
-    const burger = burgerRef.current;
-    const ancienOverflow = document.body.style.overflow;
-    document.body.style.overflow = "hidden";
-
-    const premier = panneauRef.current?.querySelector<HTMLElement>(FOCUSABLES);
-    premier?.focus();
-
-    function onKey(e: KeyboardEvent) {
-      if (e.key === "Escape") {
-        setMenuOuvertSur(null);
-        return;
-      }
-      if (e.key !== "Tab" || !panneauRef.current) return;
-      const elements = Array.from(panneauRef.current.querySelectorAll<HTMLElement>(FOCUSABLES));
-      if (elements.length === 0) return;
-      const debut = elements[0];
-      const fin = elements[elements.length - 1];
-      if (e.shiftKey && document.activeElement === debut) {
-        e.preventDefault();
-        fin.focus();
-      } else if (!e.shiftKey && document.activeElement === fin) {
-        e.preventDefault();
-        debut.focus();
-      }
-    }
-    document.addEventListener("keydown", onKey);
-    return () => {
-      document.removeEventListener("keydown", onKey);
-      document.body.style.overflow = ancienOverflow;
-      burger?.focus();
-    };
-  }, [menuOuvert]);
-
-  // Menu compte : clic extérieur + Échap
-  useEffect(() => {
-    if (!compteOuvert) return;
-    function onDown(e: MouseEvent) {
-      if (compteRef.current && !compteRef.current.contains(e.target as Node)) setCompteOuvert(false);
-    }
-    function onKey(e: KeyboardEvent) {
-      if (e.key === "Escape") setCompteOuvert(false);
-    }
-    document.addEventListener("mousedown", onDown);
-    document.addEventListener("keydown", onKey);
-    return () => {
-      document.removeEventListener("mousedown", onDown);
-      document.removeEventListener("keydown", onKey);
-    };
-  }, [compteOuvert]);
-
   async function confirmerDeconnexion() {
     setLoggingOut(true);
     try {
@@ -150,263 +88,220 @@ export default function Header() {
     } finally {
       setLoggingOut(false);
       setConfirmLogoutOpen(false);
-      setCompteOuvert(false);
-      setMenuOuvertSur(null);
+      setSheetOpen(false);
       logoutLocal();
       navigate("/");
     }
   }
 
-  const fermerMenu = () => setMenuOuvertSur(null);
-
-  const avatarRond = (taille = "h-8 w-8") =>
-    avatar ? (
-      <img
-        src={avatar}
-        alt=""
-        width={32}
-        height={32}
-        referrerPolicy="no-referrer"
-        className={`${taille} rounded-full object-cover ring-2 ring-amber-400/60`}
-      />
-    ) : (
-      <span
-        className={`${taille} flex items-center justify-center rounded-full bg-amber-500 text-xs font-bold text-gray-900`}
-        aria-hidden="true"
-      >
-        {initiale}
-      </span>
-    );
-
   return (
-    <MotionConfig reducedMotion="user">
+    <>
       <a
         href="#contenu"
-        className="sr-only focus:not-sr-only focus:fixed focus:left-3 focus:top-3 focus:z-[80] focus:rounded-lg focus:bg-gray-900 focus:px-4 focus:py-2 focus:text-sm focus:font-semibold focus:text-white"
+        className="sr-only focus:not-sr-only focus:fixed focus:left-3 focus:top-3 focus:z-[80] focus:rounded-lg focus:bg-primary focus:px-4 focus:py-2 focus:text-sm focus:font-semibold focus:text-primary-foreground"
       >
         Aller au contenu
       </a>
 
       <AnnonceBanner />
 
-      <header
-        className={`sticky top-0 z-40 w-full transition-[background-color,box-shadow,border-color] duration-300 ${
-          defile
-            ? "border-b border-black/5 bg-amber-50/80 shadow-sm backdrop-blur-md"
-            : "border-b border-transparent bg-transparent"
-        }`}
-      >
-        <div className="mx-auto flex h-16 max-w-7xl items-center justify-between gap-3 px-4 sm:px-6 lg:px-8">
+      <header className="sticky top-0 z-40 w-full border-b border-border/70 bg-background/85 backdrop-blur-md">
+        <div className="mx-auto flex h-16 max-w-7xl items-center justify-between gap-4 px-4 sm:px-6 lg:px-8">
           <Logo nom={siteNom} />
 
           {/* Navigation desktop */}
           <nav aria-label="Navigation principale" className="hidden items-center gap-1 lg:flex">
             {liens.map((l) => (
-              <NavLink key={l.to} to={l.to} className={lienNavClasse}>
+              <NavLink
+                key={l.to}
+                to={l.to}
+                className={({ isActive }) =>
+                  cn(
+                    "rounded-lg px-3 py-2 text-sm font-medium transition-colors",
+                    isActive
+                      ? "bg-secondary text-foreground"
+                      : "text-muted-foreground hover:bg-secondary/60 hover:text-foreground"
+                  )
+                }
+              >
                 {l.label}
               </NavLink>
             ))}
           </nav>
 
+          {/* Actions droite */}
           <div className="flex items-center gap-2">
             {isAuthenticated ? (
               <>
-                <Link
-                  to={espace.path}
-                  className="hidden items-center gap-1.5 rounded-lg bg-gray-900 px-3.5 py-2 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-gray-700 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-amber-500 sm:inline-flex"
-                >
-                  <LayoutDashboard size={15} aria-hidden="true" />
-                  {espace.label}
-                </Link>
+                <Button asChild size="sm" className="hidden sm:inline-flex">
+                  <Link to={espace.path}>
+                    <LayoutDashboard className="size-4" aria-hidden="true" />
+                    {espace.label}
+                  </Link>
+                </Button>
 
-                <div ref={compteRef} className="relative hidden sm:block">
-                  <button
-                    type="button"
-                    onClick={() => setCompteOuvert((v) => !v)}
-                    aria-expanded={compteOuvert}
-                    aria-controls={compteMenuId}
-                    aria-label="Menu du compte"
-                    className="flex items-center gap-1 rounded-full p-0.5 transition-opacity hover:opacity-90 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-amber-500"
-                  >
-                    {avatarRond()}
-                    <ChevronDown size={14} className="text-gray-500" aria-hidden="true" />
-                  </button>
-                  {compteOuvert && (
-                    <div
-                      id={compteMenuId}
-                      className="absolute right-0 mt-2 w-56 overflow-hidden rounded-xl border border-gray-100 bg-white py-1 shadow-xl"
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <button
+                      type="button"
+                      aria-label="Menu du compte"
+                      className="hidden sm:flex items-center gap-1.5 rounded-full p-0.5 transition-opacity hover:opacity-90 outline-none focus-visible:ring-2 focus-visible:ring-ring cursor-pointer"
                     >
-                      <div className="border-b border-gray-100 px-4 py-2.5">
-                        <p className="truncate text-sm font-semibold text-gray-900">
+                      <Avatar className="size-8">
+                        {avatar && <AvatarImage src={avatar} alt="" referrerPolicy="no-referrer" />}
+                        <AvatarFallback>{initiale}</AvatarFallback>
+                      </Avatar>
+                      <ChevronDown className="size-3.5 text-muted-foreground" aria-hidden="true" />
+                    </button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="end" className="w-56">
+                    <DropdownMenuLabel className="font-normal">
+                      <div className="flex flex-col gap-0.5">
+                        <p className="truncate text-sm font-semibold text-foreground">
                           {user?.prenom} {user?.nom}
                         </p>
-                        <p className="truncate text-xs text-gray-500">{user?.email}</p>
+                        <p className="truncate text-xs text-muted-foreground">{user?.email}</p>
                       </div>
-                      <Link
-                        to={espace.profil}
-                        onClick={() => setCompteOuvert(false)}
-                        className="flex items-center gap-2 px-4 py-2 text-sm text-gray-700 hover:bg-amber-50"
-                      >
-                        <User size={15} aria-hidden="true" /> Mon profil
-                      </Link>
-                      <button
-                        type="button"
-                        onClick={() => {
-                          setCompteOuvert(false);
-                          setConfirmLogoutOpen(true);
-                        }}
-                        className="flex w-full items-center gap-2 px-4 py-2 text-left text-sm text-gray-700 hover:bg-amber-50"
-                      >
-                        <LogOut size={15} aria-hidden="true" /> Déconnexion
-                      </button>
-                    </div>
-                  )}
-                </div>
+                    </DropdownMenuLabel>
+                    <DropdownMenuSeparator />
+                    <DropdownMenuItem onSelect={() => navigate(espace.path)}>
+                      <LayoutDashboard className="size-4" />
+                      {espace.label}
+                    </DropdownMenuItem>
+                    <DropdownMenuItem onSelect={() => navigate(espace.profil)}>
+                      <User className="size-4" />
+                      Mon profil
+                    </DropdownMenuItem>
+                    <DropdownMenuSeparator />
+                    <DropdownMenuItem
+                      variant="destructive"
+                      onSelect={() => setConfirmLogoutOpen(true)}
+                    >
+                      <LogOut className="size-4" />
+                      Déconnexion
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
               </>
             ) : (
               <>
-                <Link
-                  to="/auth/login"
-                  className="hidden rounded-lg px-3 py-2 text-sm font-semibold text-gray-700 transition-colors hover:text-gray-900 focus-visible:outline-2 focus-visible:outline-amber-500 sm:inline-flex"
-                >
-                  Connexion
-                </Link>
-                <Link
-                  to={inscriptionsOuvertes ? "/auth/signup" : "/exercices"}
-                  className="inline-flex items-center gap-1.5 rounded-lg bg-amber-500 px-3 py-2 text-sm font-semibold text-gray-900 shadow-sm shadow-amber-500/30 transition-colors hover:bg-amber-400 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gray-900 sm:px-4"
-                >
-                  <span className="sm:hidden">{inscriptionsOuvertes ? "S'inscrire" : "Explorer"}</span>
-                  <span className="hidden sm:inline">
-                    {inscriptionsOuvertes ? "Inscription gratuite" : "Explorer les exercices"}
-                  </span>
-                  <ArrowRight size={15} className="hidden sm:block" aria-hidden="true" />
-                </Link>
+                <Button asChild variant="ghost" size="sm" className="hidden sm:inline-flex">
+                  <Link to="/auth/login">Connexion</Link>
+                </Button>
+                <Button asChild variant="brand" size="sm">
+                  <Link to={inscriptionsOuvertes ? "/auth/signup" : "/exercices"}>
+                    <span className="sm:hidden">{inscriptionsOuvertes ? "S'inscrire" : "Explorer"}</span>
+                    <span className="hidden sm:inline">
+                      {inscriptionsOuvertes ? "Inscription gratuite" : "Explorer les exercices"}
+                    </span>
+                    <ArrowRight className="hidden size-4 sm:block" aria-hidden="true" />
+                  </Link>
+                </Button>
               </>
             )}
 
-            <button
-              ref={burgerRef}
-              type="button"
-              onClick={() => setMenuOuvertSur(location.pathname)}
-              aria-expanded={menuOuvert}
-              aria-label="Ouvrir le menu"
-              className="rounded-lg p-2 text-gray-900 transition-colors hover:bg-black/5 focus-visible:outline-2 focus-visible:outline-amber-500 lg:hidden"
-            >
-              <Menu size={22} aria-hidden="true" />
-            </button>
+            {/* Menu mobile (shadcn Sheet) */}
+            <Sheet open={sheetOpen} onOpenChange={setSheetOpen}>
+              <SheetTrigger asChild>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="lg:hidden"
+                  aria-label="Ouvrir le menu"
+                >
+                  <Menu className="size-5" aria-hidden="true" />
+                </Button>
+              </SheetTrigger>
+              <SheetContent side="right" className="flex flex-col p-0">
+                <SheetHeader className="border-b border-border px-5 py-4 text-left">
+                  <SheetTitle>{siteNom}</SheetTitle>
+                </SheetHeader>
+
+                <nav aria-label="Navigation mobile" className="flex-1 overflow-y-auto px-3 py-4">
+                  <ul className="flex flex-col gap-1">
+                    {liens.map((l) => {
+                      const active = location.pathname === l.to;
+                      return (
+                        <li key={l.to}>
+                          <Link
+                            to={l.to}
+                            onClick={() => setSheetOpen(false)}
+                            className={cn(
+                              "block rounded-lg px-3 py-2.5 text-sm font-medium transition-colors",
+                              active
+                                ? "bg-secondary text-foreground"
+                                : "text-muted-foreground hover:bg-secondary/60 hover:text-foreground"
+                            )}
+                          >
+                            {l.label}
+                          </Link>
+                        </li>
+                      );
+                    })}
+                  </ul>
+                </nav>
+
+                <Separator />
+
+                <div className="p-4">
+                  {isAuthenticated ? (
+                    <div className="flex flex-col gap-2">
+                      <div className="mb-2 flex items-center gap-3 px-1">
+                        <Avatar className="size-9">
+                          {avatar && <AvatarImage src={avatar} alt="" referrerPolicy="no-referrer" />}
+                          <AvatarFallback>{initiale}</AvatarFallback>
+                        </Avatar>
+                        <div className="min-w-0">
+                          <p className="truncate text-sm font-semibold text-foreground">
+                            {user?.prenom} {user?.nom}
+                          </p>
+                          <p className="truncate text-xs text-muted-foreground">{user?.email}</p>
+                        </div>
+                      </div>
+                      <Button asChild className="w-full" onClick={() => setSheetOpen(false)}>
+                        <Link to={espace.path}>
+                          <LayoutDashboard className="size-4" />
+                          {espace.label}
+                        </Link>
+                      </Button>
+                      <Button asChild variant="outline" className="w-full" onClick={() => setSheetOpen(false)}>
+                        <Link to={espace.profil}>
+                          <User className="size-4" />
+                          Mon profil
+                        </Link>
+                      </Button>
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        className="w-full text-destructive hover:text-destructive"
+                        onClick={() => {
+                          setSheetOpen(false);
+                          setConfirmLogoutOpen(true);
+                        }}
+                      >
+                        <LogOut className="size-4" />
+                        Déconnexion
+                      </Button>
+                    </div>
+                  ) : (
+                    <div className="flex flex-col gap-2">
+                      <Button asChild variant="brand" className="w-full" onClick={() => setSheetOpen(false)}>
+                        <Link to={inscriptionsOuvertes ? "/auth/signup" : "/exercices"}>
+                          {inscriptionsOuvertes ? "Inscription gratuite" : "Explorer les exercices"}
+                          <ArrowRight className="size-4" />
+                        </Link>
+                      </Button>
+                      <Button asChild variant="outline" className="w-full" onClick={() => setSheetOpen(false)}>
+                        <Link to="/auth/login">J'ai déjà un compte</Link>
+                      </Button>
+                    </div>
+                  )}
+                </div>
+              </SheetContent>
+            </Sheet>
           </div>
         </div>
       </header>
-
-      {/* Menu mobile (drawer) */}
-      <AnimatePresence>
-        {menuOuvert && (
-          <div className="fixed inset-0 z-50 lg:hidden">
-            <motion.div
-              className="absolute inset-0 bg-gray-900/40 backdrop-blur-[2px]"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              onClick={fermerMenu}
-              aria-hidden="true"
-            />
-            <motion.div
-              ref={panneauRef}
-              role="dialog"
-              aria-modal="true"
-              aria-labelledby={drawerTitreId}
-              className="absolute inset-y-0 right-0 flex w-[86%] max-w-sm flex-col bg-amber-50 shadow-2xl"
-              initial={{ x: "100%" }}
-              animate={{ x: 0 }}
-              exit={{ x: "100%" }}
-              transition={{ type: "tween", duration: 0.25, ease: "easeOut" }}
-            >
-              <div className="flex h-16 items-center justify-between border-b border-black/5 px-4">
-                <h2 id={drawerTitreId} className="text-base font-bold text-gray-900">
-                  Menu
-                </h2>
-                <button
-                  type="button"
-                  onClick={fermerMenu}
-                  aria-label="Fermer le menu"
-                  className="rounded-lg p-2 text-gray-900 hover:bg-black/5 focus-visible:outline-2 focus-visible:outline-amber-500"
-                >
-                  <X size={22} aria-hidden="true" />
-                </button>
-              </div>
-
-              <nav aria-label="Navigation mobile" className="flex-1 overflow-y-auto px-3 py-4">
-                <ul className="flex flex-col gap-1">
-                  {liens.map((l) => (
-                    <li key={l.to}>
-                      <NavLink
-                        to={l.to}
-                        onClick={fermerMenu}
-                        className={({ isActive }) =>
-                          `block rounded-lg px-3 py-3 text-base font-medium ${
-                            isActive ? "bg-white text-gray-900 shadow-sm" : "text-gray-700 hover:bg-white/70"
-                          }`
-                        }
-                      >
-                        {l.label}
-                      </NavLink>
-                    </li>
-                  ))}
-                </ul>
-              </nav>
-
-              <div className="border-t border-black/5 p-4">
-                {isAuthenticated ? (
-                  <div className="flex flex-col gap-2">
-                    <div className="mb-1 flex items-center gap-3">
-                      {avatarRond("h-10 w-10")}
-                      <div className="min-w-0">
-                        <p className="truncate text-sm font-semibold text-gray-900">
-                          {user?.prenom} {user?.nom}
-                        </p>
-                        <p className="truncate text-xs text-gray-500">{user?.email}</p>
-                      </div>
-                    </div>
-                    <Link to={espace.path} onClick={fermerMenu} className="tely-btn w-full">
-                      <LayoutDashboard size={16} aria-hidden="true" />
-                      {espace.label}
-                    </Link>
-                    <Link to={espace.profil} onClick={fermerMenu} className="tely-btn-outline w-full">
-                      <User size={16} aria-hidden="true" />
-                      Mon profil
-                    </Link>
-                    <button
-                      type="button"
-                      onClick={() => {
-                        fermerMenu();
-                        setConfirmLogoutOpen(true);
-                      }}
-                      className="mt-1 flex items-center justify-center gap-2 rounded-lg py-2 text-sm font-medium text-gray-600 hover:text-gray-900"
-                    >
-                      <LogOut size={16} aria-hidden="true" />
-                      Déconnexion
-                    </button>
-                  </div>
-                ) : (
-                  <div className="flex flex-col gap-2">
-                    <Link
-                      to={inscriptionsOuvertes ? "/auth/signup" : "/exercices"}
-                      onClick={fermerMenu}
-                      className="inline-flex w-full items-center justify-center gap-2 rounded-[10px] bg-amber-500 px-5 py-3.5 text-sm font-semibold text-gray-900 hover:bg-amber-400"
-                    >
-                      {inscriptionsOuvertes ? "Inscription gratuite" : "Explorer les exercices"}
-                      <ArrowRight size={16} aria-hidden="true" />
-                    </Link>
-                    <Link to="/auth/login" onClick={fermerMenu} className="tely-btn-outline w-full">
-                      J'ai déjà un compte
-                    </Link>
-                  </div>
-                )}
-              </div>
-            </motion.div>
-          </div>
-        )}
-      </AnimatePresence>
 
       <ConfirmModal
         open={confirmLogoutOpen}
@@ -418,6 +313,6 @@ export default function Header() {
         onConfirm={confirmerDeconnexion}
         onCancel={() => setConfirmLogoutOpen(false)}
       />
-    </MotionConfig>
+    </>
   );
 }

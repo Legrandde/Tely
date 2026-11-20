@@ -1,11 +1,21 @@
 import { useEffect, useState } from "react";
-import { Search, Settings, Menu } from "lucide-react";
-import { useAuth } from "../context/authContext";
+import { Search, Settings, Menu, User } from "lucide-react";
+import { useAuth } from "@/context/authContext";
 import { useLocation, useNavigate } from "react-router-dom";
-import { resolveImageUrl } from "../utils/imageUrl";
-import { useSidebar } from "../context/SidebarContext";
-import NotificationDropdown from "./notifications/NotificationDropdown";
-import CommandPalette from "./admin/CommandPalette";
+import { resolveImageUrl } from "@/utils/imageUrl";
+import { useSidebar } from "@/context/SidebarContext";
+import NotificationDropdown from "@/components/notifications/NotificationDropdown";
+import CommandPalette from "@/components/admin/CommandPalette";
+import { Button } from "@/components/ui/button";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 
 const TITLES: Record<string, string> = {
   statistiques: "Statistiques & Audience",
@@ -50,11 +60,11 @@ export default function Header({ title }: { title?: string }) {
     : "";
   const initiales = nomComplet
     ? nomComplet
-    .split(" ")
-    .filter(Boolean)
-    .map((mot) => mot.charAt(0).toUpperCase())
-    .slice(0, 2)
-    .join("")
+        .split(" ")
+        .filter(Boolean)
+        .map((mot) => mot.charAt(0).toUpperCase())
+        .slice(0, 2)
+        .join("")
     : "?";
 
   const profilePath =
@@ -77,12 +87,19 @@ export default function Header({ title }: { title?: string }) {
   /* ── Palette de commandes (administrateurs uniquement) ── */
   const isAdmin = user?.role === "administrateur";
   const [paletteOuverte, setPaletteOuverte] = useState(false);
-  const estMac = typeof navigator !== "undefined" && /Mac|iPhone|iPad/i.test(navigator.platform || navigator.userAgent);
+  const estMac =
+    typeof navigator !== "undefined" &&
+    /Mac|iPhone|iPad/i.test(navigator.platform || navigator.userAgent);
 
   useEffect(() => {
     if (!isAdmin) return;
     const raccourci = (e: KeyboardEvent) => {
-      if ((e.ctrlKey || e.metaKey) && !e.altKey && !e.shiftKey && e.key.toLowerCase() === "k") {
+      if (
+        (e.ctrlKey || e.metaKey) &&
+        !e.altKey &&
+        !e.shiftKey &&
+        e.key.toLowerCase() === "k"
+      ) {
         e.preventDefault();
         setPaletteOuverte((ouvert) => !ouvert);
       }
@@ -92,24 +109,27 @@ export default function Header({ title }: { title?: string }) {
   }, [isAdmin]);
 
   return (
-    <div className="flex items-center h-16 justify-between px-3 sm:px-6 tely-page w-full shrink-0">
+    <header className="flex items-center h-16 justify-between px-4 sm:px-6 bg-background/95 backdrop-blur-sm border-b border-border w-full shrink-0">
       {/* Bouton Hamburger mobile + Titre page */}
-      <div className="flex items-center gap-2 min-w-0">
-        <button
+      <div className="flex items-center gap-2.5 min-w-0">
+        <Button
           type="button"
+          variant="ghost"
+          size="icon-sm"
           onClick={toggleMobile}
-          className="lg:hidden tely-icon-btn shrink-0"
+          className="lg:hidden shrink-0"
           aria-label="Ouvrir le menu latéral"
           title="Menu de navigation"
         >
-          <Menu size={20} />
-        </button>
-        <p className="tely-title text-lg sm:text-xl truncate">{getPageTitle()}</p>
+          <Menu className="size-5" />
+        </Button>
+        <h1 className="tely-title text-base sm:text-lg truncate">
+          {getPageTitle()}
+        </h1>
       </div>
 
       {/* Droite : search + icons + avatar */}
-      <div className="flex items-center gap-2 sm:gap-4 shrink-0">
-        {/* Recherche globale (admin) : ouvre la palette de commandes */}
+      <div className="flex items-center gap-2 sm:gap-3 shrink-0">
         {isAdmin && (
           <>
             <button
@@ -117,65 +137,89 @@ export default function Header({ title }: { title?: string }) {
               onClick={() => setPaletteOuverte(true)}
               aria-haspopup="dialog"
               aria-keyshortcuts={estMac ? "Meta+K" : "Control+K"}
-              className="hidden md:flex items-center gap-2 bg-white rounded-[10px] px-3 py-2.5 w-48 lg:w-64 border border-gray-200 text-left cursor-pointer transition-all duration-200 hover:border-gray-400 outline-none focus-visible:border-gray-900 focus-visible:shadow-[0_0_0_3px_rgba(17,17,17,0.06)]"
+              className="hidden md:flex items-center gap-2 bg-card rounded-lg px-3 h-9 w-52 lg:w-64 border border-input text-left cursor-pointer transition-colors hover:bg-secondary/60 outline-none focus-visible:ring-2 focus-visible:ring-ring"
             >
-              <Search size={15} className="text-gray-900 shrink-0" aria-hidden="true" />
-              <span className="flex-1 text-sm text-gray-400 truncate">Recherche globale...</span>
-              <kbd className="hidden lg:inline-flex items-center rounded border border-gray-200 bg-gray-50 px-1.5 py-0.5 text-[10px] font-sans font-medium text-gray-500">
+              <Search className="size-4 text-muted-foreground shrink-0" aria-hidden="true" />
+              <span className="flex-1 text-xs text-muted-foreground truncate">
+                Recherche globale...
+              </span>
+              <kbd className="hidden lg:inline-flex items-center rounded border border-border bg-muted px-1.5 py-0.5 text-[10px] font-medium text-muted-foreground">
                 {estMac ? "⌘" : "Ctrl"} K
               </kbd>
             </button>
-            <button
+            <Button
               type="button"
+              variant="ghost"
+              size="icon-sm"
               onClick={() => setPaletteOuverte(true)}
               aria-haspopup="dialog"
               aria-label="Recherche globale"
               title="Recherche globale"
-              className="md:hidden tely-icon-btn hover:bg-white"
+              className="md:hidden"
             >
-              <Search size={18} />
-            </button>
+              <Search className="size-4" />
+            </Button>
           </>
         )}
 
-        {/* Settings -> Paramètres */}
-        <button
+        <Button
           type="button"
+          variant="ghost"
+          size="icon-sm"
           onClick={() => navigate(settingsPath)}
           title="Paramètres & Configuration"
           aria-label="Paramètres"
-          className="tely-icon-btn hover:bg-white"
         >
-          <Settings size={18} />
-        </button>
+          <Settings className="size-4 text-muted-foreground" />
+        </Button>
 
-        {/* Bell avec dropdown interactif & temps réel */}
         <NotificationDropdown />
 
-        {/* Avatar cliquable */}
-        <button
-          type="button"
-          onClick={() => navigate(profilePath)}
-          className="w-9 h-9 rounded-full overflow-hidden cursor-pointer ring-2 ring-white hover:ring-gray-900 shrink-0 transition-all"
-          title={`Profil de ${nomComplet || "l'utilisateur"}`}
-          aria-label={`Profil de ${nomComplet || "l'utilisateur"}`}
-        >
-          {avatarUrl ? (
-            <img
-              src={avatarUrl}
-              alt={nomComplet || "avatar"}
-              referrerPolicy="no-referrer"
-              className="w-full h-full object-cover"
-            />
-          ) : (
-            <div className="w-full h-full bg-gray-900 text-white flex items-center justify-center text-xs font-semibold">
-              {initiales}
-            </div>
-          )}
-        </button>
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <button
+              type="button"
+              className="rounded-full outline-none focus-visible:ring-2 focus-visible:ring-ring cursor-pointer"
+              title={`Profil de ${nomComplet || "l'utilisateur"}`}
+              aria-label={`Profil de ${nomComplet || "l'utilisateur"}`}
+            >
+              <Avatar className="size-8">
+                {avatarUrl && (
+                  <AvatarImage
+                    src={avatarUrl}
+                    alt={nomComplet || "avatar"}
+                    referrerPolicy="no-referrer"
+                  />
+                )}
+                <AvatarFallback className="bg-primary text-primary-foreground">
+                  {initiales}
+                </AvatarFallback>
+              </Avatar>
+            </button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="end" className="w-52">
+            <DropdownMenuLabel className="font-normal">
+              <div className="flex flex-col gap-0.5">
+                <p className="truncate text-sm font-semibold">{nomComplet || "Utilisateur"}</p>
+                <p className="truncate text-xs text-muted-foreground">{user?.email}</p>
+              </div>
+            </DropdownMenuLabel>
+            <DropdownMenuSeparator />
+            <DropdownMenuItem onSelect={() => navigate(profilePath)}>
+              <User className="size-4" />
+              Mon profil
+            </DropdownMenuItem>
+            <DropdownMenuItem onSelect={() => navigate(settingsPath)}>
+              <Settings className="size-4" />
+              Paramètres
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
       </div>
 
-      {isAdmin && paletteOuverte && <CommandPalette onClose={() => setPaletteOuverte(false)} />}
-    </div>
+      {isAdmin && paletteOuverte && (
+        <CommandPalette onClose={() => setPaletteOuverte(false)} />
+      )}
+    </header>
   );
 }

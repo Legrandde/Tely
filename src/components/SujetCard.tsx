@@ -1,7 +1,9 @@
 import { useNavigate } from "react-router-dom";
-import type { SujetInterface } from "../types/Sujet";
-import { BookOpen, Lock } from "lucide-react";
-import { useAuth } from "../context/authContext";
+import type { SujetInterface } from "@/types/Sujet";
+import { BookOpen, Lock, ArrowRight } from "lucide-react";
+import { useAuth } from "@/context/authContext";
+import { Card } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
 
 const TYPE_LABELS: Record<string, string> = {
   classique: "Exercice",
@@ -11,18 +13,16 @@ const TYPE_LABELS: Record<string, string> = {
 };
 
 const GRADIENTS = [
-  "from-amber-400 to-amber-600",
-  "from-gray-800 to-gray-950",
-  "from-amber-500 to-amber-700",
-  "from-gray-700 to-gray-900",
-  "from-amber-600 to-amber-800",
+  "from-zinc-900 to-zinc-800",
+  "from-amber-500 to-amber-600",
+  "from-zinc-800 to-zinc-950",
+  "from-amber-600 to-amber-700",
+  "from-slate-800 to-zinc-900",
 ];
 
-// Génère un gradient stable à partir de l'id
 function gradientFor(id: string | number) {
   const numericId = Number(id);
   const index = (Number.isFinite(numericId) ? Math.abs(numericId) : 0) % GRADIENTS.length;
-
   return GRADIENTS[index];
 }
 
@@ -35,50 +35,51 @@ export default function SujetCard({ sujet }: SujetProps) {
   const { isAuthenticated } = useAuth();
 
   return (
-    <div
+    <Card
       onClick={() => navigate(`/ennoncer-sujet?id=${sujet.id}`)}
-      className="flex flex-col bg-white rounded-lg border border-gray-100 overflow-hidden hover:shadow-md transition-shadow cursor-pointer group"
+      className="p-0 gap-0 overflow-hidden transition-all duration-200 hover:shadow-md hover:-translate-y-0.5 cursor-pointer group"
     >
       {/* Vignette */}
       <div
         className={`relative h-36 w-full flex items-center justify-center overflow-hidden bg-gradient-to-br ${gradientFor(sujet.id)}`}
       >
-        <span className="absolute top-2 right-2 text-[10px] font-semibold bg-white/90 text-gray-700 px-2 py-0.5 rounded-full">
-          {sujet.niveau.libelle}
-        </span>
+        {sujet.niveau?.libelle && (
+          <Badge
+            variant="secondary"
+            className="absolute top-2.5 right-2.5 bg-background/90 backdrop-blur-xs text-foreground border-0"
+          >
+            {sujet.niveau.libelle}
+          </Badge>
+        )}
 
-        <span className="text-white font-bold text-lg text-center px-4 line-clamp-3">
+        <span className="text-white font-bold text-base sm:text-lg text-center px-5 line-clamp-3">
           {sujet.titre}
         </span>
       </div>
 
       {/* Contenu */}
-      <div className="flex flex-col p-3 gap-1.5">
-        <p className="text-xs text-gray-400">
-          En {sujet.annee}
-        </p>
+      <div className="flex flex-col p-4 gap-2 flex-1">
+        <p className="text-xs text-muted-foreground">Session {sujet.annee}</p>
 
-        <h3 className="font-semibold text-sm leading-snug line-clamp-2 group-hover:text-amber-600 transition-colors">
+        <h3 className="font-semibold text-sm leading-snug line-clamp-2 text-foreground group-hover:text-amber-600 transition-colors">
           {sujet.matiere.nom} — {sujet.titre}
         </h3>
 
-        <div className="flex items-center gap-2 text-xs text-gray-500 mt-1 flex-wrap">
+        <div className="flex items-center gap-2 text-xs text-muted-foreground mt-0.5 flex-wrap">
           <span className="flex items-center gap-1">
-            <BookOpen size={13} className="text-emerald-500" />
+            <BookOpen className="size-3.5 text-amber-500" />
             {TYPE_LABELS[sujet.type] ?? sujet.type}
           </span>
         </div>
 
-        <div className="flex items-center justify-between mt-2 pt-2 border-t border-gray-100">
-          <button
-            type="button"
-            className="text-xs font-medium text-amber-600 hover:text-amber-700 flex items-center gap-1"
-          >
-            {!isAuthenticated && <Lock size={12} className="text-amber-600" />}
+        <div className="flex items-center justify-end mt-auto pt-3 border-t border-border">
+          <span className="text-xs font-medium text-foreground group-hover:text-amber-600 flex items-center gap-1 transition-colors">
+            {!isAuthenticated && <Lock className="size-3 text-amber-500" />}
             Voir détails
-          </button>
+            <ArrowRight className="size-3 transition-transform group-hover:translate-x-0.5" />
+          </span>
         </div>
       </div>
-    </div>
+    </Card>
   );
 }

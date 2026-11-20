@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import {
   LayoutDashboard,
@@ -8,23 +8,25 @@ import {
   History,
   UserCog,
   LogOut,
-  X,
   PanelLeftClose,
   PanelLeftOpen,
 } from "lucide-react";
-import SideBarMenuItem from "../ui/SideBarMenuItem";
-import ConfirmModal from "../ui/ConfirmModal";
-import { useAuth } from "../../context/authContext";
-import { useSidebar } from "../../context/SidebarContext";
-import { logout } from "../../services/authService";
-import { reinitialiserFavoris } from "../../hooks/useFavoris";
-import { resolveImageUrl } from "../../utils/imageUrl";
+import SideBarMenuItem from "@/components/ui/SideBarMenuItem";
+import ConfirmModal from "@/components/ui/ConfirmModal";
+import { Sheet, SheetContent, SheetTitle } from "@/components/ui/sheet";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Button } from "@/components/ui/button";
+import { useAuth } from "@/context/authContext";
+import { useSidebar } from "@/context/SidebarContext";
+import { logout } from "@/services/authService";
+import { reinitialiserFavoris } from "@/hooks/useFavoris";
+import { resolveImageUrl } from "@/utils/imageUrl";
+import { cn } from "@/lib/utils";
 
 interface ItemNav {
   chemin: string;
   label: string;
   icone: React.ReactNode;
-  /** Correspondance exacte (tableau de bord) ou par préfixe */
   exact?: boolean;
 }
 
@@ -32,16 +34,16 @@ const SECTIONS: Array<{ titre: string; items: ItemNav[] }> = [
   {
     titre: "Mon espace",
     items: [
-      { chemin: "/espace", label: "Tableau de bord", icone: <LayoutDashboard size={19} />, exact: true },
-      { chemin: "/espace/favoris", label: "Mes favoris", icone: <Heart size={19} /> },
-      { chemin: "/espace/historique", label: "Historique", icone: <History size={19} /> },
+      { chemin: "/espace", label: "Tableau de bord", icone: <LayoutDashboard className="size-4" />, exact: true },
+      { chemin: "/espace/favoris", label: "Mes favoris", icone: <Heart className="size-4" /> },
+      { chemin: "/espace/historique", label: "Historique", icone: <History className="size-4" /> },
     ],
   },
   {
     titre: "Réviser",
     items: [
-      { chemin: "/exercices", label: "Explorer les exercices", icone: <Compass size={19} /> },
-      { chemin: "/sujets", label: "Sujets d'examen", icone: <ClipboardList size={19} /> },
+      { chemin: "/exercices", label: "Explorer les exercices", icone: <Compass className="size-4" /> },
+      { chemin: "/sujets", label: "Sujets d'examen", icone: <ClipboardList className="size-4" /> },
     ],
   },
 ];
@@ -56,16 +58,6 @@ export default function SideBarEleve() {
   const { isOpenMobile, closeMobile } = useSidebar();
 
   const chemin = location.pathname.toLowerCase().replace(/\/+$/, "") || "/";
-
-  // Échap ferme le menu mobile
-  useEffect(() => {
-    if (!isOpenMobile) return;
-    const onKey = (e: KeyboardEvent) => {
-      if (e.key === "Escape") closeMobile();
-    };
-    window.addEventListener("keydown", onKey);
-    return () => window.removeEventListener("keydown", onKey);
-  }, [isOpenMobile, closeMobile]);
 
   const estActif = (item: ItemNav) =>
     item.exact ? chemin === item.chemin : chemin === item.chemin || chemin.startsWith(`${item.chemin}/`);
@@ -95,34 +87,44 @@ export default function SideBarEleve() {
   const contenu = (mobile: boolean) => {
     const reduit = mobile ? false : collapsed;
     return (
-      <>
-        <div className="flex items-center justify-between pb-4 pt-1 px-2 border-b border-gray-100">
+      <div className="flex flex-col h-full">
+        <div className="flex items-center justify-between h-16 px-3 border-b border-border shrink-0">
           {!reduit && (
-            <button type="button" onClick={() => aller("/espace")} className="tely-title text-lg cursor-pointer">
-              Tely <span className="text-amber-500">Élève</span>
-            </button>
-          )}
-          {mobile ? (
-            <button type="button" onClick={closeMobile} className="tely-icon-btn" aria-label="Fermer le menu">
-              <X size={20} />
-            </button>
-          ) : (
             <button
               type="button"
+              onClick={() => aller("/espace")}
+              className="tely-title text-base cursor-pointer flex items-center gap-2"
+            >
+              <span className="flex size-7 items-center justify-center rounded-lg bg-primary text-xs font-bold text-primary-foreground">
+                T
+              </span>
+              <span>
+                Tely <span className="text-amber-500">Élève</span>
+              </span>
+            </button>
+          )}
+          {!mobile && (
+            <Button
+              type="button"
+              variant="ghost"
+              size="icon-sm"
               onClick={() => setCollapsed((c) => !c)}
-              className={`tely-icon-btn ${reduit ? "mx-auto" : ""}`}
+              className={cn(reduit && "mx-auto")}
               aria-label={reduit ? "Agrandir le menu" : "Réduire le menu"}
               title={reduit ? "Agrandir" : "Réduire"}
             >
-              {reduit ? <PanelLeftOpen size={18} /> : <PanelLeftClose size={18} />}
-            </button>
+              {reduit ? <PanelLeftOpen className="size-4" /> : <PanelLeftClose className="size-4" />}
+            </Button>
           )}
         </div>
 
-        <nav aria-label="Navigation de l'espace élève" className="flex flex-col gap-1 py-3 flex-1 overflow-y-auto overflow-x-hidden no-scrollbar">
+        <nav
+          aria-label="Navigation de l'espace élève"
+          className="flex flex-col gap-4 p-3 flex-1 overflow-y-auto overflow-x-hidden no-scrollbar"
+        >
           {SECTIONS.map((section) => (
-            <div key={section.titre} className="flex flex-col gap-1 mb-2">
-              {!reduit && <span className="tely-overline px-3 mb-1">{section.titre}</span>}
+            <div key={section.titre} className="flex flex-col gap-1">
+              {!reduit && <span className="tely-overline px-2.5 mb-1">{section.titre}</span>}
               {section.items.map((item) => (
                 <SideBarMenuItem
                   key={item.chemin}
@@ -137,67 +139,65 @@ export default function SideBarEleve() {
           ))}
         </nav>
 
-        {!reduit && user && (
-          <button
-            type="button"
-            onClick={() => aller("/espace/compte")}
-            className="mb-2 p-2.5 rounded-[10px] bg-gray-50 flex items-center gap-2.5 cursor-pointer hover:bg-gray-100 transition-colors text-left w-full"
-          >
-            <span className="w-8 h-8 rounded-full overflow-hidden bg-gray-900 text-white text-xs font-bold flex items-center justify-center shrink-0">
-              {avatar ? (
-                <img src={avatar} alt="" referrerPolicy="no-referrer" className="w-full h-full object-cover" />
-              ) : (
-                initiale
-              )}
-            </span>
-            <span className="min-w-0">
-              <span className="text-xs font-semibold text-gray-800 truncate block">
-                {user.prenom} {user.nom}
+        <div className="p-3 border-t border-border space-y-1.5">
+          {!reduit && user && (
+            <button
+              type="button"
+              onClick={() => aller("/espace/compte")}
+              className="mb-1 p-2 rounded-lg border border-border bg-secondary/40 flex items-center gap-2.5 cursor-pointer hover:bg-secondary transition-colors text-left w-full"
+            >
+              <Avatar className="size-8">
+                {avatar && <AvatarImage src={avatar} alt="" referrerPolicy="no-referrer" />}
+                <AvatarFallback className="bg-primary text-primary-foreground">
+                  {initiale}
+                </AvatarFallback>
+              </Avatar>
+              <span className="min-w-0">
+                <span className="text-xs font-semibold text-foreground truncate block">
+                  {user.prenom} {user.nom}
+                </span>
+                <span className="text-[11px] text-muted-foreground block truncate">
+                  {user.eleve?.niveau?.libelle ?? "Élève"}
+                </span>
               </span>
-              <span className="text-[10px] text-gray-400 font-medium block truncate">
-                {user.eleve?.niveau?.libelle ?? "Élève"} • Mon compte
-              </span>
-            </span>
-          </button>
-        )}
+            </button>
+          )}
 
-        <div className="pt-2 border-t border-gray-100 space-y-1">
           <SideBarMenuItem
             OnNavigate={() => aller("/espace/compte")}
-            icons={<UserCog size={19} />}
+            icons={<UserCog className="size-4" />}
             Titre="Mon compte"
             isActive={chemin.startsWith("/espace/compte")}
             collapsed={reduit}
           />
           <SideBarMenuItem
             OnNavigate={() => setConfirmLogoutOpen(true)}
-            icons={<LogOut size={19} />}
+            icons={<LogOut className="size-4" />}
             Titre="Déconnexion"
             collapsed={reduit}
           />
         </div>
-      </>
+      </div>
     );
   };
 
   return (
     <>
       <aside
-        className={`hidden lg:flex flex-col p-3 bg-white h-screen transition-all duration-300 shrink-0 select-none ${
-          collapsed ? "w-20" : "w-64"
-        }`}
+        className={cn(
+          "hidden lg:flex flex-col bg-card border-r border-border h-screen transition-all duration-200 shrink-0 select-none",
+          collapsed ? "w-16" : "w-64"
+        )}
       >
         {contenu(false)}
       </aside>
 
-      {isOpenMobile && (
-        <div className="fixed inset-0 z-50 lg:hidden flex" role="dialog" aria-modal="true" aria-label="Menu de l'espace élève">
-          <div onClick={closeMobile} className="fixed inset-0 bg-black/40 backdrop-blur-xs" aria-hidden="true" />
-          <aside className="relative flex flex-col w-72 max-w-[85vw] bg-white h-full p-4 shadow-2xl z-10 select-none">
-            {contenu(true)}
-          </aside>
-        </div>
-      )}
+      <Sheet open={isOpenMobile} onOpenChange={(open) => { if (!open) closeMobile(); }}>
+        <SheetContent side="left" className="p-0 w-72">
+          <SheetTitle className="sr-only">Menu de l'espace élève</SheetTitle>
+          {contenu(true)}
+        </SheetContent>
+      </Sheet>
 
       <ConfirmModal
         open={confirmLogoutOpen}

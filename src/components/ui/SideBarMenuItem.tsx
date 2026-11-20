@@ -1,4 +1,5 @@
 import React from "react";
+import { cn } from "@/lib/utils";
 
 interface SideBarMenuItemProps {
   icons: React.ReactNode;
@@ -22,21 +23,28 @@ export default function SideBarMenuItem({
       type="button"
       onClick={OnNavigate}
       title={collapsed ? Titre : undefined}
-      className={`flex h-10 items-center rounded-[10px] p-3 cursor-pointer transition-all duration-200 text-left w-full ${
+      className={cn(
+        "flex h-9 items-center rounded-lg px-2.5 cursor-pointer transition-colors duration-150 text-left w-full text-sm",
         isActive
-          ? "bg-gray-900 text-white font-semibold"
-          : "text-gray-500 hover:bg-gray-50 hover:text-gray-900 bg-transparent"
-      } ${collapsed ? "justify-center" : "justify-between"}`}
+          ? "bg-primary text-primary-foreground font-medium shadow-2xs"
+          : "text-muted-foreground hover:bg-secondary hover:text-foreground",
+        collapsed ? "justify-center px-0" : "justify-between"
+      )}
     >
-      <div className="flex items-center gap-3 min-w-0">
-        <span className={`shrink-0 ${isActive ? "text-white" : "text-gray-900"}`}>{icons}</span>
-        {!collapsed && <span className="text-sm truncate">{Titre}</span>}
+      <div className="flex items-center gap-2.5 min-w-0">
+        <span className={cn("shrink-0", isActive ? "text-primary-foreground" : "text-muted-foreground")}>
+          {icons}
+        </span>
+        {!collapsed && <span className="truncate">{Titre}</span>}
       </div>
       {!collapsed && badge !== undefined && (
         <span
-          className={`text-[11px] px-2 py-0.5 rounded-full font-medium ${
-            isActive ? "bg-white/15 text-white" : "bg-gray-100 text-gray-600"
-          }`}
+          className={cn(
+            "text-[11px] px-1.5 py-0.5 rounded-md font-medium",
+            isActive
+              ? "bg-primary-foreground/15 text-primary-foreground"
+              : "bg-secondary text-muted-foreground"
+          )}
         >
           {badge}
         </span>

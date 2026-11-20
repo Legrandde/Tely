@@ -1,111 +1,168 @@
-@import url("https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,300..800&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,300..800&family=Inter:wght@400;500;600;700&display=swap");
 @import "tailwindcss";
 
-/* Police unique de l'application : Bricolage Grotesque */
-@theme {
-  --font-sans: "Bricolage Grotesque", ui-sans-serif, system-ui, sans-serif;
+/* ─────────────────────────────────────────────────────────────
+   shadcn/ui + Tely Elearning — Design System Tokens (Tailwind v4)
+   Esthétique SaaS moderne, minimaliste, sobre et accessible.
+   ───────────────────────────────────────────────────────────── */
+:root {
+  --background: oklch(0.99 0.002 90);
+  --foreground: oklch(0.145 0.005 285);
+  --card: oklch(1 0 0);
+  --card-foreground: oklch(0.145 0.005 285);
+  --popover: oklch(1 0 0);
+  --popover-foreground: oklch(0.145 0.005 285);
+  --primary: oklch(0.18 0.006 285);
+  --primary-foreground: oklch(0.985 0 0);
+  --secondary: oklch(0.965 0.004 285);
+  --secondary-foreground: oklch(0.21 0.006 285);
+  --muted: oklch(0.962 0.004 285);
+  --muted-foreground: oklch(0.52 0.012 285);
+  --accent: oklch(0.965 0.008 85);
+  --accent-foreground: oklch(0.21 0.006 285);
+  --destructive: oklch(0.577 0.245 27.325);
+  --destructive-foreground: oklch(0.985 0 0);
+  --border: oklch(0.915 0.005 285);
+  --input: oklch(0.915 0.005 285);
+  --ring: oklch(0.769 0.188 70.08);
+  --brand: oklch(0.769 0.188 70.08);
+  --brand-foreground: oklch(0.16 0.006 285);
+  --radius: 0.75rem;
 }
 
-html,
-body {
-  font-family: var(--font-sans);
+@theme inline {
+  --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
+  --font-display: "Bricolage Grotesque", "Inter", ui-sans-serif, system-ui, sans-serif;
+
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --color-brand: var(--brand);
+  --color-brand-foreground: var(--brand-foreground);
+
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+}
+
+@layer base {
+  * {
+    border-color: var(--border);
+  }
+
+  html,
+  body {
+    font-family: var(--font-sans);
+    background-color: var(--background);
+    color: var(--foreground);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  h1,
+  h2,
+  h3 {
+    font-family: var(--font-display);
+    letter-spacing: -0.02em;
+  }
 }
 
 /* ─────────────────────────────────────────────────────────────
-   Design system « Connexion »
-   Règles reprises à l'identique de la page de connexion
-   (AuthLayout, LoginForm, AppInput, AppButton) et appliquées
-   à tous les tableaux de bord.
+   Classes utilitaires Tely mappées sur les tokens shadcn/ui
+   Assure une cohérence SaaS immédiate sur toutes les vues.
    ───────────────────────────────────────────────────────────── */
 @layer components {
-  /* Fond de page : crème (AuthLayout → bg-amber-50) */
   .tely-page {
-    @apply bg-amber-50 font-sans;
+    @apply bg-background text-foreground font-sans;
   }
 
-  /* Surface : carte blanche, rounded-lg, sans bordure, ombre xl */
   .tely-card {
-    @apply bg-white rounded-lg shadow-xl;
+    @apply bg-card text-card-foreground rounded-xl border border-border shadow-xs;
   }
 
-  /* Titres : Bricolage Grotesque bold, gris 900 (« Bienvenue ! ») */
   .tely-title {
-    font-family: var(--font-sans);
-    letter-spacing: -0.02em;
-    @apply font-bold text-gray-900 leading-tight;
+    font-family: var(--font-display);
+    letter-spacing: -0.025em;
+    @apply font-bold text-foreground leading-tight;
   }
+
   .tely-h1 {
-    font-family: var(--font-sans);
-    letter-spacing: -0.02em;
-    @apply text-[28px] font-bold text-gray-900 leading-tight;
+    font-family: var(--font-display);
+    letter-spacing: -0.025em;
+    @apply text-2xl sm:text-[28px] font-bold text-foreground leading-tight;
   }
 
-  /* Sous-titre (« Entrer vos informations ») */
   .tely-subtitle {
-    @apply text-sm text-gray-400;
+    @apply text-sm text-muted-foreground;
   }
 
-  /* Libellé de champ (AppInput) */
   .tely-label {
-    @apply text-xs font-medium tracking-wide text-gray-400;
+    @apply text-xs font-medium text-muted-foreground;
   }
 
-  /* Champ de saisie / select / textarea (AppInput) */
   .tely-input {
-    @apply w-full bg-gray-50 border border-gray-200 rounded-[10px] px-3 py-3.5 text-sm text-gray-900 font-normal outline-none transition-all duration-200 placeholder:text-gray-400 focus:border-gray-900 focus:shadow-[0_0_0_3px_rgba(17,17,17,0.06)];
+    @apply w-full bg-background border border-input rounded-lg px-3.5 py-2.5 text-sm text-foreground font-normal outline-none transition-all duration-150 placeholder:text-muted-foreground focus:border-foreground focus:ring-2 focus:ring-ring/25;
   }
 
-  /* Bouton principal (AppButton variant="primary") */
   .tely-btn {
-    @apply inline-flex items-center justify-center gap-2 rounded-[10px] px-5 py-3.5 text-sm font-semibold tracking-[0.01em] transition-all duration-200 cursor-pointer bg-gray-900 text-white border border-transparent hover:bg-gray-700 hover:shadow-lg hover:-translate-y-px disabled:bg-gray-300 disabled:cursor-not-allowed disabled:hover:translate-y-0 disabled:hover:shadow-none;
+    @apply inline-flex items-center justify-center gap-2 rounded-lg px-4 py-2.5 text-sm font-medium transition-all duration-150 cursor-pointer bg-primary text-primary-foreground shadow-xs hover:bg-primary/90 active:scale-[0.99] disabled:opacity-50 disabled:pointer-events-none;
   }
 
-  /* Bouton secondaire (AppButton variant="outline") */
   .tely-btn-outline {
-    @apply inline-flex items-center justify-center gap-2 rounded-[10px] px-5 py-3.5 text-sm font-semibold tracking-[0.01em] transition-all duration-200 cursor-pointer bg-white text-gray-900 border border-gray-200 hover:bg-gray-50 hover:shadow-sm disabled:opacity-50 disabled:cursor-not-allowed;
+    @apply inline-flex items-center justify-center gap-2 rounded-lg px-4 py-2.5 text-sm font-medium transition-all duration-150 cursor-pointer bg-background text-foreground border border-input shadow-2xs hover:bg-secondary active:scale-[0.99] disabled:opacity-50 disabled:pointer-events-none;
   }
 
-  /* Action destructive : même gabarit que le bouton principal */
   .tely-btn-danger {
-    @apply inline-flex items-center justify-center gap-2 rounded-[10px] px-5 py-3.5 text-sm font-semibold tracking-[0.01em] transition-all duration-200 cursor-pointer bg-red-500 text-white border border-transparent hover:bg-red-600 hover:shadow-lg hover:-translate-y-px disabled:bg-gray-300 disabled:cursor-not-allowed;
+    @apply inline-flex items-center justify-center gap-2 rounded-lg px-4 py-2.5 text-sm font-medium transition-all duration-150 cursor-pointer bg-destructive text-destructive-foreground shadow-xs hover:bg-destructive/90 active:scale-[0.99] disabled:opacity-50 disabled:pointer-events-none;
   }
 
-  /* Bouton icône (actions de tableau) */
   .tely-icon-btn {
-    @apply inline-flex items-center justify-center p-2 rounded-[10px] text-gray-900 transition-colors duration-200 cursor-pointer hover:text-gray-900 hover:bg-gray-50;
+    @apply inline-flex items-center justify-center h-8 w-8 rounded-lg text-muted-foreground transition-colors duration-150 cursor-pointer hover:text-foreground hover:bg-secondary;
   }
 
-  /* Séparateur à libellé (« OU CONTINUER AVEC ») */
   .tely-overline {
-    @apply text-[11px] text-gray-400 font-medium tracking-[0.05em] uppercase;
+    @apply text-[11px] text-muted-foreground font-semibold tracking-wider uppercase;
   }
+
   .tely-divider {
-    @apply h-px bg-gray-200;
+    @apply h-px bg-border;
   }
 
-  /* Lien (« Inscription ») */
   .tely-link {
-    @apply text-gray-900 font-semibold cursor-pointer hover:underline;
+    @apply text-foreground font-medium cursor-pointer hover:underline underline-offset-4;
   }
 
-  /* Case à cocher */
   .tely-checkbox {
-    @apply accent-gray-900 w-3.5 h-3.5;
+    @apply accent-primary w-3.5 h-3.5 rounded;
   }
 
-  /* Message d'erreur */
   .tely-error {
-    @apply text-xs text-red-500;
+    @apply text-xs text-destructive font-medium;
   }
 
-  /* Pastille neutre (badges, statuts) */
   .tely-chip {
-    @apply inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-[11px] font-medium bg-gray-100 text-gray-600;
+    @apply inline-flex items-center gap-1 rounded-md border border-border bg-secondary px-2 py-0.5 text-[11px] font-medium text-secondary-foreground;
   }
 
-  /* Apparition de la carte de connexion */
   .tely-animate {
-    animation: fadeSlideIn 0.5s ease both;
+    animation: fadeSlideIn 0.35s cubic-bezier(0.16, 1, 0.3, 1) both;
   }
 }
 
@@ -146,7 +203,7 @@ body {
     margin: 0 0 18pt;
     padding-bottom: 12pt;
     border-bottom: 1px solid #ccc;
-    font-family: var(--font-sans);
+    font-family: var(--font-display);
     letter-spacing: -0.02em;
     font-size: 22pt;
     line-height: 1.2;
@@ -162,11 +219,29 @@ body {
 @keyframes fadeSlideIn {
   from {
     opacity: 0;
-    transform: translateY(16px);
+    transform: translateY(10px);
   }
   to {
     opacity: 1;
     transform: translateY(0);
+  }
+}
+
+@keyframes accordion-down {
+  from {
+    height: 0;
+  }
+  to {
+    height: var(--radix-accordion-content-height);
+  }
+}
+
+@keyframes accordion-up {
+  from {
+    height: var(--radix-accordion-content-height);
+  }
+  to {
+    height: 0;
   }
 }
 
@@ -182,10 +257,10 @@ body {
   scrollbar-width: none !important;
 }
 
-/* ─── Scrollbars fines et modernes (suppression des flèches Windows) ─── */
+/* ─── Scrollbars fines et modernes ─── */
 ::-webkit-scrollbar {
-  width: 5px;
-  height: 5px;
+  width: 6px;
+  height: 6px;
 }
 
 ::-webkit-scrollbar-track {
@@ -193,12 +268,12 @@ body {
 }
 
 ::-webkit-scrollbar-thumb {
-  background: rgba(156, 163, 175, 0.35);
+  background: rgba(113, 113, 122, 0.25);
   border-radius: 9999px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: rgba(245, 158, 11, 0.6);
+  background: rgba(113, 113, 122, 0.45);
 }
 
 ::-webkit-scrollbar-button {
@@ -208,29 +283,36 @@ body {
 }
 
 @layer utilities {
+  .animate-accordion-down {
+    animation: accordion-down 0.2s ease-out;
+  }
+  .animate-accordion-up {
+    animation: accordion-up 0.2s ease-out;
+  }
+
   .bg-grid-pattern {
     background-size: 36px 36px;
-    background-image: 
-      linear-gradient(to right, rgba(245, 158, 11, 0.08) 1px, transparent 1px),
-      linear-gradient(to bottom, rgba(245, 158, 11, 0.08) 1px, transparent 1px);
+    background-image:
+      linear-gradient(to right, rgba(24, 24, 27, 0.04) 1px, transparent 1px),
+      linear-gradient(to bottom, rgba(24, 24, 27, 0.04) 1px, transparent 1px);
   }
 
   .bg-grid-pattern-subtle {
     background-size: 40px 40px;
-    background-image: 
-      linear-gradient(to right, rgba(0, 0, 0, 0.035) 1px, transparent 1px),
-      linear-gradient(to bottom, rgba(0, 0, 0, 0.035) 1px, transparent 1px);
+    background-image:
+      linear-gradient(to right, rgba(24, 24, 27, 0.03) 1px, transparent 1px),
+      linear-gradient(to bottom, rgba(24, 24, 27, 0.03) 1px, transparent 1px);
   }
-  
+
   .bg-grid-pattern-dark {
     background-size: 36px 36px;
-    background-image: 
+    background-image:
       linear-gradient(to right, rgba(255, 255, 255, 0.05) 1px, transparent 1px),
       linear-gradient(to bottom, rgba(255, 255, 255, 0.05) 1px, transparent 1px);
   }
 
   .bg-grid-dots {
     background-size: 24px 24px;
-    background-image: radial-gradient(circle, rgba(245, 158, 11, 0.12) 1px, transparent 1px);
+    background-image: radial-gradient(circle, rgba(24, 24, 27, 0.09) 1px, transparent 1px);
   }
 }

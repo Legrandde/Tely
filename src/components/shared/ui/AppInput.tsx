@@ -1,4 +1,6 @@
-import { useState } from "react";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { cn } from "@/lib/utils";
 
 interface AppInputProps {
   label: string;
@@ -25,50 +27,45 @@ export function AppInput({
   hint,
   onHintClick,
 }: AppInputProps) {
-  const [focused, setFocused] = useState(false);
-
   return (
     <div className="flex flex-col gap-1.5 w-full">
       <div className="flex justify-between items-center">
-        <label className={`text-xs font-medium tracking-wide ${error ? "text-red-500" : "text-gray-400"}`}>
+        <Label className={cn(error ? "text-destructive" : "text-foreground")}>
           {label}
-        </label>
+        </Label>
         {hint && (
-          <span
+          <button
+            type="button"
             onClick={onHintClick}
-            className="text-[11px] text-gray-400 cursor-pointer hover:text-gray-700 transition-colors"
+            className="text-xs text-muted-foreground cursor-pointer hover:text-foreground transition-colors"
           >
             {hint}
-          </span>
+          </button>
         )}
       </div>
 
-      <div
-        className={`flex items-center bg-gray-50 border rounded-[10px] px-3 gap-2 transition-all duration-200
-          ${error ? "border-red-500" : focused ? "border-gray-900 shadow-[0_0_0_3px_rgba(17,17,17,0.06)]" : "border-gray-200"}`}
-      >
-        <input
+      <div className="relative flex items-center">
+        <Input
           type={type}
           value={value}
           onChange={onChange}
           placeholder={placeholder}
-          onFocus={() => setFocused(true)}
-          onBlur={() => setFocused(false)}
-          className="flex-1 bg-transparent border-none outline-none text-sm text-gray-900 py-3.5 font-normal placeholder:text-gray-400"
+          aria-invalid={!!error}
+          className={cn(iconRight && "pr-10")}
         />
         {iconRight && (
           <button
             type="button"
             tabIndex={-1}
             onClick={onIconRightClick}
-            className="text-gray-400 flex items-center cursor-pointer hover:text-gray-600 transition-colors"
+            className="absolute right-3 text-muted-foreground flex items-center cursor-pointer hover:text-foreground transition-colors"
           >
             {iconRight}
           </button>
         )}
       </div>
 
-      {error && <span className="text-[11px] text-red-500">{error}</span>}
+      {error && <span className="text-xs text-destructive">{error}</span>}
     </div>
   );
 }

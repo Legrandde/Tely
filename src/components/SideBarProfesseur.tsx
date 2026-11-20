@@ -1,6 +1,4 @@
 import { useState } from "react";
-import { FiSidebar } from "react-icons/fi";
-import SideBarMenuItem from "./ui/SideBarMenuItem";
 import {
   LayoutDashboard,
   BookOpen,
@@ -9,13 +7,20 @@ import {
   FileText,
   Settings,
   LogOut,
-  X,
+  PanelLeftClose,
+  PanelLeftOpen,
 } from "lucide-react";
 import { useNavigate, useLocation } from "react-router-dom";
-import { useAuth } from "../context/authContext";
-import { useSidebar } from "../context/SidebarContext";
-import { logout } from "../services/authService";
-import ConfirmModal from "./ui/ConfirmModal";
+import { useAuth } from "@/context/authContext";
+import { useSidebar } from "@/context/SidebarContext";
+import { logout } from "@/services/authService";
+import { resolveImageUrl } from "@/utils/imageUrl";
+import SideBarMenuItem from "@/components/ui/SideBarMenuItem";
+import ConfirmModal from "@/components/ui/ConfirmModal";
+import { Sheet, SheetContent, SheetTitle } from "@/components/ui/sheet";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Button } from "@/components/ui/button";
+import { cn } from "@/lib/utils";
 
 export default function SideBarProfesseur() {
   const [collapsed, setCollapsed] = useState(false);
@@ -57,11 +62,11 @@ export default function SideBarProfesseur() {
   );
 
   const navItems = [
-    { route: "", label: "Tableau de bord", icon: <LayoutDashboard size={19} /> },
-    { route: "exercices", label: "Mes Exercices", icon: <BookOpen size={19} /> },
-    { route: "sujets", label: "Sujets Examens", icon: <ClipboardList size={19} /> },
-    { route: "corrections", label: "Corrigés & Solutions", icon: <CheckCircle2 size={19} /> },
-    { route: "ressources", label: "Documents & PDFs", icon: <FileText size={19} /> },
+    { route: "", label: "Tableau de bord", icon: <LayoutDashboard className="size-4" /> },
+    { route: "exercices", label: "Mes Exercices", icon: <BookOpen className="size-4" /> },
+    { route: "sujets", label: "Sujets Examens", icon: <ClipboardList className="size-4" /> },
+    { route: "corrections", label: "Corrigés & Solutions", icon: <CheckCircle2 className="size-4" /> },
+    { route: "ressources", label: "Documents & PDFs", icon: <FileText className="size-4" /> },
   ];
 
   const handleNavigate = (route: string) => {
@@ -73,46 +78,48 @@ export default function SideBarProfesseur() {
     closeMobile();
   };
 
+  const avatar = resolveImageUrl(user?.avatar_url || user?.avatar);
+
   const navContent = (isMobileView: boolean) => {
     const isCollapsedView = isMobileView ? false : collapsed;
 
     return (
-      <>
+      <div className="flex flex-col h-full">
         {/* Brand Header */}
-        <div className="flex items-center justify-between pb-4 pt-1 px-2 border-b border-gray-100">
+        <div className="flex items-center justify-between h-16 px-3 border-b border-border shrink-0">
           {!isCollapsedView && (
-            <h1
+            <button
+              type="button"
               onClick={() => handleNavigate("")}
-              className="tely-title text-lg cursor-pointer"
+              className="tely-title text-base cursor-pointer flex items-center gap-2"
             >
-              Tely Elearning
-            </h1>
+              <span className="flex size-7 items-center justify-center rounded-lg bg-primary text-xs font-bold text-primary-foreground">
+                T
+              </span>
+              <span>
+                Tely <span className="text-amber-500">Prof</span>
+              </span>
+            </button>
           )}
-          {isMobileView ? (
-            <button
+          {!isMobileView && (
+            <Button
               type="button"
-              onClick={closeMobile}
-              className="tely-icon-btn"
-              title="Fermer le menu"
-            >
-              <X size={20} />
-            </button>
-          ) : (
-            <button
-              type="button"
+              variant="ghost"
+              size="icon-sm"
               onClick={() => setCollapsed(!collapsed)}
-              className="tely-icon-btn mx-auto"
+              className={cn(isCollapsedView && "mx-auto")}
               title={collapsed ? "Agrandir" : "Réduire"}
+              aria-label={collapsed ? "Agrandir le menu" : "Réduire le menu"}
             >
-              <FiSidebar size={18} />
-            </button>
+              {collapsed ? <PanelLeftOpen className="size-4" /> : <PanelLeftClose className="size-4" />}
+            </Button>
           )}
         </div>
 
         {/* Navigation Links */}
-        <div className="flex flex-col gap-1 py-3 flex-1 overflow-y-auto overflow-x-hidden no-scrollbar">
+        <nav className="flex flex-col gap-1 p-3 flex-1 overflow-y-auto overflow-x-hidden no-scrollbar">
           {!isCollapsedView && (
-            <span className="tely-overline px-3 mb-1">
+            <span className="tely-overline px-2.5 mb-1">
               Production pédagogique
             </span>
           )}
@@ -126,76 +133,69 @@ export default function SideBarProfesseur() {
               collapsed={isCollapsedView}
             />
           ))}
-        </div>
+        </nav>
 
-        {/* Profil enseignant en bas */}
-        {!isCollapsedView && user && (
-          <div
-            onClick={() => handleNavigate("profile")}
-            className="mb-2 p-2.5 rounded-[10px] bg-gray-50 flex items-center gap-2.5 cursor-pointer hover:bg-gray-100 transition-colors"
-            title="Consulter mon profil"
-          >
-            <div className="w-8 h-8 rounded-full bg-gray-900 text-white text-xs font-bold flex items-center justify-center shrink-0">
-              {user.prenom?.[0] ?? "P"}
-            </div>
-            <div className="min-w-0">
-              <p className="text-xs font-semibold text-gray-800 truncate">
-                {user.prenom} {user.nom}
-              </p>
-              <span className="text-[10px] text-gray-400 font-medium block">
-                Enseignant • Voir profil
-              </span>
-            </div>
-          </div>
-        )}
+        {/* Profil + Paramètres & Déconnexion */}
+        <div className="p-3 border-t border-border space-y-1.5">
+          {!isCollapsedView && user && (
+            <button
+              type="button"
+              onClick={() => handleNavigate("profile")}
+              className="mb-1 p-2 rounded-lg border border-border bg-secondary/40 flex items-center gap-2.5 cursor-pointer hover:bg-secondary transition-colors text-left w-full"
+              title="Consulter mon profil"
+            >
+              <Avatar className="size-8">
+                {avatar && <AvatarImage src={avatar} alt="" referrerPolicy="no-referrer" />}
+                <AvatarFallback className="bg-primary text-primary-foreground">
+                  {(user.prenom?.[0] ?? "P").toUpperCase()}
+                </AvatarFallback>
+              </Avatar>
+              <div className="min-w-0">
+                <p className="text-xs font-semibold text-foreground truncate">
+                  {user.prenom} {user.nom}
+                </p>
+                <span className="text-[11px] text-muted-foreground block truncate">
+                  Enseignant
+                </span>
+              </div>
+            </button>
+          )}
 
-        {/* Section Paramètres & Compte + Déconnexion en bas */}
-        <div className="pt-2 border-t border-gray-100 space-y-1">
           <SideBarMenuItem
             OnNavigate={() => handleNavigate("profile")}
-            icons={<Settings size={19} />}
+            icons={<Settings className="size-4" />}
             Titre="Paramètres & Compte"
             isActive={isAccountSectionActive}
             collapsed={isCollapsedView}
           />
           <SideBarMenuItem
             OnNavigate={() => setConfirmLogoutOpen(true)}
-            icons={<LogOut size={19} />}
+            icons={<LogOut className="size-4" />}
             Titre="Déconnexion"
             collapsed={isCollapsedView}
           />
         </div>
-      </>
+      </div>
     );
   };
 
   return (
     <>
-      {/* ── Desktop Sidebar (lg screens and above) ── */}
       <aside
-        className={`hidden lg:flex flex-col p-3 bg-white h-screen transition-all duration-300 shrink-0 select-none ${
-          collapsed ? "w-20" : "w-64"
-        }`}
+        className={cn(
+          "hidden lg:flex flex-col bg-card border-r border-border h-screen transition-all duration-200 shrink-0 select-none",
+          collapsed ? "w-16" : "w-64"
+        )}
       >
         {navContent(false)}
       </aside>
 
-      {/* ── Mobile Drawer (under lg screens) ── */}
-      {isOpenMobile && (
-        <div className="fixed inset-0 z-50 lg:hidden flex">
-          {/* Backdrop */}
-          <div
-            onClick={closeMobile}
-            className="fixed inset-0 bg-black/40 backdrop-blur-xs transition-opacity"
-            aria-hidden="true"
-          />
-
-          {/* Drawer content */}
-          <aside className="relative flex flex-col w-72 max-w-[85vw] bg-white h-full p-4 shadow-2xl z-10 select-none animate-in slide-in-from-left duration-200">
-            {navContent(true)}
-          </aside>
-        </div>
-      )}
+      <Sheet open={isOpenMobile} onOpenChange={(open) => { if (!open) closeMobile(); }}>
+        <SheetContent side="left" className="p-0 w-72">
+          <SheetTitle className="sr-only">Menu de l'espace enseignant</SheetTitle>
+          {navContent(true)}
+        </SheetContent>
+      </Sheet>
 
       <ConfirmModal
         open={confirmLogoutOpen}

@@ -1,4 +1,13 @@
-import { X } from "lucide-react";
+import { Loader2 } from "lucide-react";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import { Button } from "@/components/ui/button";
 
 interface ConfirmModalProps {
   open: boolean;
@@ -21,60 +30,46 @@ export default function ConfirmModal({
   confirmLabel = "Confirmer",
   loadingLabel = "Traitement...",
   cancelLabel = "Annuler",
+  variant = "warning",
   onConfirm,
   onCancel,
 }: ConfirmModalProps) {
-  if (!open) return null;
+  const isDanger = variant === "danger";
 
   return (
-    <div
-      onClick={onCancel}
-      className="fixed inset-0 z-[60] flex items-center justify-center bg-black/40 p-4"
-    >
-      <div
-        onClick={(e) => e.stopPropagation()}
-        className="tely-card tely-animate w-full max-w-sm p-6"
-      >
-        <div className="flex items-start justify-between gap-3">
-          <div>
-            <h3 className="tely-title text-xl">{title}</h3>
-            {description && (
-              <p className="tely-subtitle mt-1.5 leading-relaxed">
-                {description}
-              </p>
-            )}
-          </div>
+    <Dialog open={open} onOpenChange={(isOpen) => { if (!isOpen && !loading) onCancel(); }}>
+      <DialogContent className="sm:max-w-md">
+        <DialogHeader>
+          <DialogTitle>{title}</DialogTitle>
+          {description && <DialogDescription>{description}</DialogDescription>}
+        </DialogHeader>
 
-          <button
+        <DialogFooter className="mt-2">
+          <Button
             type="button"
+            variant="outline"
             onClick={onCancel}
             disabled={loading}
-            className="tely-icon-btn shrink-0"
-            aria-label="Fermer"
-          >
-            <X size={16} />
-          </button>
-        </div>
-
-        <div className="flex items-center gap-3 mt-5">
-          <button
-            type="button"
-            onClick={onCancel}
-            disabled={loading}
-            className="tely-btn-outline flex-1"
           >
             {cancelLabel}
-          </button>
-          <button
+          </Button>
+          <Button
             type="button"
+            variant={isDanger ? "destructive" : "default"}
             onClick={onConfirm}
             disabled={loading}
-            className="tely-btn flex-1"
           >
-            {loading ? loadingLabel : confirmLabel}
-          </button>
-        </div>
-      </div>
-    </div>
+            {loading ? (
+              <>
+                <Loader2 className="size-4 animate-spin" />
+                {loadingLabel}
+              </>
+            ) : (
+              confirmLabel
+            )}
+          </Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
   );
 }

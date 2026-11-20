@@ -1,12 +1,20 @@
 import { Link } from "react-router-dom";
-import { Clock, Newspaper, Star } from "lucide-react";
-import type { ArticleCarte } from "../../../types/blog";
-import { resolveImageUrl } from "../../../utils/imageUrl";
-import { dateLongue, dateRelative, libelleLecture, nomAuteur, urlArticle } from "../utils";
-import { AvatarAuteur, CategorieBadge } from "./Elements";
+import { Newspaper } from "lucide-react";
+import type { ArticleCarte } from "@/types/blog";
+import { resolveImageUrl } from "@/utils/imageUrl";
+import { dateRelative, libelleLecture, nomAuteur, urlArticle } from "../utils";
+import { Skeleton } from "@/components/ui/skeleton";
 
-/** Visuel de couverture (ou motif de remplacement si l'article n'en a pas). */
-export function Couverture({ src, className = "", eager = false }: { src: string | null | undefined; className?: string; eager?: boolean }) {
+/** Visuel de couverture pleine hauteur (ou fond sombre raffiné si l'article n'a pas d'image). */
+export function Couverture({
+  src,
+  className = "",
+  eager = false,
+}: {
+  src: string | null | undefined;
+  className?: string;
+  eager?: boolean;
+}) {
   const url = resolveImageUrl(src);
   if (url) {
     return (
@@ -20,50 +28,71 @@ export function Couverture({ src, className = "", eager = false }: { src: string
     );
   }
   return (
-    <div aria-hidden="true" className={`relative flex h-full w-full items-center justify-center overflow-hidden bg-gradient-to-br from-amber-100 via-amber-50 to-white ${className}`}>
-      <div className="bg-grid-pattern absolute inset-0 opacity-60" />
-      <Newspaper size={34} className="relative text-amber-500/70" />
+    <div
+      aria-hidden="true"
+      className={`relative flex h-full w-full items-center justify-center overflow-hidden bg-gradient-to-br from-zinc-800 via-zinc-900 to-zinc-950 ${className}`}
+    >
+      <div className="bg-grid-pattern-dark absolute inset-0 opacity-60" />
+      <Newspaper className="relative size-10 text-zinc-600" />
     </div>
   );
 }
 
-/** Carte d'article de la grille du blog (toute la carte est cliquable). */
-export default function ArticleCard({ article, titreNiveau = "h3" }: { article: ArticleCarte; titreNiveau?: "h2" | "h3" }) {
+/**
+ * Carte d'article pleine image (style éditorial portrait avec texte superposé en bas
+ * sur dégradé sombre : Titre, Sous-titre catégorie/date, puis extrait).
+ */
+export default function ArticleCard({
+  article,
+  titreNiveau = "h3",
+}: {
+  article: ArticleCarte;
+  titreNiveau?: "h2" | "h3";
+}) {
   const Titre = titreNiveau;
+  const sousTitreParts = [
+    article.categorie?.nom || nomAuteur(article.auteur),
+    article.publie_le ? dateRelative(article.publie_le) : libelleLecture(article.temps_lecture),
+  ].filter(Boolean);
+
   return (
-    <article className="group relative flex h-full flex-col overflow-hidden rounded-2xl border border-gray-100 bg-white shadow-sm transition-all duration-300 focus-within:ring-2 focus-within:ring-amber-500 hover:-translate-y-0.5 hover:shadow-xl hover:shadow-gray-900/5">
-      <div className="aspect-[16/9] overflow-hidden bg-amber-50">
-        <Couverture src={article.image_couverture} className="transition-transform duration-500 group-hover:scale-[1.03]" />
+    <article className="group relative aspect-[3/4] w-full overflow-hidden rounded-xl bg-zinc-900 shadow-xs transition-all duration-300 focus-within:ring-2 focus-within:ring-ring hover:shadow-xl">
+      {/* Image plein cadre */}
+      <div className="absolute inset-0">
+        <Couverture
+          src={article.image_couverture}
+          className="transition-transform duration-500 ease-out group-hover:scale-[1.04]"
+        />
       </div>
-      <div className="flex flex-1 flex-col p-5">
-        <div className="flex items-center gap-2">
-          <CategorieBadge categorie={article.categorie} />
-          {article.mis_en_avant && (
-            <span className="inline-flex items-center gap-1 text-[11px] font-semibold text-amber-700">
-              <Star size={12} className="fill-amber-400 text-amber-500" aria-hidden="true" /> À la une
-            </span>
-          )}
-        </div>
-        <Titre className="mt-3 text-lg font-bold leading-snug tracking-tight text-gray-900">
-          <Link to={urlArticle(article.slug)} className="outline-none after:absolute after:inset-0 after:content-[''] group-hover:text-gray-700">
+
+      {/* Dégradé sombre en bas pour lisibilité optimale du texte blanc */}
+      <div
+        aria-hidden="true"
+        className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/85 via-black/35 to-transparent"
+      />
+
+      {/* Contenu superposé en bas à gauche */}
+      <div className="relative z-10 flex h-full flex-col justify-end p-6 text-left text-white">
+        <Titre className="text-lg sm:text-xl font-medium leading-snug tracking-tight text-white">
+          <Link
+            to={urlArticle(article.slug)}
+            className="outline-none after:absolute after:inset-0 after:content-['']"
+          >
             {article.titre}
           </Link>
         </Titre>
-        {article.extrait && <p className="mt-2 line-clamp-3 text-sm leading-relaxed text-gray-600">{article.extrait}</p>}
-        <div className="mt-auto flex items-center justify-between gap-3 pt-5 text-xs text-gray-500">
-          <span className="flex min-w-0 items-center gap-2">
-            <AvatarAuteur auteur={article.auteur} taille="h-7 w-7" />
-            <span className="min-w-0">
-              <span className="block truncate font-semibold text-gray-800">{nomAuteur(article.auteur)}</span>
-              <time dateTime={article.publie_le ?? undefined} title={dateLongue(article.publie_le)}>
-                {dateRelative(article.publie_le)}
-              </time>
-            </span>
-          </span>
-          <span className="inline-flex shrink-0 items-center gap-1">
-            <Clock size={13} aria-hidden="true" /> {libelleLecture(article.temps_lecture)}
-          </span>
-        </div>
+
+        {sousTitreParts.length > 0 && (
+          <p className="mt-0.5 text-sm font-normal text-white/85">
+            {sousTitreParts.join(", ")}
+          </p>
+        )}
+
+        {article.extrait && (
+          <p className="mt-3 line-clamp-3 text-xs sm:text-sm font-light leading-relaxed text-white/85">
+            {article.extrait}
+          </p>
+        )}
       </div>
     </article>
   );
@@ -71,17 +100,18 @@ export default function ArticleCard({ article, titreNiveau = "h3" }: { article: 
 
 export function ArticleCardSkeleton() {
   return (
-    <div className="overflow-hidden rounded-2xl border border-gray-100 bg-white" aria-hidden="true">
-      <div className="aspect-[16/9] animate-pulse bg-gray-100" />
-      <div className="space-y-3 p-5">
-        <div className="h-4 w-20 animate-pulse rounded-full bg-gray-100" />
-        <div className="h-5 w-11/12 animate-pulse rounded bg-gray-200" />
-        <div className="h-5 w-2/3 animate-pulse rounded bg-gray-200" />
-        <div className="h-3 w-full animate-pulse rounded bg-gray-100" />
-        <div className="h-3 w-4/5 animate-pulse rounded bg-gray-100" />
-        <div className="flex items-center gap-2 pt-3">
-          <div className="h-7 w-7 animate-pulse rounded-full bg-gray-100" />
-          <div className="h-3 w-24 animate-pulse rounded bg-gray-100" />
+    <div
+      className="relative aspect-[3/4] w-full overflow-hidden rounded-xl bg-muted"
+      aria-hidden="true"
+    >
+      <Skeleton className="h-full w-full rounded-none" />
+      <div className="absolute inset-x-0 bottom-0 space-y-2.5 p-6">
+        <Skeleton className="h-5 w-3/4 bg-foreground/15" />
+        <Skeleton className="h-3.5 w-1/2 bg-foreground/10" />
+        <div className="space-y-1.5 pt-2">
+          <Skeleton className="h-3 w-full bg-foreground/10" />
+          <Skeleton className="h-3 w-5/6 bg-foreground/10" />
+          <Skeleton className="h-3 w-2/3 bg-foreground/10" />
         </div>
       </div>
     </div>
