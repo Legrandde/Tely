@@ -25,6 +25,7 @@ import {
   SheetTrigger,
 } from "@/components/ui/sheet";
 import { Separator } from "@/components/ui/separator";
+import ThemeToggle from "@/components/ui/ThemeToggle";
 import { cn } from "@/lib/utils";
 
 type Role = "eleve" | "professeur" | "administrateur";
@@ -131,6 +132,8 @@ export default function Header() {
 
           {/* Actions droite */}
           <div className="flex items-center gap-2">
+            <ThemeToggle />
+
             {isAuthenticated ? (
               <>
                 <Button asChild size="sm" className="hidden sm:inline-flex">

@@ -1,9 +1,11 @@
 @import url("https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,300..800&family=Inter:wght@400;500;600;700&display=swap");
 @import "tailwindcss";
 
+@custom-variant dark (&:where(.dark, .dark *));
+
 /* ─────────────────────────────────────────────────────────────
    shadcn/ui + Tely Elearning — Design System Tokens (Tailwind v4)
-   Esthétique SaaS moderne, minimaliste, sobre et accessible.
+   Esthétique SaaS moderne, minimaliste, sobre et accessible (Clair & Sombre).
    ───────────────────────────────────────────────────────────── */
 :root {
   --background: oklch(0.99 0.002 90);
@@ -28,6 +30,30 @@
   --brand: oklch(0.769 0.188 70.08);
   --brand-foreground: oklch(0.16 0.006 285);
   --radius: 0.75rem;
+}
+
+.dark {
+  --background: oklch(0.13 0.005 285);
+  --foreground: oklch(0.975 0.002 285);
+  --card: oklch(0.165 0.006 285);
+  --card-foreground: oklch(0.975 0.002 285);
+  --popover: oklch(0.165 0.006 285);
+  --popover-foreground: oklch(0.975 0.002 285);
+  --primary: oklch(0.975 0.002 285);
+  --primary-foreground: oklch(0.145 0.005 285);
+  --secondary: oklch(0.22 0.006 285);
+  --secondary-foreground: oklch(0.96 0.002 285);
+  --muted: oklch(0.21 0.006 285);
+  --muted-foreground: oklch(0.67 0.01 285);
+  --accent: oklch(0.23 0.008 285);
+  --accent-foreground: oklch(0.975 0.002 285);
+  --destructive: oklch(0.62 0.22 25);
+  --destructive-foreground: oklch(0.985 0 0);
+  --border: oklch(0.26 0.006 285);
+  --input: oklch(0.28 0.006 285);
+  --ring: oklch(0.769 0.188 70.08);
+  --brand: oklch(0.79 0.18 72);
+  --brand-foreground: oklch(0.14 0.006 285);
 }
 
 @theme inline {
@@ -315,4 +341,67 @@
     background-size: 24px 24px;
     background-image: radial-gradient(circle, rgba(24, 24, 27, 0.09) 1px, transparent 1px);
   }
+}
+
+/* ─────────────────────────────────────────────────────────────
+   Compatibilité mode sombre pour les pages/composants existants
+   qui utilisent encore des classes utilitaires claires directes.
+   ───────────────────────────────────────────────────────────── */
+.dark .bg-grid-pattern {
+  background-image:
+    linear-gradient(to right, rgba(255, 255, 255, 0.045) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(255, 255, 255, 0.045) 1px, transparent 1px);
+}
+
+.dark .bg-grid-pattern-subtle {
+  background-image:
+    linear-gradient(to right, rgba(255, 255, 255, 0.035) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(255, 255, 255, 0.035) 1px, transparent 1px);
+}
+
+.dark .bg-grid-dots {
+  background-image: radial-gradient(circle, rgba(255, 255, 255, 0.1) 1px, transparent 1px);
+}
+
+.dark .bg-white {
+  background-color: var(--card);
+}
+.dark .bg-gray-50,
+.dark .bg-slate-50 {
+  background-color: var(--background);
+}
+.dark .bg-gray-100,
+.dark .bg-slate-100 {
+  background-color: var(--secondary);
+}
+.dark .bg-amber-50 {
+  background-color: var(--background);
+}
+.dark .border-gray-100,
+.dark .border-gray-200,
+.dark .border-slate-100,
+.dark .border-slate-200 {
+  border-color: var(--border);
+}
+.dark .divide-gray-50 > :not([hidden]) ~ :not([hidden]),
+.dark .divide-gray-100 > :not([hidden]) ~ :not([hidden]),
+.dark .divide-slate-100 > :not([hidden]) ~ :not([hidden]) {
+  border-color: var(--border);
+}
+.dark .text-gray-900,
+.dark .text-slate-900,
+.dark .text-black {
+  color: var(--foreground);
+}
+.dark .text-gray-800,
+.dark .text-slate-800,
+.dark .text-gray-700,
+.dark .text-slate-700 {
+  color: oklch(0.88 0.005 285);
+}
+.dark .text-gray-600,
+.dark .text-slate-600,
+.dark .text-gray-500,
+.dark .text-slate-500 {
+  color: var(--muted-foreground);
 }

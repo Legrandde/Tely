@@ -6,6 +6,7 @@ import { useSidebar } from "@/context/SidebarContext";
 import { resolveImageUrl } from "@/utils/imageUrl";
 import NotificationDropdown from "@/components/notifications/NotificationDropdown";
 import { Button } from "@/components/ui/button";
+import ThemeToggle from "@/components/ui/ThemeToggle";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
 const TITRES: Array<[string, string]> = [
@@ -76,6 +77,8 @@ export default function HeaderEleve() {
             className="bg-transparent text-xs sm:text-sm text-foreground outline-none w-full placeholder:text-muted-foreground"
           />
         </form>
+
+        <ThemeToggle />
 
         <NotificationDropdown />
 

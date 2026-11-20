@@ -1,5 +1,6 @@
 import { Link, Outlet } from "react-router-dom";
 import { Card } from "@/components/ui/card";
+import ThemeToggle from "@/components/ui/ThemeToggle";
 
 export function AuthLayout() {
   return (
@@ -10,7 +11,7 @@ export function AuthLayout() {
       />
 
       <div className="relative z-10 w-full max-w-4xl tely-animate">
-        <div className="mb-6 flex justify-center md:justify-start">
+        <div className="mb-6 flex items-center justify-between">
           <Link
             to="/"
             className="inline-flex items-center gap-2.5 rounded-lg outline-none focus-visible:ring-2 focus-visible:ring-ring"
@@ -22,6 +23,7 @@ export function AuthLayout() {
               Tely Elearning<span className="text-amber-500">.</span>
             </span>
           </Link>
+          <ThemeToggle />
         </div>
 
         <Card className="flex flex-col md:flex-row w-full overflow-hidden p-0 gap-0 shadow-lg border-border/80 min-h-[32rem]">

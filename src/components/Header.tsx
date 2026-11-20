@@ -7,6 +7,7 @@ import { useSidebar } from "@/context/SidebarContext";
 import NotificationDropdown from "@/components/notifications/NotificationDropdown";
 import CommandPalette from "@/components/admin/CommandPalette";
 import { Button } from "@/components/ui/button";
+import ThemeToggle from "@/components/ui/ThemeToggle";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
   DropdownMenu,
@@ -161,6 +162,8 @@ export default function Header({ title }: { title?: string }) {
             </Button>
           </>
         )}
+
+        <ThemeToggle />
 
         <Button
           type="button"
