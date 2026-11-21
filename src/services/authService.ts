@@ -81,7 +81,8 @@ export function loginWithGoogle(): void {
   } catch {
     // stockage indisponible : le callback refusera la connexion, faute de nonce
   }
-  window.location.href = `${import.meta.env.VITE_API_URL}/api/auth/google?nonce=${nonce}`;
+  const apiBase = String(import.meta.env.VITE_API_URL ?? "").replace(/\/+$/, "");
+  window.location.href = `${apiBase}/api/auth/google?nonce=${nonce}`;
 }
 
 /** Vérifie puis consomme (usage unique) le nonce de la connexion Google en cours. */

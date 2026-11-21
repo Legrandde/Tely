@@ -2,7 +2,7 @@ import axios from "axios";
 import { getAccess, clearAccess } from "../utils/storage";
 
 const api = axios.create({
-  baseURL: import.meta.env.VITE_API_URL,
+  baseURL: String(import.meta.env.VITE_API_URL ?? "").replace(/\/+$/, ""),
   timeout: 10000,
   headers: {
     Accept: "application/json",
@@ -25,7 +25,9 @@ api.interceptors.request.use(
 api.interceptors.response.use(
   (response) => response,
   (error) => {
-    if (error.response?.status === 401) {
+    const url = String(error.config?.url ?? "");
+    const isAuthCall = url.includes("/api/auth/login") || url.includes("/api/auth/register") || url.includes("/api/auth/google/");
+    if (error.response?.status === 401 && !isAuthCall) {
       clearAccess();
       window.location.href = "/auth/login";
     }

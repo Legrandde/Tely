@@ -10,6 +10,13 @@ import {
   extraireCheminFrom,
 } from "../../services/authService";
 
+interface GooglePromptMomentNotification {
+  isNotDisplayed?: () => boolean;
+  getNotDisplayedReason?: () => string;
+  isSkippedMoment?: () => boolean;
+  getSkippedReason?: () => string;
+}
+
 declare global {
   interface Window {
     google?: {
@@ -20,8 +27,10 @@ declare global {
             callback: (response: { credential: string }) => void;
             auto_select?: boolean;
             cancel_on_tap_outside?: boolean;
+            use_fedcm_for_prompt?: boolean;
           }) => void;
-          prompt: (momentListener?: (notification: unknown) => void) => void;
+          prompt: (momentListener?: (notification: GooglePromptMomentNotification) => void) => void;
+          cancel: () => void;
           renderButton: (
             parent: HTMLElement,
             options: Record<string, unknown>
@@ -33,7 +42,7 @@ declare global {
 }
 
 export default function GoogleOneTap() {
-  const { isAuthenticated, setUser } = useAuth();
+  const { isAuthenticated, isLoading, setUser } = useAuth();
   const { addToast } = useToast();
   const navigate = useNavigate();
   const location = useLocation();
@@ -45,15 +54,21 @@ export default function GoogleOneTap() {
   }, [location.state]);
 
   useEffect(() => {
-    if (isAuthenticated) return;
+    // Attend la fin de la vérification de session avant d'afficher One Tap
+    if (isLoading || isAuthenticated) return;
     if (initializedRef.current) return;
 
-    const clientId =
+    const clientId = (
       import.meta.env.VITE_GOOGLE_CLIENT_ID ||
-      "839117011473-4ihglsfe6d452oi0tfkfks4d9frko76g.apps.googleusercontent.com";
+      "839117011473-4ihglsfe6d452oi0tfkfks4d9frko76g.apps.googleusercontent.com"
+    ).trim();
+
+    if (!clientId) return;
+
+    let annule = false;
 
     const initOneTap = () => {
-      if (!window.google?.accounts?.id) return;
+      if (annule || initializedRef.current || !window.google?.accounts?.id) return;
 
       try {
         window.google.accounts.id.initialize({
@@ -79,33 +94,55 @@ export default function GoogleOneTap() {
           },
           auto_select: false,
           cancel_on_tap_outside: true,
+          use_fedcm_for_prompt: true,
         });
 
-        window.google.accounts.id.prompt();
+        window.google.accounts.id.prompt((notification) => {
+          if (import.meta.env.DEV) {
+            if (notification.isNotDisplayed?.()) {
+              console.warn("Google One Tap non affiché :", notification.getNotDisplayedReason?.());
+            } else if (notification.isSkippedMoment?.()) {
+              console.warn("Google One Tap ignoré :", notification.getSkippedReason?.());
+            }
+          }
+        });
         initializedRef.current = true;
       } catch (e) {
         console.warn("Google One Tap initialize error:", e);
       }
     };
 
-    // If script not loaded, load it dynamically
+    let existingScript = document.getElementById("google-gsi-script") as HTMLScriptElement | null;
     if (!window.google?.accounts?.id) {
-      const existingScript = document.getElementById("google-gsi-script");
       if (!existingScript) {
         const script = document.createElement("script");
         script.id = "google-gsi-script";
         script.src = "https://accounts.google.com/gsi/client";
         script.async = true;
         script.defer = true;
-        script.onload = initOneTap;
+        script.addEventListener("load", initOneTap);
         document.head.appendChild(script);
+        existingScript = script;
       } else {
         existingScript.addEventListener("load", initOneTap);
       }
     } else {
       initOneTap();
     }
-  }, [isAuthenticated, setUser, addToast, navigate]);
+
+    return () => {
+      annule = true;
+      existingScript?.removeEventListener("load", initOneTap);
+      if (initializedRef.current) {
+        try {
+          window.google?.accounts?.id?.cancel();
+        } catch {
+          // ignore
+        }
+        initializedRef.current = false;
+      }
+    };
+  }, [isLoading, isAuthenticated, setUser, addToast, navigate]);
 
   return null;
 }
