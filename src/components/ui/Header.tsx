@@ -180,20 +180,10 @@ export default function Header() {
               </>
             ) : (
               <>
-                <Button
-                  asChild
-                  variant="ghost"
-                  size="sm"
-                  className="hidden rounded-full px-4 sm:inline-flex"
-                >
+                <Button asChild variant="ghost" size="sm" className="hidden sm:inline-flex">
                   <Link to="/auth/login">Connexion</Link>
                 </Button>
-                <Button
-                  asChild
-                  variant="brand"
-                  size="sm"
-                  className="h-9 rounded-full bg-gradient-to-r from-amber-500 to-amber-400 px-5 font-semibold text-zinc-950 shadow-[0_2px_16px_rgba(245,158,11,0.35)] transition-all duration-200 hover:from-amber-400 hover:to-amber-300 hover:shadow-[0_4px_22px_rgba(245,158,11,0.5)] active:scale-[0.98]"
-                >
+                <Button asChild variant="brand" size="sm">
                   <Link to={inscriptionsOuvertes ? "/auth/signup" : "/exercices"}>
                     <span className="sm:hidden">{inscriptionsOuvertes ? "S'inscrire" : "Explorer"}</span>
                     <span className="hidden sm:inline">
@@ -290,18 +280,13 @@ export default function Header() {
                     </div>
                   ) : (
                     <div className="flex flex-col gap-2">
-                      <Button
-                        asChild
-                        variant="brand"
-                        className="w-full rounded-full bg-gradient-to-r from-amber-500 to-amber-400 font-semibold text-zinc-950 shadow-[0_2px_16px_rgba(245,158,11,0.35)] hover:from-amber-400 hover:to-amber-300"
-                        onClick={() => setSheetOpen(false)}
-                      >
+                      <Button asChild variant="brand" className="w-full" onClick={() => setSheetOpen(false)}>
                         <Link to={inscriptionsOuvertes ? "/auth/signup" : "/exercices"}>
                           {inscriptionsOuvertes ? "Inscription gratuite" : "Explorer les exercices"}
                           <ArrowRight className="size-4" />
                         </Link>
                       </Button>
-                      <Button asChild variant="outline" className="w-full rounded-full" onClick={() => setSheetOpen(false)}>
+                      <Button asChild variant="outline" className="w-full" onClick={() => setSheetOpen(false)}>
                         <Link to="/auth/login">J'ai déjà un compte</Link>
                       </Button>
                     </div>

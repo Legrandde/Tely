@@ -5,6 +5,7 @@ import { ArrowRight, ChevronLeft, ChevronRight } from "lucide-react";
 import { useAuth } from "@/context/authContext";
 import { useSite } from "@/context/SiteContext";
 import { useCtaInscription } from "./useCtaInscription";
+import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 
 type ModeHero = "eleves" | "enseignants";
@@ -195,13 +196,12 @@ const HeroSection = forwardRef<HTMLDivElement>(function HeroSection(_props, finR
                 </p>
 
                 <div className="mt-8">
-                  <Link
-                    to={contenu.ctaTo}
-                    className="inline-flex h-11 items-center justify-center gap-2 rounded-full bg-gradient-to-r from-amber-500 to-amber-400 px-6 text-sm font-semibold text-zinc-950 shadow-[0_4px_22px_rgba(245,158,11,0.45)] transition-all duration-200 hover:from-amber-400 hover:to-amber-300 hover:shadow-[0_6px_30px_rgba(245,158,11,0.65)] active:scale-[0.98] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-amber-400 sm:h-12 sm:px-7 sm:text-base"
-                  >
-                    {contenu.ctaLabel}
-                    <ArrowRight className="size-4" aria-hidden="true" />
-                  </Link>
+                  <Button asChild variant="brand" size="lg" className="h-11 px-6 text-sm sm:h-12 sm:px-7 sm:text-base">
+                    <Link to={contenu.ctaTo}>
+                      {contenu.ctaLabel}
+                      <ArrowRight className="size-4" aria-hidden="true" />
+                    </Link>
+                  </Button>
                 </div>
               </motion.div>
             </AnimatePresence>
