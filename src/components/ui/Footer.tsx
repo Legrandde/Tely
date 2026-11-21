@@ -84,7 +84,7 @@ export default function Footer() {
       <div className="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <div className="grid grid-cols-2 gap-x-6 gap-y-10 border-b border-gray-800 pb-12 md:grid-cols-12">
           {/* Marque */}
-          <div className="col-span-2 space-y-4 md:col-span-4">
+          <div className="col-span-2 space-y-4 md:col-span-3">
             <Link to="/" className="inline-flex items-center rounded-lg outline-none focus-visible:ring-2 focus-visible:ring-amber-500">
               <BrandLogo nom={siteNom} className="text-white" markClassName="h-8" textClassName="text-2xl text-white" />
             </Link>
@@ -218,7 +218,7 @@ export default function Footer() {
           </nav>
 
           {/* Appel à l'action */}
-          <div className="col-span-2 space-y-3 md:col-span-2">
+          <div className="col-span-2 space-y-3 md:col-span-3">
             <h2 className="text-xs font-semibold uppercase tracking-wider text-white">Prêt à progresser ?</h2>
             <p className="text-sm text-gray-400">
               {inscriptionsOuvertes
@@ -227,10 +227,10 @@ export default function Footer() {
             </p>
             <Link
               to={inscriptionsOuvertes ? "/auth/signup" : "/exercices"}
-              className="inline-flex items-center gap-2 rounded-lg bg-amber-500 px-4 py-2.5 text-sm font-semibold text-gray-900 shadow-md shadow-amber-500/20 transition-colors hover:bg-amber-400 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-amber-300"
+              className="inline-flex items-center gap-2 whitespace-nowrap rounded-lg bg-amber-500 px-4 py-2.5 text-sm font-semibold text-zinc-950 shadow-sm transition-colors hover:bg-amber-400 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-amber-300"
             >
               {inscriptionsOuvertes ? "Créer un compte gratuit" : "Explorer les exercices"}
-              <ArrowRight size={15} aria-hidden="true" />
+              <ArrowRight size={15} className="shrink-0" aria-hidden="true" />
             </Link>
           </div>
         </div>

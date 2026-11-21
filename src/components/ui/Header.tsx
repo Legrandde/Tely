@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Link, NavLink, useLocation, useNavigate } from "react-router-dom";
-import { ArrowRight, ChevronDown, LayoutDashboard, LogOut, Menu, User } from "lucide-react";
+import { ArrowRight, ChevronDown, Download, LayoutDashboard, LogOut, Menu, User } from "lucide-react";
 import { logout } from "@/services/authService";
 import { useAuth } from "@/context/authContext";
 import { useSite, useSiteNom } from "@/context/SiteContext";
@@ -27,6 +27,7 @@ import {
 import { Separator } from "@/components/ui/separator";
 import ThemeToggle from "@/components/ui/ThemeToggle";
 import BrandLogo from "@/components/ui/BrandLogo";
+import { usePwaInstall } from "@/hooks/usePwaInstall";
 import { cn } from "@/lib/utils";
 
 type Role = "eleve" | "professeur" | "administrateur";
@@ -56,6 +57,7 @@ export default function Header() {
   const siteNom = useSiteNom();
   const navigate = useNavigate();
   const location = useLocation();
+  const { canInstall, promptInstall } = usePwaInstall();
 
   const [sheetOpen, setSheetOpen] = useState(false);
   const [confirmLogoutOpen, setConfirmLogoutOpen] = useState(false);
@@ -124,6 +126,20 @@ export default function Header() {
 
           {/* Actions droite */}
           <div className="flex items-center gap-2">
+            {canInstall && (
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                onClick={() => void promptInstall()}
+                aria-label="Installer l'application Tely"
+                title="Installer l'application"
+                className="hidden sm:inline-flex"
+              >
+                <Download className="size-4" aria-hidden="true" />
+                <span className="hidden md:inline">Installer</span>
+              </Button>
+            )}
             <ThemeToggle />
 
             {isAuthenticated ? (

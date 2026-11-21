@@ -7,6 +7,7 @@ import { Route } from "./routes/Routes";
 import ErrorBoundary from "./components/site/ErrorBoundary";
 import MaintenanceGate from "./components/site/MaintenanceGate";
 import CookieConsent from "./components/site/CookieConsent";
+import PwaInstallPrompt from "./components/site/PwaInstallPrompt";
 
 function App() {
   return (
@@ -19,6 +20,7 @@ function App() {
                 <RouterProvider router={Route} />
               </MaintenanceGate>
               <CookieConsent onNavigate={(to) => void Route.navigate(to)} />
+              <PwaInstallPrompt />
             </SiteProvider>
           </AuthProvider>
         </ToastProvider>
