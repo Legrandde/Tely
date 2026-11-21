@@ -6,6 +6,7 @@ import { useSite, useSiteNom } from "../../context/SiteContext";
 import { openCookiePreferences } from "../site/consent";
 import type { LienNavigation } from "../../types/site";
 import { URL_RSS } from "../../services/blogService";
+import BrandLogo from "./BrandLogo";
 
 const LEGAL_FIXES: LienNavigation[] = [
   { titre: "Mentions légales", slug: "mentions-legales" },
@@ -84,17 +85,8 @@ export default function Footer() {
         <div className="grid grid-cols-2 gap-x-6 gap-y-10 border-b border-gray-800 pb-12 md:grid-cols-12">
           {/* Marque */}
           <div className="col-span-2 space-y-4 md:col-span-4">
-            <Link to="/" className="inline-flex items-center gap-2 text-xl font-bold tracking-tight text-white">
-              <span
-                className="flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-tr from-amber-500 to-amber-400 font-black text-gray-950"
-                aria-hidden="true"
-              >
-                {siteNom.charAt(0).toUpperCase()}
-              </span>
-              <span>
-                {siteNom}
-                <span className="text-amber-400">.</span>
-              </span>
+            <Link to="/" className="inline-flex items-center rounded-lg outline-none focus-visible:ring-2 focus-visible:ring-amber-500">
+              <BrandLogo nom={siteNom} className="text-white" markClassName="h-8" textClassName="text-2xl text-white" />
             </Link>
             <p className="max-w-xs text-sm leading-relaxed text-gray-400">{description}</p>
 

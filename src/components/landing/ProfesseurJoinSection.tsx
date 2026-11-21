@@ -93,9 +93,6 @@ export default function ProfesseurJoinSection() {
       {/* ── Bloc enseignants ── */}
       <div className="mx-auto grid max-w-6xl items-center gap-8 overflow-hidden rounded-3xl bg-gray-900 px-6 py-10 text-white shadow-xl sm:px-10 md:grid-cols-[1.4fr_1fr] md:py-14">
         <div className="flex flex-col items-start gap-4 text-left">
-          <span className="rounded-full bg-amber-500/15 px-3 py-1 text-xs font-semibold uppercase tracking-wider text-amber-300">
-            Espace enseignants
-          </span>
           <h2 id="enseignants-titre" className="text-2xl font-bold tracking-tight sm:text-3xl">
             Vous êtes enseignant ? Partagez votre savoir sur Tely
           </h2>
@@ -103,24 +100,6 @@ export default function ProfesseurJoinSection() {
             Publiez vos exercices, anciens sujets et corrigés détaillés pour accompagner les élèves dans
             leurs révisions. Votre compte est activé après validation de votre candidature par notre équipe.
           </p>
-          <ul className="grid gap-2 text-sm text-gray-300 sm:grid-cols-2">
-            <li className="flex items-center gap-2">
-              <CheckCircle2 size={16} className="shrink-0 text-amber-400" aria-hidden="true" />
-              Tableau de bord dédié
-            </li>
-            <li className="flex items-center gap-2">
-              <CheckCircle2 size={16} className="shrink-0 text-amber-400" aria-hidden="true" />
-              Statistiques de consultation
-            </li>
-            <li className="flex items-center gap-2">
-              <CheckCircle2 size={16} className="shrink-0 text-amber-400" aria-hidden="true" />
-              Publication simple et rapide
-            </li>
-            <li className="flex items-center gap-2">
-              <CheckCircle2 size={16} className="shrink-0 text-amber-400" aria-hidden="true" />
-              Visibilité auprès des élèves
-            </li>
-          </ul>
           <button
             type="button"
             onClick={() => {

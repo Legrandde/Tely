@@ -7,7 +7,6 @@ import NouvelleLettre from "../components/NouvelleLettre";
 import GoogleOneTap from "../components/auth/GoogleOneTap";
 import ProfesseurJoinSection from "../components/landing/ProfesseurJoinSection";
 import HeroSection from "../components/landing/HeroSection";
-import ReassuranceBand from "../components/landing/ReassuranceBand";
 import HowItWorks from "../components/landing/HowItWorks";
 import BenefitsSection from "../components/landing/BenefitsSection";
 import ExploreSection from "../components/landing/ExploreSection";
@@ -200,7 +199,6 @@ export default function Landing() {
 
         <main id="contenu">
           <HeroSection ref={finHeroRef} />
-          <ReassuranceBand />
           <HowItWorks />
           <BenefitsSection />
           <ExploreSection />

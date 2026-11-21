@@ -1,4 +1,5 @@
 import { lazy, Suspense, type ComponentType, type LazyExoticComponent, type ReactNode } from "react";
+import LogoLoader from "@/components/ui/LogoLoader";
 import { createBrowserRouter, Navigate } from "react-router-dom";
 import Landing from "../pages/Landing";
 import { AuthLayout } from "../pages/Login";
@@ -54,12 +55,7 @@ const GestionBlog = lazy(() => import("../pages/admin/GestionBlog"));
 const BlogEditorPage = lazy(() => import("../pages/admin/BlogEditorPage"));
 
 function Chargement() {
-  return (
-    <div className="min-h-[50vh] flex items-center justify-center" role="status" aria-live="polite">
-      <span className="w-8 h-8 rounded-full border-2 border-amber-200 border-t-amber-500 animate-spin" aria-hidden="true" />
-      <span className="sr-only">Chargement…</span>
-    </div>
-  );
+  return <LogoLoader />;
 }
 
 function charger(Composant: LazyExoticComponent<ComponentType>): ReactNode {

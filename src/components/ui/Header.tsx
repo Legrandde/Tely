@@ -26,6 +26,7 @@ import {
 } from "@/components/ui/sheet";
 import { Separator } from "@/components/ui/separator";
 import ThemeToggle from "@/components/ui/ThemeToggle";
+import BrandLogo from "@/components/ui/BrandLogo";
 import { cn } from "@/lib/utils";
 
 type Role = "eleve" | "professeur" | "administrateur";
@@ -40,19 +41,10 @@ function Logo({ nom }: { nom: string }) {
   return (
     <Link
       to="/"
-      className="flex shrink-0 items-center gap-2.5 rounded-lg outline-none focus-visible:ring-2 focus-visible:ring-ring"
+      className="flex shrink-0 items-center rounded-lg outline-none focus-visible:ring-2 focus-visible:ring-ring"
       aria-label={`${nom} — accueil`}
     >
-      <span
-        className="flex size-8 items-center justify-center rounded-lg bg-primary text-sm font-bold text-primary-foreground shadow-2xs"
-        aria-hidden="true"
-      >
-        {nom.charAt(0).toUpperCase()}
-      </span>
-      <span className="tely-title text-lg tracking-tight">
-        {nom}
-        <span className="text-amber-500">.</span>
-      </span>
+      <BrandLogo nom={nom} />
     </Link>
   );
 }

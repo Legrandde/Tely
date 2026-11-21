@@ -5,7 +5,6 @@ import ExerciceCard from "../components/ExericiceCard";
 import ModernFilterBar from "../components/ModernFilterBar";
 import Header from "../components/ui/Header";
 import Footer from "../components/ui/Footer";
-import ConversionBanner from "../components/site/ConversionBanner";
 import { useExercices } from "../hooks/useExercices";
 import { useSeo } from "../hooks/useSeo";
 import type { Difficulte, ExerciceFilters, ExerciceType } from "../types/exercice";
@@ -92,8 +91,6 @@ export default function ListeExercices() {
             Explorez nos séries d'exercices, annales et résolutions guidées
           </p>
         </div>
-
-        <ConversionBanner />
 
         <ModernFilterBar
           values={{

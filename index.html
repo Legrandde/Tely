@@ -51,7 +51,24 @@
   </head>
   <body class="bg-background text-foreground">
     <noscript>Tely nécessite JavaScript pour fonctionner. Activez-le dans votre navigateur.</noscript>
-    <div id="root"></div>
+    <div id="root">
+      <style>
+        .tely-boot{min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;background:#fafafa;color:#0b1120;font-family:system-ui,-apple-system,sans-serif}
+        html.dark .tely-boot{background:#09090b;color:#f8fafc}
+        @keyframes telyBootDraw{0%{stroke-dashoffset:100;opacity:.2}38%{stroke-dashoffset:0;opacity:1}68%{stroke-dashoffset:0;opacity:1}100%{stroke-dashoffset:-100;opacity:.2}}
+        .tely-boot-a{stroke-dasharray:100;stroke-dashoffset:100;animation:telyBootDraw 1.85s cubic-bezier(.65,0,.35,1) infinite}
+        .tely-boot-b{stroke-dasharray:100;stroke-dashoffset:100;animation:telyBootDraw 1.85s cubic-bezier(.65,0,.35,1) .22s infinite}
+      </style>
+      <div class="tely-boot" role="status" aria-label="Chargement de Tely">
+        <svg viewBox="0 0 64 56" width="60" height="52" fill="none" aria-hidden="true">
+          <path d="M23.5 22.5H14.5C9.8 22.5 7 19.3 7 15.2C7 11.1 10.2 8 15.2 8H20.5C30 8 36.8 14.8 36.8 24.5V40.5C36.8 45.8 34.4 49 32 49" stroke="currentColor" stroke-opacity=".12" stroke-width="7.2" stroke-linecap="round" stroke-linejoin="round"/>
+          <path d="M40.5 22.5H49.5C54.2 22.5 57 19.3 57 15.2C57 11.1 53.8 8 48.8 8H43.5C34 8 27.2 14.8 27.2 24.5V40.5C27.2 45.8 29.6 49 32 49" stroke="#F59E0B" stroke-opacity=".16" stroke-width="7.2" stroke-linecap="round" stroke-linejoin="round"/>
+          <path pathLength="100" class="tely-boot-a" d="M23.5 22.5H14.5C9.8 22.5 7 19.3 7 15.2C7 11.1 10.2 8 15.2 8H20.5C30 8 36.8 14.8 36.8 24.5V40.5C36.8 45.8 34.4 49 32 49" stroke="currentColor" stroke-width="7.2" stroke-linecap="round" stroke-linejoin="round"/>
+          <path pathLength="100" class="tely-boot-b" d="M40.5 22.5H49.5C54.2 22.5 57 19.3 57 15.2C57 11.1 53.8 8 48.8 8H43.5C34 8 27.2 14.8 27.2 24.5V40.5C27.2 45.8 29.6 49 32 49" stroke="#F59E0B" stroke-width="7.2" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+        <span style="font-size:18px;font-weight:800;letter-spacing:-.03em;opacity:.85">tely</span>
+      </div>
+    </div>
     <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>

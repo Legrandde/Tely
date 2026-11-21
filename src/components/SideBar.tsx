@@ -1,4 +1,5 @@
 import { useState } from "react";
+import BrandLogo from "@/components/ui/BrandLogo";
 import {
   LayoutDashboard,
   TrendingUp,
@@ -180,14 +181,9 @@ export default function SideBar() {
             <button
               type="button"
               onClick={() => handleNavigate("")}
-              className="tely-title text-base cursor-pointer flex items-center gap-2"
+              className="cursor-pointer flex items-center"
             >
-              <span className="flex size-7 items-center justify-center rounded-lg bg-primary text-xs font-bold text-primary-foreground">
-                T
-              </span>
-              <span>
-                Tely <span className="text-amber-500">Admin</span>
-              </span>
+              <BrandLogo nom="tely" suffixe="Admin" markClassName="h-6" textClassName="text-lg" />
             </button>
           )}
           {!isMobileView && (

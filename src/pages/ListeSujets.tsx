@@ -4,7 +4,6 @@ import ExerciceCardSkeleton from "../components/ExerciceCardSkeleton";
 import UseSujet from "../hooks/useSujet";
 import SujetCard from "../components/SujetCard";
 import ModernFilterBar, { type FilterValues } from "../components/ModernFilterBar";
-import ConversionBanner from "../components/site/ConversionBanner";
 import { useSeo } from "../hooks/useSeo";
 import { useMemo } from "react";
 import { useSearchParams } from "react-router-dom";
@@ -104,8 +103,6 @@ export default function ListeSujets() {
             Retrouvez les annales officielles des examens d'État (BAC, BEPC, CEE) et compositions
           </p>
         </div>
-
-        <ConversionBanner />
 
         {/* ── NOUVELLE BARRE DE FILTRE MODERNE (conforme à la maquette) ── */}
         <ModernFilterBar

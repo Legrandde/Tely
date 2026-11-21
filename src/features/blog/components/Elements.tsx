@@ -3,7 +3,7 @@ import { Link } from "react-router-dom";
 import { CalendarDays, Clock } from "lucide-react";
 import type { ArticleCarte, AuteurArticle, CategorieResume } from "../../../types/blog";
 import { resolveImageUrl } from "../../../utils/imageUrl";
-import { dateHeureLongue, dateLongue, initialesAuteur, libelleLecture, nomAuteur, styleCouleur, urlCategorie } from "../utils";
+import { dateHeureLongue, dateLongue, initialesAuteur, libelleLecture, nomAuteur, urlCategorie } from "../utils";
 
 export function CategorieBadge({
   categorie,
@@ -15,22 +15,15 @@ export function CategorieBadge({
   taille?: "sm" | "md";
 }) {
   if (!categorie) return null;
-  const s = styleCouleur(categorie.couleur);
-  const classe = `inline-flex items-center gap-1.5 rounded-full font-semibold transition-colors ${s.chip} ${
-    taille === "md" ? "px-3 py-1 text-xs" : "px-2.5 py-0.5 text-[11px]"
+  const classe = `inline-flex items-center font-semibold uppercase tracking-[0.08em] text-amber-600 transition-colors hover:text-amber-500 dark:text-amber-400 dark:hover:text-amber-300 ${
+    taille === "md" ? "text-xs" : "text-[11px]"
   }`;
-  const contenu = (
-    <>
-      <span className={`h-1.5 w-1.5 rounded-full ${s.point}`} aria-hidden="true" />
-      {categorie.nom}
-    </>
-  );
   return lien ? (
     <Link to={urlCategorie(categorie.slug)} className={`${classe} relative z-10 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-amber-500`}>
-      {contenu}
+      {categorie.nom}
     </Link>
   ) : (
-    <span className={classe}>{contenu}</span>
+    <span className={classe}>{categorie.nom}</span>
   );
 }
 

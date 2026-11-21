@@ -1,6 +1,7 @@
 import { Link, Outlet } from "react-router-dom";
 import { Card } from "@/components/ui/card";
 import ThemeToggle from "@/components/ui/ThemeToggle";
+import BrandLogo from "@/components/ui/BrandLogo";
 
 export function AuthLayout() {
   return (
@@ -14,14 +15,9 @@ export function AuthLayout() {
         <div className="mb-6 flex items-center justify-between">
           <Link
             to="/"
-            className="inline-flex items-center gap-2.5 rounded-lg outline-none focus-visible:ring-2 focus-visible:ring-ring"
+            className="inline-flex items-center rounded-lg outline-none focus-visible:ring-2 focus-visible:ring-ring"
           >
-            <span className="flex size-8 items-center justify-center rounded-lg bg-primary text-sm font-bold text-primary-foreground shadow-2xs">
-              T
-            </span>
-            <span className="tely-title text-lg tracking-tight">
-              Tely Elearning<span className="text-amber-500">.</span>
-            </span>
+            <BrandLogo nom="tely" />
           </Link>
           <ThemeToggle />
         </div>

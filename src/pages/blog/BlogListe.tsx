@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { Link, useParams, useSearchParams } from "react-router-dom";
-import { ArrowRight, ChevronLeft, ChevronRight, Hash, Newspaper, RefreshCw, Rss, Search, SearchX, Star, X } from "lucide-react";
+import { ArrowRight, ChevronLeft, ChevronRight, Hash, Newspaper, RefreshCw, Rss, Search, SearchX, X } from "lucide-react";
 import Header from "../../components/ui/Header";
 import Footer from "../../components/ui/Footer";
 import { useSeo } from "../../hooks/useSeo";
@@ -40,11 +40,14 @@ function ArticleALaUne({ article }: { article: ArticleCarte }) {
         <Couverture src={article.image_couverture} eager className="transition-transform duration-500 group-hover:scale-[1.02]" />
       </div>
       <div className="flex flex-col justify-center p-6 sm:p-8 lg:p-10">
-        <div className="flex flex-wrap items-center gap-2">
-          <span className="inline-flex items-center gap-1 rounded-full bg-gray-900 px-2.5 py-0.5 text-[11px] font-semibold text-amber-400">
-            <Star size={12} className="fill-amber-400" aria-hidden="true" /> À la une
-          </span>
-          <CategorieBadge categorie={article.categorie} />
+        <div className="flex flex-wrap items-center gap-2 text-[11px] font-semibold uppercase tracking-[0.08em]">
+          <span className="text-muted-foreground">À la une</span>
+          {article.categorie && (
+            <>
+              <span className="text-muted-foreground/40" aria-hidden="true">/</span>
+              <CategorieBadge categorie={article.categorie} />
+            </>
+          )}
         </div>
         <h2 className="mt-4 text-2xl font-extrabold leading-tight tracking-tight text-gray-900 sm:text-3xl">
           <Link to={urlArticle(article.slug)} className="outline-none after:absolute after:inset-0 after:content-['']">

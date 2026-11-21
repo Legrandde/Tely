@@ -3,6 +3,7 @@ import { Link, useParams } from "react-router-dom";
 import { ArrowLeft, FileQuestionMark, RefreshCw } from "lucide-react";
 import Header from "../components/ui/Header";
 import FooterSection from "../components/FooterSection";
+import LogoLoader from "../components/ui/LogoLoader";
 import PageRenderer from "../features/pagebuilder/PageRenderer";
 import type { PagePublique } from "../features/pagebuilder/types";
 import { getPublicPage, lireErreur } from "../services/pageService";
@@ -13,30 +14,6 @@ type Etat =
   | { statut: "ok"; slug: string; page: PagePublique }
   | { statut: "introuvable"; slug: string }
   | { statut: "erreur"; slug: string; message: string };
-
-function Squelette() {
-  return (
-    <div aria-busy="true" aria-label="Chargement de la page" className="animate-pulse">
-      <div className="bg-amber-50 px-4 py-20">
-        <div className="mx-auto flex max-w-3xl flex-col items-center gap-4">
-          <div className="h-10 w-4/5 rounded-xl bg-amber-100" />
-          <div className="h-10 w-3/5 rounded-xl bg-amber-100" />
-          <div className="mt-2 h-4 w-2/3 rounded bg-amber-100/70" />
-          <div className="h-4 w-1/2 rounded bg-amber-100/70" />
-          <div className="mt-4 flex gap-3">
-            <div className="h-12 w-40 rounded-xl bg-amber-200/70" />
-            <div className="h-12 w-40 rounded-xl bg-white" />
-          </div>
-        </div>
-      </div>
-      <div className="mx-auto grid max-w-6xl gap-5 px-4 py-16 sm:grid-cols-3">
-        {[0, 1, 2].map((i) => (
-          <div key={i} className="h-44 rounded-2xl bg-gray-100" />
-        ))}
-      </div>
-    </div>
-  );
-}
 
 export default function PublicPage() {
   const { slug = "" } = useParams<{ slug: string }>();
@@ -74,13 +51,11 @@ export default function PublicPage() {
   }, [slug]);
 
   return (
-    <div className="flex min-h-screen flex-col bg-white font-sans">
-      <div className="bg-amber-50 px-3 pt-2">
-        <Header />
-      </div>
+    <div className="flex min-h-screen flex-col bg-background text-foreground font-sans">
+      <Header />
 
       <main id="contenu" className="flex-1">
-        {courant.statut === "chargement" && <Squelette />}
+        {courant.statut === "chargement" && <LogoLoader pleinEcran />}
 
         {courant.statut === "ok" && courant.page && (
           (courant.page.blocs ?? []).length > 0 ? (

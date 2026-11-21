@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { flushSync } from "react-dom";
 import { Link, useLocation, useNavigate } from "react-router-dom";
-import { CheckCircle2, Lock } from "lucide-react";
+import { Lock } from "lucide-react";
 import { AppInput } from "../shared/ui/AppInput";
 import { AppButton } from "../shared/ui/AppButton";
 import { IconEye } from "../shared/ui/IconEye";
@@ -15,8 +15,6 @@ import {
 } from "../../services/authService";
 import { useAuth } from "../../context/authContext";
 import api from "../../api/axio";
-
-const REASSURANCES = ["100 % gratuit", "Sans engagement", "Corrigés détaillés"];
 
 /** Score 1–4 et libellé de la robustesse d'un mot de passe. */
 function forceMotDePasse(mdp: string): { score: number; label: string; couleur: string } {
@@ -152,16 +150,7 @@ export function SignupForm() {
       <h1 className="text-[28px] font-bold text-gray-900 leading-tight mb-1">
         Créer un compte
       </h1>
-      <p className="text-sm text-gray-400 mb-4">Rejoins Tely et commence à t'exercer</p>
-
-      <ul className="flex flex-wrap gap-x-4 gap-y-1.5 mb-6" aria-label="Avantages">
-        {REASSURANCES.map((r) => (
-          <li key={r} className="flex items-center gap-1.5 text-xs font-medium text-gray-700">
-            <CheckCircle2 size={14} className="text-amber-500" aria-hidden="true" />
-            {r}
-          </li>
-        ))}
-      </ul>
+      <p className="text-sm text-gray-400 mb-6">Rejoins Tely et commence à t'exercer</p>
 
       {inscriptionsFermees && (
         <div role="alert" className="flex items-start gap-2.5 text-xs text-amber-800 bg-amber-50 border border-amber-200 rounded-[10px] px-3 py-2.5 mb-4">
