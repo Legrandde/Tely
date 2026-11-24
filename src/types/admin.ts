@@ -32,6 +32,8 @@ export interface SujetItem {
   type: "bac" | "brevet" | "composition" | "autre";
   ennonce: string;
   enonce?: string;
+  fichier_pdf?: string | null;
+  pdf_url?: string | null;
   matiere_id?: number | string;
   niveau_id?: number | string;
   matiere?: { id: number | string; nom: string; code?: string };
