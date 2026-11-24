@@ -79,11 +79,49 @@ export async function getSujetById(id: string | number): Promise<SujetItem> {
   const { data } = await api.get(`/api/sujets/${id}`);
   return data;
 }
-export async function createSujet(values: Record<string, unknown>) {
+function toSujetFormData(values: Record<string, unknown>, pdfFile: File, methodOverride?: "PUT"): FormData {
+  const fd = new FormData();
+  if (methodOverride) fd.append("_method", methodOverride);
+  Object.entries(values).forEach(([k, v]) => {
+    if (v === undefined || v === null || k === "fichier_pdf") return;
+    if (Array.isArray(v)) {
+      v.forEach((item, idx) => {
+        if (item && typeof item === "object") {
+          Object.entries(item as Record<string, unknown>).forEach(([sk, sv]) => {
+            if (sv !== undefined && sv !== null) fd.append(`${k}[${idx}][${sk}]`, String(sv));
+          });
+        } else if (item !== undefined && item !== null) {
+          fd.append(`${k}[${idx}]`, String(item));
+        }
+      });
+    } else {
+      fd.append(k, String(v));
+    }
+  });
+  fd.append("fichier_pdf", pdfFile);
+  return fd;
+}
+
+export async function createSujet(values: Record<string, unknown>, pdfFile?: File | null) {
+  if (pdfFile) {
+    const { data } = await api.post("/api/sujets", toSujetFormData(values, pdfFile), {
+      headers: { "Content-Type": "multipart/form-data" },
+      timeout: 30000,
+    });
+    return data;
+  }
   const { data } = await api.post("/api/sujets", values);
   return data;
 }
-export async function updateSujet(id: string | number, values: Record<string, unknown>) {
+
+export async function updateSujet(id: string | number, values: Record<string, unknown>, pdfFile?: File | null) {
+  if (pdfFile) {
+    const { data } = await api.post(`/api/sujets/${id}`, toSujetFormData(values, pdfFile, "PUT"), {
+      headers: { "Content-Type": "multipart/form-data" },
+      timeout: 30000,
+    });
+    return data;
+  }
   const { data } = await api.put(`/api/sujets/${id}`, values);
   return data;
 }

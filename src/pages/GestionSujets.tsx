@@ -1,9 +1,41 @@
 import { useEffect, useState, useMemo } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
-import { Plus, Pencil, Trash2, ClipboardList, Search, Eye, Filter, Calendar } from "lucide-react";
+import {
+  Plus,
+  Pencil,
+  Trash2,
+  ClipboardList,
+  Search,
+  Eye,
+  Filter,
+  Calendar,
+  Download,
+  Upload,
+  FileSpreadsheet,
+  FileText,
+  FileJson,
+  ChevronDown,
+} from "lucide-react";
 import ConfirmModal from "../components/ui/ConfirmModal";
 import ResourceForm from "../components/form/ResourceForm";
 import Modal from "../components/ui/Modal";
+import ImportSujetsModal from "../components/admin/ImportSujetsModal";
+import { Button } from "@/components/ui/button";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import {
+  exporterSujetsCsv,
+  exporterSujetsExcel,
+  exporterSujetsJson,
+  exporterSujetsPdf,
+  telechargerModeleImport,
+} from "@/utils/sujetsImportExport";
 import { sujetSchema } from "../config/resourceSchemas";
 import { deleteSujet, listSujets, getSujetById } from "../services/resourceService";
 import type { SujetItem } from "../types/admin";
@@ -39,6 +71,8 @@ export default function GestionSujets() {
 
   const [deleteTarget, setDeleteTarget] = useState<SujetItem | null>(null);
   const [deleting, setDeleting] = useState(false);
+  const [importModalOpen, setImportModalOpen] = useState(false);
+  const [exporting, setExporting] = useState(false);
   const toast = useToast();
 
   async function fetchSujets() {
@@ -182,13 +216,101 @@ export default function GestionSujets() {
           </p>
         </div>
 
-        <button
-          onClick={openCreate}
-          className="tely-btn self-start sm:self-auto"
-        >
-          <Plus size={16} />
-          Ajouter un sujet
-        </button>
+        <div className="flex flex-wrap items-center gap-2 self-start sm:self-auto">
+          {!isProfesseur && (
+            <>
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                onClick={() => setImportModalOpen(true)}
+              >
+                <Upload className="size-4" aria-hidden="true" />
+                Importer
+              </Button>
+
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    disabled={exporting || filteredSujets.length === 0}
+                  >
+                    <Download className="size-4" aria-hidden="true" />
+                    {exporting ? "Export…" : "Exporter"}
+                    <ChevronDown className="size-3.5 opacity-70" aria-hidden="true" />
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end" className="w-52">
+                  <DropdownMenuLabel>
+                    Exporter ({filteredSujets.length} sujet{filteredSujets.length > 1 ? "s" : ""})
+                  </DropdownMenuLabel>
+                  <DropdownMenuItem
+                    onSelect={() => {
+                      exporterSujetsCsv(filteredSujets);
+                      toast.success("Export CSV téléchargé.");
+                    }}
+                  >
+                    <FileSpreadsheet className="size-4" />
+                    CSV (.csv)
+                  </DropdownMenuItem>
+                  <DropdownMenuItem
+                    onSelect={async () => {
+                      setExporting(true);
+                      try {
+                        await exporterSujetsExcel(filteredSujets);
+                        toast.success("Export Excel (.xlsx) téléchargé.");
+                      } catch {
+                        toast.error("Erreur lors de l'export Excel.");
+                      } finally {
+                        setExporting(false);
+                      }
+                    }}
+                  >
+                    <FileSpreadsheet className="size-4" />
+                    Excel (.xlsx)
+                  </DropdownMenuItem>
+                  <DropdownMenuItem
+                    onSelect={() => {
+                      exporterSujetsPdf(filteredSujets);
+                    }}
+                  >
+                    <FileText className="size-4" />
+                    PDF imprimable (.pdf)
+                  </DropdownMenuItem>
+                  <DropdownMenuItem
+                    onSelect={() => {
+                      exporterSujetsJson(filteredSujets);
+                      toast.success("Export JSON téléchargé.");
+                    }}
+                  >
+                    <FileJson className="size-4" />
+                    JSON (.json)
+                  </DropdownMenuItem>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuLabel>Modèles d'import</DropdownMenuLabel>
+                  <DropdownMenuItem onSelect={() => void telechargerModeleImport("xlsx")}>
+                    <Download className="size-4" />
+                    Modèle Excel (.xlsx)
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onSelect={() => void telechargerModeleImport("csv")}>
+                    <Download className="size-4" />
+                    Modèle CSV (.csv)
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            </>
+          )}
+
+          <button
+            onClick={openCreate}
+            className="tely-btn"
+          >
+            <Plus size={16} />
+            Ajouter un sujet
+          </button>
+        </div>
       </div>
 
       {/* Barre d'outils / Recherche & Filtres */}
@@ -499,6 +621,13 @@ export default function GestionSujets() {
           </div>
         )}
       </Modal>
+
+      {/* Modal import multi-formats (CSV, Excel, JSON, PDF) */}
+      <ImportSujetsModal
+        open={importModalOpen}
+        onClose={() => setImportModalOpen(false)}
+        onImported={fetchSujets}
+      />
 
       {/* Modal confirmation suppression */}
       <ConfirmModal

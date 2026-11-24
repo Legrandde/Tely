@@ -20,6 +20,7 @@ import {
   CheckCircle,
 } from "lucide-react";
 import Header from "../components/ui/Header";
+import PdfPagesPreview from "@/components/sujets/PdfPagesPreview";
 import { getSujet } from "../services/sujetService";
 
 import type { Sujet } from "../types/Sujet";
@@ -277,6 +278,12 @@ export default function SujetDetailPage() {
                 <div className="text-gray-800 leading-relaxed whitespace-pre-line text-base">
                   {texteSujet}
                 </div>
+                {isAuthenticated && (sujet.pdf_url || sujet.fichier_pdf) && (
+                  <PdfPagesPreview
+                    url={sujet.pdf_url || sujet.fichier_pdf}
+                    titre="Document original (figures géométriques & schémas)"
+                  />
+                )}
               </div>
             )}
 

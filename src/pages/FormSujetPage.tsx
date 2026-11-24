@@ -20,7 +20,8 @@ import {
   loadNiveauOptions,
 } from "../services/resourceService";
 import { useToast } from "../context/ToastContext";
-import api from "../api/axio";
+import { extraireTextePdf, type ProgressionExtractionPdf } from "@/utils/pdfOcr";
+import PdfPagesPreview from "@/components/sujets/PdfPagesPreview";
 
 interface SujetFormState {
   titre: string;
@@ -62,9 +63,14 @@ export default function FormSujetPage() {
   const [matieres, setMatieres] = useState<{ value: string; label: string }[]>([]);
   const [niveaux, setNiveaux] = useState<{ value: string; label: string }[]>([]);
 
-  // État PDF
+  // État PDF / OCR / Vision LaTeX
   const [extractingPdf, setExtractingPdf] = useState(false);
+  const [pdfProgress, setPdfProgress] = useState<ProgressionExtractionPdf | null>(null);
   const [pdfSuccessName, setPdfSuccessName] = useState<string | null>(null);
+  const [pdfFile, setPdfFile] = useState<File | null>(null);
+  const [existingPdfUrl, setExistingPdfUrl] = useState<string | null>(null);
+  const [pdfSource, setPdfSource] = useState<"serveur" | "gemini_vision" | "pdfjs" | "ocr" | null>(null);
+  const [isDragging, setIsDragging] = useState(false);
 
   useEffect(() => {
     async function init() {
@@ -94,6 +100,9 @@ export default function FormSujetPage() {
                 : String(raw.niveau_id ?? ""),
             ennonce: String(raw.ennonce ?? ""),
           });
+          if (typeof raw.pdf_url === "string" && raw.pdf_url) {
+            setExistingPdfUrl(raw.pdf_url);
+          }
         }
       } catch (err: unknown) {
         const msg =
@@ -112,43 +121,55 @@ export default function FormSujetPage() {
     setForm((prev) => ({ ...prev, [field]: value }));
   }
 
-  async function handleFileUpload(file: File) {
-    if (!file || file.type !== "application/pdf") {
+  async function handleFileUpload(file: File, forceVision = false) {
+    const isPdf = file && (file.type === "application/pdf" || file.name.toLowerCase().endsWith(".pdf"));
+    if (!isPdf) {
       toast.error("Veuillez sélectionner un fichier PDF valide.");
       return;
     }
 
+    // Conserve le PDF original pour l'attacher au sujet (figures géométriques & schémas intacts)
+    setPdfFile(file);
     setExtractingPdf(true);
+    setPdfProgress({
+      etape: "serveur",
+      message: forceVision ? "Analyse Vision IA (texte + formules LaTeX)…" : "Lecture du PDF en cours…",
+      pourcentage: 10,
+    });
     setPdfSuccessName(null);
+    setPdfSource(null);
     setError(undefined);
 
     try {
-      const formData = new FormData();
-      formData.append("pdf", file);
+      const resultat = await extraireTextePdf(file, (p) => setPdfProgress(p), { forceVision });
 
-      const { data } = await api.post<{ success: boolean; text: string; filename: string }>(
-        "/api/pdf/extract-text",
-        formData,
-        { headers: { "Content-Type": "multipart/form-data" } }
-      );
-
-      if (data.text) {
+      if (resultat.text) {
         setForm((prev) => ({
           ...prev,
-          ennonce: data.text,
+          ennonce: resultat.text,
           titre: prev.titre || file.name.replace(/\.[^/.]+$/, "").replace(/[-_]/g, " "),
         }));
+        setActiveTab("edit");
         setPdfSuccessName(file.name);
-        toast.success(`Énoncé extrait avec succès depuis "${file.name}"`);
+        setPdfSource(resultat.source);
+        toast.success(
+          resultat.source === "gemini_vision"
+            ? `Texte et formules LaTeX extraits par Vision IA depuis "${file.name}"`
+            : resultat.source === "ocr"
+            ? `Texte reconnu par OCR (${resultat.pages} page${resultat.pages > 1 ? "s" : ""}) depuis "${file.name}"`
+            : `Énoncé extrait avec succès depuis "${file.name}"`
+        );
       }
     } catch (err: unknown) {
       const msg =
-        (err as { response?: { data?: { message?: string } } })?.response?.data?.message ??
+        (err as { response?: { data?: { message?: string } }; message?: string })?.response?.data?.message ??
+        (err instanceof Error ? err.message : null) ??
         "Erreur lors de l'extraction du texte du PDF.";
       setError(msg);
       toast.error(msg);
     } finally {
       setExtractingPdf(false);
+      setPdfProgress(null);
     }
   }
 
@@ -177,10 +198,10 @@ export default function FormSujetPage() {
     try {
       const payload = form as unknown as Record<string, unknown>;
       if (isEditMode && id) {
-        await updateSujet(id, payload);
+        await updateSujet(id, payload, pdfFile);
         toast.success("Sujet d'examen mis à jour avec succès !");
       } else {
-        await createSujet(payload);
+        await createSujet(payload, pdfFile);
         toast.success("Nouveau sujet d'examen créé avec succès !");
       }
       navigate(basePath);
@@ -534,15 +555,29 @@ export default function FormSujetPage() {
                 </div>
               </div>
 
-              {/* ── Zone Import PDF interactive ── */}
+              {/* ── Zone Import PDF interactive (natif + OCR scan) ── */}
               <div className="mb-4">
                 <label
+                  onDragOver={(e) => {
+                    e.preventDefault();
+                    if (!extractingPdf) setIsDragging(true);
+                  }}
+                  onDragLeave={() => setIsDragging(false)}
+                  onDrop={(e) => {
+                    e.preventDefault();
+                    setIsDragging(false);
+                    if (extractingPdf) return;
+                    const file = e.dataTransfer.files?.[0];
+                    if (file) void handleFileUpload(file);
+                  }}
                   className={`relative flex flex-col items-center justify-center p-6 border-2 border-dashed rounded-[10px] text-center transition-all cursor-pointer ${
                     extractingPdf
-                      ? "border-gray-900 bg-gray-50 cursor-wait"
+                      ? "border-amber-500 bg-amber-50/40 dark:bg-amber-500/10 cursor-wait"
+                      : isDragging
+                      ? "border-amber-500 bg-amber-50/60 dark:bg-amber-500/15"
                       : pdfSuccessName
-                      ? "border-gray-900 bg-gray-50 hover:bg-gray-100"
-                      : "border-gray-200 bg-gray-50 hover:border-gray-900"
+                      ? "border-gray-900 bg-gray-50 hover:bg-gray-100 dark:border-zinc-600 dark:bg-zinc-900/60"
+                      : "border-gray-200 bg-gray-50 hover:border-gray-900 dark:border-zinc-800 dark:bg-zinc-900/40"
                   }`}
                 >
                   <input
@@ -551,40 +586,89 @@ export default function FormSujetPage() {
                     disabled={extractingPdf}
                     onChange={(e) => {
                       const file = e.target.files?.[0];
-                      if (file) handleFileUpload(file);
+                      if (file) void handleFileUpload(file);
                       e.target.value = "";
                     }}
                     className="hidden"
                   />
 
                   {extractingPdf ? (
-                    <div className="w-full max-w-md mx-auto space-y-2.5 animate-pulse py-1">
-                      <div className="h-3.5 bg-gray-200 rounded w-3/4 mx-auto" />
-                      <div className="h-2.5 bg-gray-200/70 rounded w-full" />
-                      <div className="h-2.5 bg-gray-200/70 rounded w-5/6 mx-auto" />
+                    <div className="w-full max-w-md mx-auto space-y-2.5 py-1">
+                      <p className="text-xs font-semibold text-foreground">
+                        {pdfProgress?.message ?? "Extraction du texte en cours…"}
+                      </p>
+                      <div className="h-2 w-full overflow-hidden rounded-full bg-gray-200 dark:bg-zinc-800">
+                        <div
+                          className="h-full rounded-full bg-amber-500 transition-all duration-300"
+                          style={{ width: `${pdfProgress?.pourcentage ?? 15}%` }}
+                        />
+                      </div>
+                      <p className="text-[11px] text-muted-foreground">
+                        {pdfProgress?.etape === "ocr"
+                          ? "Document scanné détecté — reconnaissance automatique du texte en français…"
+                          : "Analyse du document PDF…"}
+                      </p>
                     </div>
                   ) : pdfSuccessName ? (
-                    <div className="flex flex-col items-center gap-1.5 text-gray-900">
-                      <CheckCircle2 size={32} className="text-gray-900" />
-                      <p className="text-sm font-bold">Fichier extrait avec succès</p>
-                      <p className="text-xs text-gray-500">
+                    <div className="flex flex-col items-center gap-1.5 text-foreground">
+                      <CheckCircle2 size={32} className="text-amber-500" />
+                      <p className="text-sm font-bold">
+                        {pdfSource === "gemini_vision"
+                          ? "Texte et formules LaTeX extraits (Vision IA)"
+                          : pdfSource === "ocr"
+                          ? "Texte reconnu par OCR (PDF scanné)"
+                          : "Fichier extrait avec succès"}
+                      </p>
+                      <p className="text-xs text-muted-foreground">
                         Document source : <span className="font-medium underline">{pdfSuccessName}</span> (cliquez pour remplacer)
                       </p>
                     </div>
                   ) : (
                     <div className="flex flex-col items-center gap-1.5">
-                      <div className="p-3 bg-white text-gray-900 rounded-full mb-1">
+                      <div className="p-3 bg-white dark:bg-zinc-900 text-foreground rounded-full mb-1">
                         <UploadCloud size={24} />
                       </div>
-                      <p className="text-sm font-bold text-gray-800">
+                      <p className="text-sm font-bold text-foreground">
                         Glissez-déposez le PDF de l'épreuve ici, ou <span className="tely-link underline">parcourez</span>
                       </p>
-                      <p className="text-xs text-gray-400">
-                        Le texte de l'énoncé, les questions et barèmes seront automatiquement extraits
+                      <p className="text-xs text-muted-foreground">
+                        PDF numérique ou scanné : texte + formules extraits automatiquement, et PDF original joint pour conserver les figures et schémas
                       </p>
                     </div>
                   )}
                 </label>
+
+                {pdfFile && !extractingPdf && (
+                  <div className="mt-2.5 flex flex-wrap items-center justify-between gap-2 rounded-lg border border-border bg-muted/40 px-3.5 py-2 text-xs">
+                    <span className="text-muted-foreground">
+                      Pièce jointe conservée :{" "}
+                      <strong className="font-medium text-foreground">{pdfFile.name}</strong>{" "}
+                      (figures &amp; schémas disponibles en PDF pour les élèves)
+                    </span>
+                    <div className="flex items-center gap-3">
+                      {pdfSource !== "gemini_vision" && (
+                        <button
+                          type="button"
+                          onClick={() => void handleFileUpload(pdfFile, true)}
+                          className="font-medium text-amber-600 hover:text-amber-500 dark:text-amber-400 cursor-pointer"
+                        >
+                          Ré-extraire les formules (IA)
+                        </button>
+                      )}
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setPdfFile(null);
+                          setPdfSuccessName(null);
+                          setPdfSource(null);
+                        }}
+                        className="text-muted-foreground hover:text-destructive cursor-pointer"
+                      >
+                        Retirer le PDF
+                      </button>
+                    </div>
+                  </div>
+                )}
               </div>
 
               {/* Éditeur ou Aperçu */}
@@ -613,6 +697,11 @@ export default function FormSujetPage() {
                     </p>
                   )}
                 </div>
+              )}
+
+              {/* Aperçu visuel des pages du PDF (figures géométriques, schémas, courbes) */}
+              {(pdfFile || existingPdfUrl) && (
+                <PdfPagesPreview file={pdfFile} url={existingPdfUrl} />
               )}
             </div>
           </div>
