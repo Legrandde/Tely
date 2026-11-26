@@ -147,13 +147,13 @@ export function SignupForm() {
 
   return (
     <form onSubmit={handleSubmit} className="flex flex-col" noValidate>
-      <h1 className="text-[28px] font-bold text-gray-900 leading-tight mb-1">
+      <h1 className="text-[28px] font-bold text-foreground leading-tight mb-1">
         Créer un compte
       </h1>
-      <p className="text-sm text-gray-400 mb-6">Rejoins Tely et commence à t'exercer</p>
+      <p className="text-sm text-muted-foreground mb-6">Rejoins Tely et commence à t'exercer</p>
 
       {inscriptionsFermees && (
-        <div role="alert" className="flex items-start gap-2.5 text-xs text-amber-800 bg-amber-50 border border-amber-200 rounded-[10px] px-3 py-2.5 mb-4">
+        <div role="alert" className="flex items-start gap-2.5 text-xs text-amber-800 bg-amber-500/10 border border-amber-500/30 rounded-[10px] px-3 py-2.5 mb-4">
           <Lock size={15} className="shrink-0 mt-px" aria-hidden="true" />
           <div>
             <p className="font-semibold">Inscriptions fermées</p>
@@ -220,8 +220,8 @@ export function SignupForm() {
                 />
               ))}
             </div>
-            <p className="text-[11px] text-gray-500 mt-1">
-              Robustesse : <span className="font-semibold text-gray-700">{force.label}</span>
+            <p className="text-[11px] text-muted-foreground mt-1">
+              Robustesse : <span className="font-semibold text-foreground/85">{force.label}</span>
               {force.score < 3 && " · ajoutez majuscules, chiffres ou symboles"}
             </p>
           </div>
@@ -238,7 +238,7 @@ export function SignupForm() {
         />
       </div>
 
-      <label className="flex items-start gap-2 text-xs text-gray-500 cursor-pointer select-none mb-0 leading-relaxed">
+      <label className="flex items-start gap-2 text-xs text-muted-foreground cursor-pointer select-none mb-0 leading-relaxed">
         <input
           type="checkbox"
           checked={accepteConditions}
@@ -265,7 +265,7 @@ export function SignupForm() {
 
       <div className="flex items-center gap-3 my-5">
         <div className="flex-1 h-px bg-gray-200" />
-        <span className="text-[11px] text-gray-400 font-medium tracking-[0.05em] whitespace-nowrap">
+        <span className="text-[11px] text-muted-foreground font-medium tracking-[0.05em] whitespace-nowrap">
           OU CONTINUER AVEC
         </span>
         <div className="flex-1 h-px bg-gray-200" />
@@ -282,10 +282,10 @@ export function SignupForm() {
         >
           Inscription avec Google
         </AppButton>
-        <p className="text-[11px] text-gray-400 mt-1.5 text-center">
+        <p className="text-[11px] text-muted-foreground mt-1.5 text-center">
           En continuant avec Google, vous acceptez nos{" "}
-          <Link to="/p/cgu" target="_blank" rel="noopener" className="underline hover:text-gray-700">CGU</Link> et notre{" "}
-          <Link to="/p/confidentialite" target="_blank" rel="noopener" className="underline hover:text-gray-700">politique de confidentialité</Link>.
+          <Link to="/p/cgu" target="_blank" rel="noopener" className="underline hover:text-foreground/85">CGU</Link> et notre{" "}
+          <Link to="/p/confidentialite" target="_blank" rel="noopener" className="underline hover:text-foreground/85">politique de confidentialité</Link>.
         </p>
       </div>
 
@@ -299,12 +299,12 @@ export function SignupForm() {
         Créer mon compte
       </AppButton>
 
-      <p className="text-center text-xs text-gray-400 mt-5">
+      <p className="text-center text-xs text-muted-foreground mt-5">
         Déjà un compte ?
         <Link
           to="/auth/login"
           state={location.state}
-          className="text-gray-900 font-semibold cursor-pointer ml-1 hover:underline"
+          className="text-foreground font-semibold cursor-pointer ml-1 hover:underline"
         >
           Connexion
         </Link>

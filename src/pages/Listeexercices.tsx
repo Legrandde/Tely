@@ -87,7 +87,7 @@ export default function ListeExercices() {
         {/* Entête de page */}
         <div className="mb-6">
           <h1 className="tely-title text-2xl sm:text-3xl">Tous les exercices</h1>
-          <p className="mt-1 text-sm text-gray-500">
+          <p className="mt-1 text-sm text-muted-foreground">
             Explorez nos séries d'exercices, annales et résolutions guidées
           </p>
         </div>
@@ -124,18 +124,18 @@ export default function ListeExercices() {
             ))}
           </div>
         ) : error ? (
-          <div className="rounded-2xl border border-red-100 bg-white p-8 text-center" role="alert">
+          <div className="rounded-2xl border border-destructive/30 bg-card p-8 text-center" role="alert">
             <p className="mb-3 text-sm text-red-600">{error}</p>
             <button type="button" onClick={() => window.location.reload()} className="tely-btn-outline">
               Réessayer
             </button>
           </div>
         ) : exercices.length === 0 ? (
-          <div className="rounded-2xl border border-gray-100 bg-white p-8 py-16 text-center">
-            <p className="mb-1 text-base font-medium text-gray-700">
+          <div className="rounded-2xl border border-border bg-card p-8 py-16 text-center">
+            <p className="mb-1 text-base font-medium text-foreground">
               Aucun exercice ne correspond à ces critères
             </p>
-            <p className="mb-4 text-sm text-gray-400">
+            <p className="mb-4 text-sm text-muted-foreground">
               Essayez d'ajuster ou d'effacer certains filtres pour élargir la recherche.
             </p>
             <button
@@ -162,7 +162,7 @@ export default function ListeExercices() {
                   onClick={() => goToPage(page - 1)}
                   disabled={page <= 1}
                   aria-label="Page précédente"
-                  className="rounded-lg border border-gray-200 bg-white p-2 hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-40"
+                  className="rounded-lg border border-border bg-card p-2 text-foreground hover:bg-muted disabled:cursor-not-allowed disabled:opacity-40"
                 >
                   <ChevronLeft size={16} aria-hidden="true" />
                 </button>
@@ -179,7 +179,7 @@ export default function ListeExercices() {
                       className={`h-9 w-9 rounded-lg text-sm font-medium transition-colors ${
                         p === page
                           ? "bg-amber-500 text-gray-900"
-                          : "border border-gray-200 bg-white text-gray-700 hover:bg-gray-50"
+                          : "border border-border bg-card text-foreground hover:bg-muted"
                       }`}
                     >
                       {p}
@@ -192,7 +192,7 @@ export default function ListeExercices() {
                   onClick={() => goToPage(page + 1)}
                   disabled={page >= totalPages}
                   aria-label="Page suivante"
-                  className="rounded-lg border border-gray-200 bg-white p-2 hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-40"
+                  className="rounded-lg border border-border bg-card p-2 text-foreground hover:bg-muted disabled:cursor-not-allowed disabled:opacity-40"
                 >
                   <ChevronRight size={16} aria-hidden="true" />
                 </button>

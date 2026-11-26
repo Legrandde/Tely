@@ -56,10 +56,10 @@ export function ResetPasswordForm() {
 
   return (
     <form onSubmit={handleSubmit} className="flex flex-col">
-      <h1 className="text-[28px] font-bold text-gray-900 leading-tight mb-1">
+      <h1 className="text-[28px] font-bold text-foreground leading-tight mb-1">
         Nouveau mot de passe
       </h1>
-      <p className="text-sm text-gray-400 mb-7">Choisis un nouveau mot de passe</p>
+      <p className="text-sm text-muted-foreground mb-7">Choisis un nouveau mot de passe</p>
 
       {errors.global && (
         <p className="text-xs text-red-500 mb-3.5">
@@ -94,8 +94,8 @@ export function ResetPasswordForm() {
         Réinitialiser
       </AppButton>
 
-      <p className="text-center text-xs text-gray-400 mt-5">
-        <Link to="/auth/login" className="text-gray-900 font-semibold cursor-pointer hover:underline">
+      <p className="text-center text-xs text-muted-foreground mt-5">
+        <Link to="/auth/login" className="text-foreground font-semibold cursor-pointer hover:underline">
           Retour à la connexion
         </Link>
       </p>

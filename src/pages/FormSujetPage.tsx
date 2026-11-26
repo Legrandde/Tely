@@ -22,6 +22,7 @@ import {
 import { useToast } from "../context/ToastContext";
 import { extraireTextePdf, type ProgressionExtractionPdf } from "@/utils/pdfOcr";
 import PdfPagesPreview from "@/components/sujets/PdfPagesPreview";
+import ContenuScientifique from "@/components/ui/ContenuScientifique";
 
 interface SujetFormState {
   titre: string;
@@ -688,11 +689,11 @@ export default function FormSujetPage() {
                   </div>
                 </div>
               ) : (
-                <div className="p-6 bg-gray-50 border border-gray-200 rounded-[10px] min-h-[300px] whitespace-pre-wrap font-serif text-sm text-gray-800 leading-relaxed">
+                <div className="p-6 bg-muted/40 border border-border rounded-[10px] min-h-[300px] text-sm">
                   {form.ennonce ? (
-                    form.ennonce
+                    <ContenuScientifique texte={form.ennonce} />
                   ) : (
-                    <p className="text-gray-400 italic text-center py-12">
+                    <p className="text-muted-foreground italic text-center py-12">
                       L'énoncé est actuellement vide. Rédigez du texte ou importez un PDF pour afficher l'aperçu.
                     </p>
                   )}

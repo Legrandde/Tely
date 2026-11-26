@@ -99,7 +99,7 @@ export default function ListeSujets() {
         {/* Entête */}
         <div className="mb-6">
           <h1 className="tely-title text-2xl sm:text-3xl">Tous les sujets d'examen</h1>
-          <p className="mt-1 text-sm text-gray-500">
+          <p className="mt-1 text-sm text-muted-foreground">
             Retrouvez les annales officielles des examens d'État (BAC, BEPC, CEE) et compositions
           </p>
         </div>
@@ -120,24 +120,24 @@ export default function ListeSujets() {
             ))}
           </div>
         ) : err ? (
-          <div className="rounded-2xl border border-red-100 bg-white p-8 text-center" role="alert">
-            <p className="mb-3 text-sm text-red-600">Impossible de charger les sujets d'examen.</p>
+          <div className="rounded-2xl border border-destructive/30 bg-card p-8 text-center" role="alert">
+            <p className="mb-3 text-sm text-destructive">Impossible de charger les sujets d'examen.</p>
             <button type="button" onClick={() => window.location.reload()} className="tely-btn-outline">
               Réessayer
             </button>
           </div>
         ) : sujetFiltre.length === 0 ? (
-          <div className="text-center py-16 bg-white rounded-2xl border border-gray-100 p-8">
-            <p className="text-base font-medium text-gray-700 mb-1">
+          <div className="text-center py-16 bg-card rounded-2xl border border-border p-8">
+            <p className="text-base font-medium text-foreground mb-1">
               Aucun sujet d'examen ne correspond à ces critères
             </p>
-            <p className="text-sm text-gray-400 mb-4">
+            <p className="text-sm text-muted-foreground mb-4">
               Essayez de réinitialiser vos critères de recherche pour afficher tous les sujets disponibles.
             </p>
             <button
               type="button"
               onClick={() => setFilterValues({ tri: "pertinence" })}
-              className="text-sm font-medium text-amber-700 hover:text-amber-800 underline"
+              className="text-sm font-medium text-amber-600 hover:text-amber-500 dark:text-amber-400 underline"
             >
               Réinitialiser les filtres
             </button>

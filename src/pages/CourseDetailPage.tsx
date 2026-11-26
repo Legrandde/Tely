@@ -26,8 +26,9 @@ import { trackEvent } from "../services/analyticsTracker";
 import { enregistrerActivite } from "../services/eleveService";
 import FavoriButton from "../components/eleve/FavoriButton";
 import MurInscription from "../components/eleve/MurInscription";
-
+import ContenuScientifique from "@/components/ui/ContenuScientifique";
 import { resolveImageUrl } from "../utils/imageUrl";
+
 // ── Types ────────────────────────────────────────────────────────────────
 
 type Tab = "Énoncé" | "Corrigé" | "Ressources";
@@ -44,7 +45,7 @@ const INCLUDES: IncludeItem[] = [
   { icon: Clock, label: "Accès illimité, à ton rythme" },
   { icon: Award, label: "Progression suivie sur ton profil" },
   { icon: Laptop, label: "Accessible sur mobile, tablette et ordinateur" },
-  { icon: Layers, label: "100% en ligne, adapté au programme sénégalais" },
+  { icon: Layers, label: "100 % en ligne, du collège au BAC" },
 ];
 
 const SHARE_BUTTONS: IncludeItem[] = [
@@ -77,11 +78,11 @@ interface RowProps {
 function Row({ icon: Icon, label, value }: RowProps) {
   return (
     <div className="flex items-center justify-between">
-      <span className="flex items-center gap-2 text-gray-500">
+      <span className="flex items-center gap-2 text-muted-foreground">
         <Icon size={15} className="text-amber-500" />
         {label}
       </span>
-      <span className="font-medium">{value}</span>
+      <span className="font-medium text-foreground">{value}</span>
     </div>
   );
 }
@@ -100,7 +101,9 @@ export default function CourseDetailPage() {
 
   const [exercice, setExercice] = useState<Exercice | null>(null);
   const [loading, setLoading] = useState(!!exerciceId);
-  const [error, setError] = useState<string | undefined>(!exerciceId ? "Aucun exercice sélectionné." : undefined);
+  const [error, setError] = useState<string | undefined>(
+    !exerciceId ? "Aucun exercice sélectionné." : undefined
+  );
   const [activeTab, setActiveTab] = useState<Tab>("Énoncé");
   const [copied, setCopied] = useState(false);
   // Évite un double envoi pour un même affichage du corrigé (StrictMode, re-rendus)
@@ -173,10 +176,8 @@ export default function CourseDetailPage() {
   // ── États de chargement / erreur ────────────────────────────────────────
   if (loading || authLoading) {
     return (
-      <div className="min-h-screen bg-gray-50 text-gray-900">
-        <div className="px-8 pt-4">
-          <Header />
-        </div>
+      <div className="min-h-screen bg-background text-foreground">
+        <Header />
         <CourseDetailSkeleton />
       </div>
     );
@@ -184,20 +185,19 @@ export default function CourseDetailPage() {
 
   if (error || !exercice) {
     return (
-      <div className="min-h-screen bg-gray-50 text-gray-900">
-        <div className="px-8 pt-4">
-          <Header />
-        </div>
-        <div className="flex flex-col items-center justify-center py-24 text-center">
-          <div className="w-12 h-12 rounded-full bg-red-50 flex items-center justify-center mb-3">
-            <BookOpen size={20} className="text-red-500" />
+      <div className="min-h-screen bg-background text-foreground">
+        <Header />
+        <div className="flex flex-col items-center justify-center py-24 text-center px-4">
+          <div className="w-12 h-12 rounded-full bg-destructive/10 flex items-center justify-center mb-3">
+            <BookOpen size={20} className="text-destructive" />
           </div>
-          <p className="text-sm text-gray-500">
+          <p className="text-sm text-muted-foreground">
             {error ?? "Exercice introuvable."}
           </p>
           <button
+            type="button"
             onClick={() => navigate("/exercices")}
-            className="text-sm font-medium text-amber-600 hover:text-amber-700 mt-3"
+            className="text-sm font-medium text-amber-600 hover:text-amber-500 dark:text-amber-400 mt-3 cursor-pointer"
           >
             Retour aux exercices
           </button>
@@ -210,9 +210,13 @@ export default function CourseDetailPage() {
     ? `${exercice.professeur.user.prenom} ${exercice.professeur.user.nom}`.trim()
     : "Professeur";
 
-  const correction = (exercice as unknown as { correction?: { contenu?: string; explication?: string } })?.correction;
+  const correction = (
+    exercice as unknown as { correction?: { contenu?: string; explication?: string } }
+  )?.correction;
 
   const enonceTexte = exercice.enonce || "";
+  const enonceAffiche =
+    !isAuthenticated && enonceTexte.length >= 180 ? `${enonceTexte}…` : enonceTexte;
 
   function handleShare(label: string) {
     const currentUrl = window.location.href;
@@ -221,32 +225,36 @@ export default function CourseDetailPage() {
       setCopied(true);
       setTimeout(() => setCopied(false), 2000);
     } else if (label === "WhatsApp") {
-      window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(`Regarde cet exercice sur Tely : ${currentUrl}`)}`, "_blank");
+      window.open(
+        `https://api.whatsapp.com/send?text=${encodeURIComponent(`Regarde cet exercice sur Tely : ${currentUrl}`)}`,
+        "_blank"
+      );
     } else if (label === "Email") {
-      window.open(`mailto:?subject=${encodeURIComponent(`Exercice Tely : ${exercice?.titre}`)}&body=${encodeURIComponent(`Voici le lien : ${currentUrl}`)}`, "_self");
+      window.open(
+        `mailto:?subject=${encodeURIComponent(`Exercice Tely : ${exercice?.titre}`)}&body=${encodeURIComponent(`Voici le lien : ${currentUrl}`)}`,
+        "_self"
+      );
     }
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 text-gray-900">
+    <div className="min-h-screen bg-background text-foreground">
       {/* Version imprimable : titre, niveau et énoncé uniquement */}
       <PrintableDocument
         titre={exercice.titre}
         meta={[exercice.matiere?.nom, exercice.niveau?.libelle]}
         enonce={enonceTexte}
       />
-      <div className="px-8 pt-4">
-        <Header />
-      </div>
+      <Header />
 
       <div className="max-w-6xl mx-auto px-4 py-10 grid grid-cols-1 lg:grid-cols-[1fr_360px] gap-10">
         {/* Colonne gauche */}
         <div>
-          <span className="text-xs font-semibold text-amber-600 uppercase tracking-wide">
+          <span className="text-xs font-semibold text-amber-600 dark:text-amber-400 uppercase tracking-wide">
             {exercice.matiere?.nom} • {exercice.niveau?.libelle}
           </span>
 
-          <h1 className="text-3xl font-bold leading-snug mt-3">
+          <h1 className="tely-title text-3xl font-bold leading-snug mt-3 text-foreground">
             {exercice.titre}
           </h1>
 
@@ -260,30 +268,33 @@ export default function CourseDetailPage() {
                 className="w-9 h-9 rounded-full object-cover"
               />
             ) : (
-              <div className="w-9 h-9 rounded-full bg-amber-500 text-white flex items-center justify-center font-semibold">
+              <div className="w-9 h-9 rounded-full bg-amber-500 text-zinc-950 flex items-center justify-center font-semibold">
                 {auteur.charAt(0).toUpperCase()}
               </div>
             )}
             <div className="text-sm">
-              <p className="text-gray-400 leading-none">Proposé par :</p>
-              <p className="font-medium">{auteur}</p>
+              <p className="text-muted-foreground leading-none">Proposé par :</p>
+              <p className="font-medium text-foreground">{auteur}</p>
             </div>
           </div>
 
           {/* Onglets */}
-          <div className="flex gap-8 border-b border-gray-200 mt-6">
+          <div className="flex gap-8 border-b border-border mt-6">
             {TABS.map((tab) => (
               <button
                 key={tab}
+                type="button"
                 onClick={() => setActiveTab(tab)}
-                className={`pb-3 text-sm font-medium transition-colors relative flex items-center gap-1.5 ${
+                className={`pb-3 text-sm font-medium transition-colors relative flex items-center gap-1.5 cursor-pointer ${
                   activeTab === tab
-                    ? "text-gray-900 font-semibold"
-                    : "text-gray-400 hover:text-gray-600"
+                    ? "text-foreground font-semibold"
+                    : "text-muted-foreground hover:text-foreground"
                 }`}
               >
                 {tab}
-                {!isAuthenticated && tab !== "Énoncé" && <Lock size={12} className="text-amber-500" />}
+                {!isAuthenticated && tab !== "Énoncé" && (
+                  <Lock size={12} className="text-amber-500" />
+                )}
                 {activeTab === tab && (
                   <span className="absolute left-0 -bottom-px w-full h-0.5 bg-amber-500 rounded-full" />
                 )}
@@ -294,14 +305,13 @@ export default function CourseDetailPage() {
           {/* Contenu des onglets */}
           <div className="mt-6">
             {activeTab === "Énoncé" && (
-              <div className="bg-white border border-gray-200 rounded-xl p-6 shadow-sm">
-                <h2 className="text-xl font-bold mb-4">Énoncé de l'exercice</h2>
-                <div className="text-gray-800 leading-relaxed whitespace-pre-line text-base">
-                  {enonceTexte}
-                  {!isAuthenticated && enonceTexte.length >= 180 && "…"}
-                </div>
+              <div className="bg-card border border-border rounded-xl p-6 shadow-xs">
+                <h2 className="text-xl font-bold mb-4 text-foreground">
+                  Énoncé de l'exercice
+                </h2>
+                <ContenuScientifique texte={enonceAffiche} className="text-base" />
                 {!isAuthenticated && (
-                  <div className="mt-2">
+                  <div className="mt-4">
                     <MurInscription from={location.pathname + location.search} />
                   </div>
                 )}
@@ -309,30 +319,32 @@ export default function CourseDetailPage() {
             )}
 
             {activeTab === "Corrigé" && (
-              <div className="bg-white border border-gray-200 rounded-xl p-6 shadow-sm">
-                <h2 className="text-xl font-bold mb-4">Corrigé</h2>
+              <div className="bg-card border border-border rounded-xl p-6 shadow-xs">
+                <h2 className="text-xl font-bold mb-4 text-foreground">Corrigé</h2>
                 {!isAuthenticated ? (
-                  <MurInscription from={location.pathname + location.search} contexte="corrige" />
+                  <MurInscription
+                    from={location.pathname + location.search}
+                    contexte="corrige"
+                  />
                 ) : correction?.contenu ? (
                   <div className="space-y-4">
-                    <div className="text-gray-800 leading-relaxed whitespace-pre-line text-base">
-                      {correction.contenu}
-                    </div>
+                    <ContenuScientifique texte={correction.contenu} className="text-base" />
                     {correction.explication && (
-                      <div className="border-t border-gray-100 pt-4 mt-4">
-                        <p className="text-sm font-semibold text-gray-900 mb-1">
+                      <div className="border-t border-border pt-4 mt-4">
+                        <p className="text-sm font-semibold text-foreground mb-2">
                           Explication pédagogique
                         </p>
-                        <p className="text-sm text-gray-700 whitespace-pre-line">
-                          {correction.explication}
-                        </p>
+                        <ContenuScientifique
+                          texte={correction.explication}
+                          className="text-sm text-muted-foreground"
+                        />
                       </div>
                     )}
                   </div>
                 ) : (
-                  <div className="flex flex-col items-center text-center py-10 text-gray-500">
+                  <div className="flex flex-col items-center text-center py-10 text-muted-foreground">
                     <BookOpen size={28} className="mb-3 text-amber-500" />
-                    <p className="font-medium text-gray-700">
+                    <p className="font-medium text-foreground">
                       Aucun corrigé disponible pour cet exercice pour l'instant.
                     </p>
                   </div>
@@ -341,25 +353,30 @@ export default function CourseDetailPage() {
             )}
 
             {activeTab === "Ressources" && (
-              <div className="bg-white border border-gray-200 rounded-xl p-6 shadow-sm">
-                <h2 className="text-xl font-bold mb-4">Ressources associées</h2>
+              <div className="bg-card border border-border rounded-xl p-6 shadow-xs">
+                <h2 className="text-xl font-bold mb-4 text-foreground">
+                  Ressources associées
+                </h2>
                 <ul className="space-y-3">
-                  <li className="flex items-center justify-between border border-gray-200 rounded-lg px-4 py-3">
-                    <span className="flex items-center gap-2 text-sm text-gray-700">
+                  <li className="flex items-center justify-between border border-border rounded-lg px-4 py-3 bg-muted/30">
+                    <span className="flex items-center gap-2 text-sm text-foreground">
                       <FileText size={16} className="text-amber-500" />
                       Énoncé imprimable / PDF
                     </span>
                     <button
+                      type="button"
                       onClick={() =>
                         gererActionProtegee(
                           "Connecte-toi pour télécharger et imprimer les ressources.",
                           () => {
-                            void trackEvent("download_pdf", undefined, { exercice_id: exercice.id });
+                            void trackEvent("download_pdf", undefined, {
+                              exercice_id: exercice.id,
+                            });
                             imprimerDocument(exercice.titre);
                           }
                         )
                       }
-                      className="flex items-center gap-1.5 text-sm font-medium text-amber-600 hover:text-amber-700"
+                      className="flex items-center gap-1.5 text-sm font-medium text-amber-600 hover:text-amber-500 dark:text-amber-400 cursor-pointer"
                     >
                       {isAuthenticated ? <Download size={14} /> : <Lock size={14} />}
                       {isAuthenticated ? "Imprimer / Sauvegarder" : "Connexion requise"}
@@ -373,9 +390,9 @@ export default function CourseDetailPage() {
 
         {/* Sidebar droite */}
         <aside>
-          <div className="bg-white border border-gray-200 rounded-xl p-6 sticky top-6 shadow-sm">
+          <div className="bg-card border border-border rounded-xl p-6 sticky top-20 shadow-xs">
             <div className="flex items-center gap-3">
-              <span className="text-lg font-bold">
+              <span className="text-lg font-bold text-foreground">
                 {TYPE_LABELS[exercice.type] ?? exercice.type}
               </span>
             </div>
@@ -399,38 +416,47 @@ export default function CourseDetailPage() {
             </dl>
 
             <button
+              type="button"
               onClick={() => setActiveTab("Corrigé")}
-              className="w-full bg-amber-100 hover:bg-amber-200 text-amber-600 font-medium py-2.5 rounded-lg mt-6 transition-colors flex items-center justify-center gap-2"
+              className="w-full bg-amber-500/15 hover:bg-amber-500/25 text-amber-700 dark:text-amber-300 font-medium py-2.5 rounded-lg mt-6 transition-colors flex items-center justify-center gap-2 cursor-pointer"
             >
               {!isAuthenticated && <Lock size={14} />}
               Voir le corrigé
             </button>
 
             <div className="mt-2.5">
-              <FavoriButton exerciceId={exercice.id} titre={exercice.titre} variante="bouton" />
+              <FavoriButton
+                exerciceId={exercice.id}
+                titre={exercice.titre}
+                variante="bouton"
+              />
             </div>
 
-            <hr className="my-5 border-gray-200" />
+            <hr className="my-5 border-border" />
 
-            <p className="text-sm font-semibold mb-3">Cet exercice comprend :</p>
+            <p className="text-sm font-semibold mb-3 text-foreground">
+              Cet exercice comprend :
+            </p>
             <ul className="space-y-2.5">
               {INCLUDES.map(({ icon: Icon, label }) => (
                 <li
                   key={label}
-                  className="flex items-center gap-2 text-sm text-gray-600"
+                  className="flex items-center gap-2 text-sm text-muted-foreground"
                 >
-                  <Icon size={15} className="text-amber-500 flex-shrink-0" />
+                  <Icon size={15} className="text-amber-500 shrink-0" />
                   {label}
                 </li>
               ))}
             </ul>
 
-            <hr className="my-5 border-gray-200" />
+            <hr className="my-5 border-border" />
 
             <div className="flex items-center justify-between mb-3">
-              <p className="text-sm font-semibold">Partager cet exercice :</p>
+              <p className="text-sm font-semibold text-foreground">
+                Partager cet exercice :
+              </p>
               {copied && (
-                <span className="text-xs text-emerald-600 flex items-center gap-1">
+                <span className="text-xs text-emerald-600 dark:text-emerald-400 flex items-center gap-1">
                   <CheckCircle size={12} /> Lien copié
                 </span>
               )}
@@ -439,9 +465,10 @@ export default function CourseDetailPage() {
               {SHARE_BUTTONS.map(({ icon: Icon, label }) => (
                 <button
                   key={label}
+                  type="button"
                   title={label}
                   onClick={() => handleShare(label)}
-                  className="w-9 h-9 flex items-center justify-center rounded-lg border border-gray-200 text-gray-500 hover:bg-gray-50 transition-colors"
+                  className="w-9 h-9 flex items-center justify-center rounded-lg border border-border text-muted-foreground hover:bg-muted hover:text-foreground transition-colors cursor-pointer"
                 >
                   <Icon size={15} />
                 </button>

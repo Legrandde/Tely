@@ -22,6 +22,7 @@ import {
 import { getExercice } from "../services/exerciceService";
 import { useToast } from "../context/ToastContext";
 import api from "../api/axio";
+import ContenuScientifique from "@/components/ui/ContenuScientifique";
 import type { Difficulte, ExerciceType } from "../types/exercice";
 
 interface ExerciceFormState {
@@ -653,11 +654,11 @@ export default function FormExercicePage() {
                   </div>
                 </div>
               ) : (
-                <div className="p-6 bg-gray-50 border border-gray-200 rounded-[10px] min-h-[260px] whitespace-pre-wrap font-serif text-sm text-gray-800 leading-relaxed">
+                <div className="p-6 bg-muted/40 border border-border rounded-[10px] min-h-[260px] text-sm">
                   {form.enonce ? (
-                    form.enonce
+                    <ContenuScientifique texte={form.enonce} />
                   ) : (
-                    <p className="text-gray-400 italic text-center py-10">
+                    <p className="text-muted-foreground italic text-center py-10">
                       L'énoncé est vide pour le moment.
                     </p>
                   )}

@@ -21,6 +21,7 @@ import {
 } from "lucide-react";
 import Header from "../components/ui/Header";
 import PdfPagesPreview from "@/components/sujets/PdfPagesPreview";
+import ContenuScientifique from "@/components/ui/ContenuScientifique";
 import { getSujet } from "../services/sujetService";
 
 import type { Sujet } from "../types/Sujet";
@@ -78,7 +79,7 @@ interface RowProps {
 function Row({ icon: Icon, label, value }: RowProps) {
   return (
     <div className="flex items-center justify-between">
-      <span className="flex items-center gap-2 text-gray-500">
+      <span className="flex items-center gap-2 text-muted-foreground">
         <Icon size={15} className="text-amber-500" />
         {label}
       </span>
@@ -151,7 +152,7 @@ export default function SujetDetailPage() {
   // ── États de chargement / erreur ────────────────────────────────────────
   if (loading || authLoading) {
     return (
-      <div className="min-h-screen bg-gray-50 text-gray-900">
+      <div className="min-h-screen bg-background text-foreground">
         <div className="px-8 pt-4">
           <Header />
         </div>
@@ -162,7 +163,7 @@ export default function SujetDetailPage() {
 
   if (error || !sujet) {
     return (
-      <div className="min-h-screen bg-gray-50 text-gray-900">
+      <div className="min-h-screen bg-background text-foreground">
         <div className="px-8 pt-4">
           <Header />
         </div>
@@ -170,7 +171,7 @@ export default function SujetDetailPage() {
           <div className="w-12 h-12 rounded-full bg-red-50 flex items-center justify-center mb-3">
             <BookOpen size={20} className="text-red-500" />
           </div>
-          <p className="text-sm text-gray-500">
+          <p className="text-sm text-muted-foreground">
             {error ?? "Sujet introuvable."}
           </p>
           <button
@@ -207,7 +208,7 @@ export default function SujetDetailPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 text-gray-900">
+    <div className="min-h-screen bg-background text-foreground">
       {/* Version imprimable : titre, niveau et énoncé uniquement */}
       <PrintableDocument
         titre={sujet.titre}
@@ -244,21 +245,21 @@ export default function SujetDetailPage() {
               </div>
             )}
             <div className="text-sm">
-              <p className="text-gray-400 leading-none">Proposé par :</p>
+              <p className="text-muted-foreground leading-none">Proposé par :</p>
               <p className="font-medium">{auteur}</p>
             </div>
           </div>
 
           {/* Onglets */}
-          <div className="flex gap-8 border-b border-gray-200 mt-6">
+          <div className="flex gap-8 border-b border-border mt-6">
             {TABS.map((tab) => (
               <button
                 key={tab}
                 onClick={() => setActiveTab(tab)}
                 className={`pb-3 text-sm font-medium transition-colors relative flex items-center gap-1.5 ${
                   activeTab === tab
-                    ? "text-gray-900 font-semibold"
-                    : "text-gray-400 hover:text-gray-600"
+                    ? "text-foreground font-semibold"
+                    : "text-muted-foreground hover:text-foreground"
                 }`}
               >
                 {tab}
@@ -273,11 +274,9 @@ export default function SujetDetailPage() {
           {/* Contenu des onglets */}
           <div className="mt-6">
             {activeTab === "Énoncé" && (
-              <div className="bg-white border border-gray-200 rounded-xl p-6 shadow-sm">
+              <div className="bg-card border border-border rounded-xl p-6 shadow-sm">
                 <h2 className="text-xl font-bold mb-4">Énoncé officiel</h2>
-                <div className="text-gray-800 leading-relaxed whitespace-pre-line text-base">
-                  {texteSujet}
-                </div>
+                <ContenuScientifique texte={texteSujet} className="text-base" />
                 {isAuthenticated && (sujet.pdf_url || sujet.fichier_pdf) && (
                   <PdfPagesPreview
                     url={sujet.pdf_url || sujet.fichier_pdf}
@@ -288,18 +287,18 @@ export default function SujetDetailPage() {
             )}
 
             {activeTab === "Corrigé" && (
-              <div className="bg-white border border-gray-200 rounded-xl p-6 shadow-sm">
+              <div className="bg-card border border-border rounded-xl p-6 shadow-sm">
                 <h2 className="text-xl font-bold mb-4">Corrigés des exercices du sujet</h2>
 
                 {!isAuthenticated ? (
-                  <div className="flex flex-col items-center text-center py-10 text-gray-500">
+                  <div className="flex flex-col items-center text-center py-10 text-muted-foreground">
                     <div className="w-12 h-12 rounded-full bg-amber-50 text-amber-600 flex items-center justify-center mb-3">
                       <Lock size={24} />
                     </div>
-                    <p className="font-semibold text-gray-800 text-base">
+                    <p className="font-semibold text-foreground text-base">
                       Les corrigés sont réservés aux utilisateurs connectés.
                     </p>
-                    <p className="text-sm text-gray-500 mt-1 mb-5 max-w-sm">
+                    <p className="text-sm text-muted-foreground mt-1 mb-5 max-w-sm">
                       Connecte-toi pour débloquer les corrections détaillées de chaque partie et exercice de ce sujet.
                     </p>
                     <button
@@ -321,21 +320,21 @@ export default function SujetDetailPage() {
                         key={ex.id}
                         className="border border-gray-100 rounded-lg p-4 bg-gray-50/50"
                       >
-                        <p className="font-semibold text-sm text-gray-800 mb-2">
+                        <p className="font-semibold text-sm text-foreground mb-2">
                           Exercice {ex.ordre ?? index + 1}
                           {ex.titre ? ` — ${ex.titre}` : ""}
                         </p>
                         {ex.correction?.contenu ? (
                           <>
-                            <p className="text-gray-700 text-sm leading-relaxed whitespace-pre-line">
+                            <p className="text-foreground/90 text-sm leading-relaxed whitespace-pre-line">
                               {ex.correction.contenu}
                             </p>
                             {ex.correction.explication && (
-                              <div className="border-t border-gray-200 pt-3 mt-2">
-                                <p className="text-xs font-semibold text-gray-800 mb-1">
+                              <div className="border-t border-border pt-3 mt-2">
+                                <p className="text-xs font-semibold text-foreground mb-1">
                                   Explication pédagogique
                                 </p>
-                                <p className="text-xs text-gray-600 whitespace-pre-line">
+                                <p className="text-xs text-muted-foreground whitespace-pre-line">
                                   {ex.correction.explication}
                                 </p>
                               </div>
@@ -350,9 +349,9 @@ export default function SujetDetailPage() {
                     ))}
                   </div>
                 ) : (
-                  <div className="flex flex-col items-center text-center py-10 text-gray-500">
+                  <div className="flex flex-col items-center text-center py-10 text-muted-foreground">
                     <BookOpen size={28} className="mb-3 text-amber-500" />
-                    <p className="font-medium text-gray-700">
+                    <p className="font-medium text-foreground/90">
                       Aucun corrigé disponible pour l'instant pour ce sujet.
                     </p>
                   </div>
@@ -361,11 +360,11 @@ export default function SujetDetailPage() {
             )}
 
             {activeTab === "Ressources" && (
-              <div className="bg-white border border-gray-200 rounded-xl p-6 shadow-sm">
+              <div className="bg-card border border-border rounded-xl p-6 shadow-sm">
                 <h2 className="text-xl font-bold mb-4">Ressources du sujet</h2>
                 <ul className="space-y-3">
-                  <li className="flex items-center justify-between border border-gray-200 rounded-lg px-4 py-3">
-                    <span className="flex items-center gap-2 text-sm text-gray-700">
+                  <li className="flex items-center justify-between border border-border rounded-lg px-4 py-3">
+                    <span className="flex items-center gap-2 text-sm text-foreground/90">
                       <FileText size={16} className="text-amber-500" />
                       Énoncé officiel imprimable / PDF
                     </span>
@@ -403,7 +402,7 @@ export default function SujetDetailPage() {
 
         {/* Sidebar droite */}
         <aside>
-          <div className="bg-white border border-gray-200 rounded-xl p-6 sticky top-6 shadow-sm">
+          <div className="bg-card border border-border rounded-xl p-6 sticky top-6 shadow-sm">
             <div className="flex items-center gap-3">
               <span className="text-lg font-bold">
                 {TYPE_LABELS[sujet.type] ?? sujet.type}
@@ -440,32 +439,32 @@ export default function SujetDetailPage() {
                   () => setActiveTab("Corrigé")
                 )
               }
-              className="w-full bg-amber-100 hover:bg-amber-200 text-amber-600 font-medium py-2.5 rounded-lg mt-6 transition-colors flex items-center justify-center gap-2"
+              className="w-full bg-amber-500/15 hover:bg-amber-500/25 text-amber-700 dark:text-amber-300 font-medium py-2.5 rounded-lg mt-6 transition-colors flex items-center justify-center gap-2"
             >
               {!isAuthenticated && <Lock size={14} />}
               Voir les corrigés
             </button>
 
-            <hr className="my-5 border-gray-200" />
+            <hr className="my-5 border-border" />
 
             <p className="text-sm font-semibold mb-3">Ce sujet comprend :</p>
             <ul className="space-y-2.5">
               {INCLUDES.map(({ icon: Icon, label }) => (
                 <li
                   key={label}
-                  className="flex items-center gap-2 text-sm text-gray-600"
+                  className="flex items-center gap-2 text-sm text-muted-foreground"
                 >
                   <Icon size={15} className="text-amber-500 flex-shrink-0" />
                   {label}
                 </li>
               ))}
-              <li className="flex items-center gap-2 text-sm text-gray-600">
+              <li className="flex items-center gap-2 text-sm text-muted-foreground">
                 <FileText size={15} className="text-amber-500 flex-shrink-0" />
                 {exercicesTries.length} exercice{exercicesTries.length > 1 ? "s" : ""}
               </li>
             </ul>
 
-            <hr className="my-5 border-gray-200" />
+            <hr className="my-5 border-border" />
 
             <div className="flex items-center justify-between mb-3">
               <p className="text-sm font-semibold">Partager ce sujet :</p>
@@ -481,7 +480,7 @@ export default function SujetDetailPage() {
                   key={label}
                   title={label}
                   onClick={() => handleShare(label)}
-                  className="w-9 h-9 flex items-center justify-center rounded-lg border border-gray-200 text-gray-500 hover:bg-gray-50 transition-colors"
+                  className="w-9 h-9 flex items-center justify-center rounded-lg border border-border text-muted-foreground hover:bg-muted transition-colors"
                 >
                   <Icon size={15} />
                 </button>

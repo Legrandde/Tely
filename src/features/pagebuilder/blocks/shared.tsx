@@ -56,10 +56,10 @@ export function SmartLink({ href, children, className, ...rest }: SmartLinkProps
 type VarianteBouton = "primaire" | "ambre" | "clair" | "contour" | "contour-clair";
 
 const VARIANTES: Record<VarianteBouton, string> = {
-  primaire: "bg-gray-900 text-white hover:bg-gray-700 shadow-lg shadow-gray-900/10",
-  ambre: "bg-amber-500 text-gray-900 hover:bg-amber-400 shadow-lg shadow-amber-500/25",
-  clair: "bg-white text-gray-900 hover:bg-amber-50 shadow-lg shadow-black/10",
-  contour: "bg-white/70 text-gray-900 border border-gray-200 hover:bg-white hover:border-gray-300",
+  primaire: "bg-primary text-primary-foreground hover:bg-primary/90 shadow-sm",
+  ambre: "bg-amber-500 text-zinc-950 hover:bg-amber-400 shadow-lg shadow-amber-500/25",
+  clair: "bg-white text-zinc-950 hover:bg-amber-50 shadow-lg shadow-black/10",
+  contour: "bg-card/80 text-foreground border border-border hover:bg-muted",
   "contour-clair": "bg-transparent text-white border border-white/30 hover:bg-white/10",
 };
 
@@ -123,10 +123,10 @@ export function Reveal({
 // ─── Sections ─────────────────────────────────────────────────────────────
 
 const FONDS_SECTION = {
-  creme: "bg-amber-50 text-gray-900",
-  blanc: "bg-white text-gray-900",
-  sombre: "bg-gray-900 text-white",
-  ambre: "bg-amber-500 text-gray-900",
+  creme: "bg-amber-50/70 dark:bg-muted/25 text-foreground",
+  blanc: "bg-background text-foreground",
+  sombre: "bg-zinc-950 text-white",
+  ambre: "bg-amber-500 text-zinc-950",
 } as const;
 
 export function Section({
@@ -166,13 +166,13 @@ export function EnteteSection({
     <Reveal className={`mb-10 @3xl:mb-14 ${centre ? "mx-auto max-w-2xl text-center" : "max-w-2xl"}`}>
       {titre && (
         <h2
-          className={`text-[28px] font-bold leading-tight tracking-[-0.02em] @3xl:text-4xl ${clair ? "text-white" : "text-gray-900"}`}
+          className={`text-[28px] font-bold leading-tight tracking-[-0.02em] @3xl:text-4xl ${clair ? "text-white" : "text-foreground"}`}
         >
           {titre}
         </h2>
       )}
       {sousTitre && (
-        <p className={`mt-3 text-base leading-relaxed whitespace-pre-line @3xl:text-lg ${clair ? "text-white/70" : "text-gray-500"}`}>
+        <p className={`mt-3 text-base leading-relaxed whitespace-pre-line @3xl:text-lg ${clair ? "text-white/70" : "text-muted-foreground"}`}>
           {sousTitre}
         </p>
       )}

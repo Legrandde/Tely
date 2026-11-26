@@ -95,20 +95,20 @@ export function LoginForm() {
     <>
       <GoogleOneTap />
       <form onSubmit={handleSubmit} className="flex flex-col">
-        <h1 className="text-[28px] font-bold text-gray-900 leading-tight mb-1">
+        <h1 className="text-[28px] font-bold text-foreground leading-tight mb-1">
           Bienvenue !
         </h1>
-        <p className="text-sm text-gray-400 mb-7">Entrer vos informations</p>
+        <p className="text-sm text-muted-foreground mb-7">Entrer vos informations</p>
 
         {typeof raison === "string" && raison && !suspendu && !messageErreurUrl && (
-          <p className="flex items-start gap-2 text-xs text-gray-700 bg-amber-50 border border-amber-100 rounded-[10px] px-3 py-2.5 mb-3.5">
+          <p className="flex items-start gap-2 text-xs text-foreground/85 bg-amber-500/10 border border-amber-500/30 rounded-[10px] px-3 py-2.5 mb-3.5">
             <Info size={14} className="text-amber-500 shrink-0 mt-px" aria-hidden="true" />
             {raison}
           </p>
         )}
 
         {(suspendu || messageErreurUrl) && (
-          <div role="alert" className="flex items-start gap-2.5 text-xs text-red-700 bg-red-50 border border-red-100 rounded-[10px] px-3 py-2.5 mb-3.5">
+          <div role="alert" className="flex items-start gap-2.5 text-xs text-destructive bg-destructive/10 border border-destructive/30 rounded-[10px] px-3 py-2.5 mb-3.5">
             <ShieldAlert size={16} className="shrink-0 mt-px" aria-hidden="true" />
             <div>
               {suspendu || erreurUrl === "compte_suspendu" ? (
@@ -155,7 +155,7 @@ export function LoginForm() {
           />
         </div>
 
-        <label className="flex items-center gap-2 text-xs text-gray-400 cursor-pointer select-none mb-0">
+        <label className="flex items-center gap-2 text-xs text-muted-foreground cursor-pointer select-none mb-0">
           <input
             type="checkbox"
             checked={remember}
@@ -167,7 +167,7 @@ export function LoginForm() {
 
         <div className="flex items-center gap-3 my-5">
           <div className="flex-1 h-px bg-gray-200" />
-          <span className="text-[11px] text-gray-400 font-medium tracking-[0.05em] whitespace-nowrap">
+          <span className="text-[11px] text-muted-foreground font-medium tracking-[0.05em] whitespace-nowrap">
             OU CONTINUER AVEC
           </span>
           <div className="flex-1 h-px bg-gray-200" />
@@ -189,12 +189,12 @@ export function LoginForm() {
           Connexion
         </AppButton>
 
-        <p className="text-center text-xs text-gray-400 mt-5">
+        <p className="text-center text-xs text-muted-foreground mt-5">
           Vous n'avez pas de compte ?
           <Link
             to="/auth/signup"
             state={location.state}
-            className="text-gray-900 font-semibold cursor-pointer ml-1 hover:underline"
+            className="text-foreground font-semibold cursor-pointer ml-1 hover:underline"
           >
             Inscription
           </Link>
